@@ -3,7 +3,7 @@ package course.java.sdm.console;
 public class Printer {
     public static void printMenu()
     {
-        System.out.println("Wellcome!" +
+        System.out.println("Welcome!\n" +
                 "please choose your desired action:\n" +
                 "1. Load File\n" +
                 "2. Exhibit Stores Details\n" +

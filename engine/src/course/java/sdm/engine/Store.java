@@ -1,27 +1,81 @@
 package course.java.sdm.engine;
-import java.util.*;
+import generatedClasses.SDMSell;
+import generatedClasses.SDMStore;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+
+@XmlRootElement(name = "SDM-store")
 public class Store {
     private int serialNumber;
     private String name;
-    private Map<Product,Float> productPrices;
-    private Map<Product,Float> ProductsSold;
+    private Map<Product,Integer> productPrices = new HashMap<>();
+    private Map<Product,Integer> productsSold = new HashMap<>();
     private List<Order> orders;
     private float PPK;
     private float deliveryEarnings;
+    private Point location;
 
-    public Store(int n,String g,Set<Product> allProducts,float ppk,float d){
-        serialNumber = n;
-        name = g;
-        productPrices = new HashMap<>(2);
-        ProductsSold = new HashMap<>(2);
-        for(Product pruduct : allProducts)
-        {
-            productPrices.put(pruduct,3.0f);
-            ProductsSold.put(pruduct,8.0f);
+    public Store(){}
+
+    public Store(SDMStore store){
+        serialNumber = store.getId();
+        name = store.getName();
+//        for(SDMSell sell : store.getSDMPrices().getSDMSell()){
+//            productPrices.put(sell.getItemId(),sell.getPrice());
+//        }
+        PPK = store.getDeliveryPpk();
+        location = new Point(store.getLocation().getX(),store.getLocation().getY());
+
+    }
+
+    public void setSerialNumber(int serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDeliveryEarnings(float deliveryEarnings) {
+        this.deliveryEarnings = deliveryEarnings;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
+
+    public void setPPK(float PPK) {
+        this.PPK = PPK;
+    }
+
+    public Map<Product, Integer> getProductPrices() {
+        return productPrices;
+    }
+
+    public Map<Product, Integer> getProductsSold() {
+        return productsSold;
+    }
+
+    @Override
+    public String toString() {
+        int i = 1;
+        String res = "--------------------" +
+                "\nSerialNumber: " + serialNumber +
+                "\nName: " + name +
+                "\nList of products:";
+
+        for(Map.Entry<Product, Integer> product : productPrices.entrySet()){
+            res += "\n  " + i++ + ". " + (product.getKey().getName().toString()) +  "\n     price: "+(product.getValue().toString()) +
+            "\n     amount sold: " + (productsSold.get(product.getKey()));
         }
-        PPK = ppk;
-        deliveryEarnings = d;
-        orders = new ArrayList<>();
+        res = res + "\n     orders=" + orders +
+                "\nPPK:" + PPK +
+                "\ndeliveryEarnings:" + deliveryEarnings;
+
+        return res;
     }
 }
