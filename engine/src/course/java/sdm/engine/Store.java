@@ -15,7 +15,7 @@ public class Store {
     private Map<Product,Integer> productPrices = new HashMap<>();
     private Map<Product,Integer> productsSold = new HashMap<>();
     private List<Order> orders;
-    private float PPK;
+    private int PPK;
     private float deliveryEarnings;
     private Point location;
 
@@ -30,6 +30,22 @@ public class Store {
         PPK = store.getDeliveryPpk();
         location = new Point(store.getLocation().getX(),store.getLocation().getY());
 
+    }
+
+    public int getSerialNumber() {
+        return serialNumber;
+    }
+
+    public int getPPK() {
+        return PPK;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Point getLocation() {
+        return location;
     }
 
     public void setSerialNumber(int serialNumber) {
@@ -48,7 +64,7 @@ public class Store {
         this.orders = orders;
     }
 
-    public void setPPK(float PPK) {
+    public void setPPK(int PPK) {
         this.PPK = PPK;
     }
 

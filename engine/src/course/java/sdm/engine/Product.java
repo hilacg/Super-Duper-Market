@@ -22,6 +22,10 @@ public class Product {
         method  = item.getPurchaseCategory().equals("Weight") ? SellingMethod.WEIGHT : SellingMethod.Quantity;
     }
 
+    public SellingMethod getMethod() {
+        return method;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -43,15 +47,18 @@ public class Product {
     }
 
     public enum SellingMethod {
-        WEIGHT("Weight", 1),
-        Quantity("Quantity", 2);
+        WEIGHT("Weight"),
+        Quantity("Quantity");
 
         private String name;
-        private int option;
 
-        SellingMethod(String name, int option){
+        SellingMethod(String name){
             name = name;
-            option = option;
+        }
+
+        @Override
+        public String toString() {
+            return name;
         }
     }
 

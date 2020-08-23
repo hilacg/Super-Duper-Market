@@ -86,16 +86,20 @@ public class SuperXML {
        tempAllStores = new HashMap<>();
         for(SDMStore store : superMarket.getSDMStores().getSDMStore()){
             Store s = tempAllStores.putIfAbsent(store.getId(),new Store(store));
-            if(store.getLocation().getX() > 50 || store.getLocation().getX()< 1 ||
-                    store.getLocation().getY() > 50 || store.getLocation().getY()< 1){
+           if(checkLocation(store.getLocation().getX(), store.getLocation().getY()))
+            {
                 throw new Exception("locaion exception\n");
             }
-
             if(s != null)
             {
                 throw new Exception("duplicated id error\n");
             }
         }
+    }
+
+    public static boolean checkLocation(int x, int y) {
+        return (x > 50 || x< 1 ||  y > 50 || y < 1);
+
     }
 
     private void checkProducts() throws Exception {

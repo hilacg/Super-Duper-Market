@@ -1,5 +1,9 @@
 package course.java.sdm.console;
 
+import course.java.sdm.engine.Engine;
+import course.java.sdm.engine.Product;
+import course.java.sdm.engine.Store;
+
 public class Printer {
     public static void printMenu()
     {
@@ -13,7 +17,39 @@ public class Printer {
                 "6. Exit\n");
     }
 
+    public static void printStoresList(Engine engine)
+    {
+        System.out.println("Please choose desired store serial number:\n ");
+        for (Store store : engine.getStores().values()) {
+            System.out.printf("serial number: %d\n name: %s\n PPK: %d\n ------------------------\n%n",
+                    store.getSerialNumber(),store.getName(),store.getPPK());
+        }
+    }
+    public static void printProductDetails(Engine engine) {
+        if(engine.getisXMLLoaded()) {
+            for (Product product : engine.getProducts().values()) {
+                System.out.println(product.toString() + '\n');
+            }
+        }
+        else{
+            System.out.println("There is no XML loaded!\n");
+        }
+    }
+
+    public static void printStoreDetails(Engine engine) {
+        if(engine.getisXMLLoaded()) {
+            for (Store store : engine.getStores().values()) {
+                System.out.println(store.toString() + '\n');
+            }
+        }
+        else{
+            System.out.println("There is no XML loaded!\n");
+        }
+    }
+
     public static void goodbye() {
         System.out.println("Goodbye!");
     }
+
 }
+

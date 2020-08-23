@@ -7,16 +7,22 @@ import generatedClasses.*;
 public class Engine {
     private Map<Integer, Product> allProducts;
     private Map<Integer, Store> allStores;
+    private boolean isXMLLoaded = false;
     private SuperXML superXML = new SuperXML();
 
     public void loadXML(String filePath) throws Exception {
         try {
             superXML.load(filePath);
             initMembers();
+            isXMLLoaded = true;
         }
         catch (Exception e){
             throw e;
         }
+    }
+
+    public boolean getisXMLLoaded() {
+        return isXMLLoaded;
     }
 
     public void initMembers(){
@@ -34,6 +40,7 @@ public class Engine {
             }
         }
     }
+
 
     public void executeCommand() {
     }
