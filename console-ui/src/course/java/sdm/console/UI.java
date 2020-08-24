@@ -1,9 +1,6 @@
 package course.java.sdm.console;
 
-import course.java.sdm.engine.Engine;
-import course.java.sdm.engine.Product;
-import course.java.sdm.engine.Store;
-import course.java.sdm.engine.SuperXML;
+import course.java.sdm.engine.*;
 
 import java.awt.*;
 import java.io.FileNotFoundException;
@@ -77,11 +74,11 @@ import java.util.Scanner;
         }
 
         private void newOrder() throws Exception {
-
+            Order newOrder;
             Date deliveryDate;
             Store chosenStore = null;
             Point customerLocation;
-            Map<Integer, Integer> productsToOrder = new HashMap<>();
+            Map<Integer, Float> productsToOrder = new HashMap<>();
             if(engine.getisXMLLoaded()) {
                 try {
                     chosenStore = getDeliveryStore();
@@ -89,6 +86,8 @@ import java.util.Scanner;
                     customerLocation = getCustomerLocation();
                     System.out.println("Please choose products and an amount to order. enter 'q' to finish.\n");
                     productsToOrder = getOrderProducts(chosenStore);
+                    newOrder = new Order(deliveryDate, productsToOrder);
+
 
                 } catch (NumberFormatException e) {
                     throw new Exception("Invalid input, Please enter a number\n");
@@ -102,33 +101,66 @@ import java.util.Scanner;
             }
         }
 
-        private Map<Integer, Integer> getOrderProducts(Store chosenStore) {
+        private Map<Integer, Float> getOrderProducts(Store chosenStore) throws Exception {
             String chosenSerial = " ";
             int serialNumber;
-            for(Product product : engine.getProducts().values()){
+            Product chosenProduct;
+            float amount = 0;
+            Integer quantity = 0;
+            Float weight = 0f;
+            Product.SellingMethod method;
+            Map<Integer, Float> OrderProducts = new HashMap<>();
+
+            for (Product product : engine.getProducts().values()) {
                 Integer price = chosenStore.getProductPrices().get(product);
                 System.out.println(String.format("Serial number:%d\n Name:%s\n Selling method:%s\n Price:%d",
-                        product.getSerialNumber(),product.getName(),product.getMethod(),price));
+                        product.getSerialNumber(), product.getName(), product.getMethod(), price));
             }
-            while(chosenSerial.equals('q')){
-                chosenSerial = scanner.nextLine();
-                if(!chosenSerial.equals('q')) {
-                    serialNumber = Integer.parseInt(chosenSerial);
-                    if(checkIfStoreSellsProduct(chosenStore,serialNumber)){
-                        System.out.println(("Enter " + engine.getProducts().get(serialNumber).getMethod()) + ":");
-
+            while (!chosenSerial.equals("q")) {
+                try {
+                    System.out.println("Please choose another product and an amount to order. or enter 'q' to finish.\n");
+                    chosenSerial = scanner.nextLine();
+                    if (!chosenSerial.equals("q")) {
+                        serialNumber = Integer.parseInt(chosenSerial);
+                        chosenProduct = checkIfStoreSellsProduct(chosenStore, serialNumber);
+                        if (chosenProduct != null) {
+                            method = engine.getProducts().get(serialNumber).getMethod();
+                            System.out.println("Enter " + method + ":");
+                            amount = Float.parseFloat(scanner.nextLine());
+                            if (method == Product.SellingMethod.QUANTITY) {
+                                if ((amount % 1) != 0)
+                                    System.out.println("The amount must be a round number\n");
+                                else {
+                                    addToProductMap(serialNumber, amount, OrderProducts);
+                                }
+                            } else {
+                                addToProductMap(serialNumber, amount, OrderProducts);
+                            }
+                        } else
+                            System.out.println("The chosen store doesn't sell this product\n");
                     }
-
+                } catch (NumberFormatException exeption) {
+                    System.out.println("Must be decimal\n");
                 }
 
             }
-return new HashMap<>();
+            return OrderProducts;
         }
 
-        private boolean checkIfStoreSellsProduct(Store chosenStore, int serialNumber) {
-            return true;
-        }
+        private Product checkIfStoreSellsProduct(Store chosenStore, int serialNumber) {
+            if(chosenStore.getProductPrices().get(engine.getProducts().get(serialNumber))!=null)
+                return engine.getProducts().get(serialNumber);
+            else
+                return null;
 
+        }
+        private void addToProductMap(int serialNumber,Float amount,Map<Integer,Float> OrderProducts){
+            Float weight = 0f;
+            weight = OrderProducts.putIfAbsent(serialNumber, amount);
+            if (weight != null) {
+                weight += amount;
+            }
+}
         private Point getCustomerLocation() throws Exception {
             int x;
             int y;

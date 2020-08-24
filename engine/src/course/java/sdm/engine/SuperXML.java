@@ -128,8 +128,8 @@ public class SuperXML {
 
     private void storeProductCheck() throws Exception {
         for(Store store : tempAllStores.values()) {
-            for (Product producr : store.getProductPrices().keySet()) {
-                Product p = tempAllProducts.get(producr.getSerialNumber());
+            for (Product product : store.getProductPrices().keySet()) {
+                Product p = tempAllProducts.get(product.getSerialNumber());
                 if(p== null) {
                     throw new Exception("store sells an item that doesn't exist\n");
                 }

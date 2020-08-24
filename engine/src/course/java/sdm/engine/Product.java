@@ -19,7 +19,7 @@ public class Product {
     {
         serialNumber = item.getId();
         name = item.getName();
-        method  = item.getPurchaseCategory().equals("Weight") ? SellingMethod.WEIGHT : SellingMethod.Quantity;
+        method  = item.getPurchaseCategory().equals("Weight") ? SellingMethod.WEIGHT: SellingMethod.QUANTITY;
     }
 
     public SellingMethod getMethod() {
@@ -47,19 +47,19 @@ public class Product {
     }
 
     public enum SellingMethod {
-        WEIGHT("Weight"),
-        Quantity("Quantity");
+        WEIGHT,
+        QUANTITY;
 
-        private String name;
+      //  private String name;
 
-        SellingMethod(String name){
+     /*   SellingMethod(String name){
             name = name;
         }
 
         @Override
         public String toString() {
             return name;
-        }
+        }*/
     }
 
 
