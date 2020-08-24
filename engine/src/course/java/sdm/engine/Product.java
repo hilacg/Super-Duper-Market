@@ -30,14 +30,6 @@ public class Product {
         this.name = name;
     }
 
-    public void setSerialNumber(int serialNumber) {
-        this.serialNumber = serialNumber;
-    }
-
-    public void setMethod(SellingMethod method) {
-        this.method = method;
-    }
-
     public int getSerialNumber() {
         return serialNumber;
     }
@@ -47,19 +39,24 @@ public class Product {
     }
 
     public enum SellingMethod {
-        WEIGHT,
-        QUANTITY;
+        WEIGHT{public float validateAmount(String amount) throws Exception {
+            try {
+                return Float.parseFloat(amount);
+            } catch (NumberFormatException exception) {
+                throw new Exception("Must be a decimal number\n");
+            }
+        }},
 
-      //  private String name;
+        QUANTITY{public float validateAmount(String amount) throws Exception{
+            try {
+                Integer.parseInt(amount);
+                return Float.parseFloat(amount);
+            } catch (NumberFormatException exception) {
+                throw new Exception("Must be a round number\n");
+            }
+        }};
 
-     /*   SellingMethod(String name){
-            name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }*/
+        public abstract float validateAmount(String amount) throws Exception;
     }
 
 

@@ -12,8 +12,8 @@ import java.util.List;
 public class Store {
     private int serialNumber;
     private String name;
-    private Map<Product,Integer> productPrices = new HashMap<>();
-    private Map<Product,Integer> productsSold = new HashMap<>();
+    private Map<Integer,Integer> productPrices = new HashMap<>();
+    private Map<Integer,Integer> productsSold = new HashMap<>();
     private List<Order> orders;
     private int PPK;
     private float deliveryEarnings;
@@ -24,9 +24,10 @@ public class Store {
     public Store(SDMStore store){
         serialNumber = store.getId();
         name = store.getName();
-//        for(SDMSell sell : store.getSDMPrices().getSDMSell()){
-//            productPrices.put(sell.getItemId(),sell.getPrice());
-//        }
+        for(SDMSell sell : store.getSDMPrices().getSDMSell()){
+            productPrices.put(sell.getItemId(), sell.getPrice());
+            productsSold.put(sell.getItemId(),0);
+        }
         PPK = store.getDeliveryPpk();
         location = new Point(store.getLocation().getX(),store.getLocation().getY());
 
@@ -68,24 +69,23 @@ public class Store {
         this.PPK = PPK;
     }
 
-    public Map<Product, Integer> getProductPrices() {
+    public Map<Integer, Integer> getProductPrices() {
         return productPrices;
     }
 
-    public Map<Product, Integer> getProductsSold() {
+    public Map<Integer, Integer> getProductsSold() {
         return productsSold;
     }
 
-    @Override
-    public String toString() {
+    public String printStore(Map<Integer, Product> allProducts) {
         int i = 1;
         String res = "--------------------" +
                 "\nSerialNumber: " + serialNumber +
                 "\nName: " + name +
                 "\nList of products:";
 
-        for(Map.Entry<Product, Integer> product : productPrices.entrySet()){
-            res += "\n  " + i++ + ". " + (product.getKey().getName().toString()) +  "\n     price: "+(product.getValue().toString()) +
+        for(Map.Entry<Integer, Integer> product : productPrices.entrySet()){
+            res += "\n  " + i++ + ". " + (allProducts.get(product.getKey()).getName()) +  "\n     price: "+(product.getValue().toString()) +
             "\n     amount sold: " + (productsSold.get(product.getKey()));
         }
         res = res + "\n     orders=" + orders +

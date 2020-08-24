@@ -19,7 +19,6 @@ public class Printer {
 
     public static void printStoresList(Engine engine)
     {
-        System.out.println("Please choose desired store serial number:\n ");
         for (Store store : engine.getStores().values()) {
             System.out.printf("serial number: %d\n name: %s\n PPK: %d\n ------------------------\n%n",
                     store.getSerialNumber(),store.getName(),store.getPPK());
@@ -39,7 +38,7 @@ public class Printer {
     public static void printStoreDetails(Engine engine) {
         if(engine.getisXMLLoaded()) {
             for (Store store : engine.getStores().values()) {
-                System.out.println(store.toString() + '\n');
+                System.out.println(store.printStore(engine.getProducts()) + '\n');
             }
         }
         else{

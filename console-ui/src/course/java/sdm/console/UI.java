@@ -33,6 +33,7 @@ import java.util.Scanner;
 
         private int getInput() throws Exception {
             int input = 0;
+            String str;
             try {
                 input = Integer.parseInt(scanner.nextLine());
                 if(input<0 || input > 6)
@@ -79,14 +80,14 @@ import java.util.Scanner;
             Store chosenStore = null;
             Point customerLocation;
             Map<Integer, Float> productsToOrder = new HashMap<>();
+
             if(engine.getisXMLLoaded()) {
                 try {
                     chosenStore = getDeliveryStore();
                     deliveryDate = getDeliveryDate();
                     customerLocation = getCustomerLocation();
-                    System.out.println("Please choose products and an amount to order. enter 'q' to finish.\n");
                     productsToOrder = getOrderProducts(chosenStore);
-                    newOrder = new Order(deliveryDate, productsToOrder);
+ //                   newOrder = new Order(deliveryDate, productsToOrder);
 
 
                 } catch (NumberFormatException e) {
@@ -101,105 +102,19 @@ import java.util.Scanner;
             }
         }
 
-        private Map<Integer, Float> getOrderProducts(Store chosenStore) throws Exception {
-            String chosenSerial = " ";
-            int serialNumber;
-            Product chosenProduct;
-            float amount = 0;
-            Integer quantity = 0;
-            Float weight = 0f;
-            Product.SellingMethod method;
-            Map<Integer, Float> OrderProducts = new HashMap<>();
-
-            for (Product product : engine.getProducts().values()) {
-                Integer price = chosenStore.getProductPrices().get(product);
-                System.out.println(String.format("Serial number:%d\n Name:%s\n Selling method:%s\n Price:%d",
-                        product.getSerialNumber(), product.getName(), product.getMethod(), price));
-            }
-            while (!chosenSerial.equals("q")) {
-                try {
-                    System.out.println("Please choose another product and an amount to order. or enter 'q' to finish.\n");
-                    chosenSerial = scanner.nextLine();
-                    if (!chosenSerial.equals("q")) {
-                        serialNumber = Integer.parseInt(chosenSerial);
-                        chosenProduct = checkIfStoreSellsProduct(chosenStore, serialNumber);
-                        if (chosenProduct != null) {
-                            method = engine.getProducts().get(serialNumber).getMethod();
-                            System.out.println("Enter " + method + ":");
-                            amount = Float.parseFloat(scanner.nextLine());
-                            if (method == Product.SellingMethod.QUANTITY) {
-                                if ((amount % 1) != 0)
-                                    System.out.println("The amount must be a round number\n");
-                                else {
-                                    addToProductMap(serialNumber, amount, OrderProducts);
-                                }
-                            } else {
-                                addToProductMap(serialNumber, amount, OrderProducts);
-                            }
-                        } else
-                            System.out.println("The chosen store doesn't sell this product\n");
-                    }
-                } catch (NumberFormatException exeption) {
-                    System.out.println("Must be decimal\n");
-                }
-
-            }
-            return OrderProducts;
-        }
-
-        private Product checkIfStoreSellsProduct(Store chosenStore, int serialNumber) {
-            if(chosenStore.getProductPrices().get(engine.getProducts().get(serialNumber))!=null)
-                return engine.getProducts().get(serialNumber);
-            else
-                return null;
-
-        }
-        private void addToProductMap(int serialNumber,Float amount,Map<Integer,Float> OrderProducts){
-            Float weight = 0f;
-            weight = OrderProducts.putIfAbsent(serialNumber, amount);
-            if (weight != null) {
-                weight += amount;
-            }
-}
-        private Point getCustomerLocation() throws Exception {
-            int x;
-            int y;
-            Point location;
-            try{
-                System.out.println("Please enter your location:\nx:");
-                 x = Integer.parseInt(scanner.nextLine());
-                System.out.println("y:");
-                 y  = Integer.parseInt(scanner.nextLine());
-                 if(SuperXML.checkLocation(x,y))
-                     throw new Exception("Location is out of range!\n");
-                 location = new Point(x,y);
-                 for(Store store : engine.getStores().values())
-                 {
-                     if(location.equals(store.getLocation()))
-                         throw new Exception("You are in a Store!\n");
-                 }
-                 return location;
-            } catch (Exception e) {
-                throw e;
-            }
-        }
-
         private Store getDeliveryStore() throws Exception {
             int input;
             Store chosenStore = null ;
-            try{
-                Printer.printStoresList(engine);
-                input = Integer.parseInt(scanner.nextLine());
-                chosenStore = engine.getStores().get(input);
-                if (chosenStore == null) {
-                    throw new Exception("Store doesn't exist\n");
-                }
-                return  chosenStore;
-            } catch (Exception e) {
-                throw e;
-            }
-        }
 
+            System.out.println("Please choose desired store serial number:\n ");
+            Printer.printStoresList(engine);
+            input = Integer.parseInt(scanner.nextLine());
+            chosenStore = engine.getStores().get(input);
+            if (chosenStore == null) {
+                throw new Exception("Store doesn't exist\n");
+            }
+            return  chosenStore;
+        }
 
         private Date getDeliveryDate() throws Exception {
             String dateInput;
@@ -207,6 +122,7 @@ import java.util.Scanner;
             SimpleDateFormat date = new SimpleDateFormat () ;
             date.applyPattern("dd/MM-HH:mm");
             date.setLenient(false);
+
             try{
                 System.out.println("Please enter delivery date (in dd/mm-hh:mm format)\n");
                 dateInput = scanner.nextLine();
@@ -219,6 +135,88 @@ import java.util.Scanner;
             } catch (ParseException e) {
                 throw new Exception("Wrong date format entered\n");
             }
+        }
+
+        private Point getCustomerLocation() throws Exception {
+            int x;
+            int y;
+            Point location;
+
+            try{
+                System.out.println("Please enter your location:\nx:");
+                x = Integer.parseInt(scanner.nextLine());
+                System.out.println("y:");
+                y  = Integer.parseInt(scanner.nextLine());
+                if(SuperXML.checkLocationRange(x,y))
+                    throw new Exception("Location is out of range!\n");
+                location = new Point(x,y);
+                for(Store store : engine.getStores().values())
+                {
+                    if(location.equals(store.getLocation()))
+                        throw new Exception("You are in a Store!\n");
+                }
+                return location;
+            } catch (Exception e) {
+                throw e;
+            }
+        }
+
+        private Map<Integer, Float> getOrderProducts(Store chosenStore) {
+            Integer price = 0;
+            int chosenSerial = 0;
+            Product chosenProduct;
+            float amount = 0;
+            Map<Integer, Float> orderProducts = new HashMap<>();
+
+            System.out.println("Please choose products and an amount to order. enter 'q' to finish.\n");
+
+            for (Product product : engine.getProducts().values()) {
+                price = chosenStore.getProductPrices().get(product.getSerialNumber());
+                System.out.printf("Serial number:%d\n Name:%s\n Selling method:%s\n Price:%d%n",
+                        product.getSerialNumber(), product.getName(), product.getMethod(), price);
+            }
+
+            System.out.println("\nProduct serial number:\n");
+            while (scanner.hasNext()) {
+                try {
+                    if (scanner.hasNextInt()) {
+                        chosenSerial = Integer.parseInt(scanner.nextLine());
+                        chosenProduct = getChosenProduct(chosenStore, chosenSerial);
+                        amount = getAmountToBuy(chosenProduct);
+                        orderProducts.put(chosenProduct.getSerialNumber(), orderProducts.getOrDefault(chosenProduct.getSerialNumber(), 0f) + amount);
+                    } else {
+                        String input = scanner.nextLine();
+                        if (input.equalsIgnoreCase("Q")) {
+                            System.out.println("Exiting");
+                            break;
+                        } else {
+                            System.out.println("You did not enter a valid value. Please enter a number or \"q\" to quit.");
+                        }
+                    }
+                }catch (Exception exception) {
+                    System.out.println(exception.getMessage());
+                }
+                System.out.println("Product serial number:\n");
+            }
+            return orderProducts;
+        }
+
+        private Product getChosenProduct(Store chosenStore, int chosenSerial) throws Exception {
+            if (chosenStore.getProductPrices().containsKey(chosenSerial))
+                return engine.getProducts().get(chosenSerial);
+            else
+                throw new Exception("the chosen store doesn't sell this product\n");
+
+        }
+
+        private float getAmountToBuy(Product chosenProduct) throws Exception {
+            String amount;
+            float validAmount;
+            Product.SellingMethod method;
+            method = chosenProduct.getMethod();
+            System.out.println("Enter " + method + ": ");
+            amount = scanner.nextLine();
+            return chosenProduct.getMethod().validateAmount(amount);
         }
 
         private void loadXml() {
@@ -234,7 +232,4 @@ import java.util.Scanner;
 
         }
 
-        private boolean validateInput(int input) {
-            return true;
-        }
     }

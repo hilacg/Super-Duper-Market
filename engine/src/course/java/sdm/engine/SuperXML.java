@@ -86,18 +86,18 @@ public class SuperXML {
        tempAllStores = new HashMap<>();
         for(SDMStore store : superMarket.getSDMStores().getSDMStore()){
             Store s = tempAllStores.putIfAbsent(store.getId(),new Store(store));
-           if(checkLocation(store.getLocation().getX(), store.getLocation().getY()))
+           if(checkLocationRange(store.getLocation().getX(), store.getLocation().getY()))
             {
-                throw new Exception("locaion exception\n");
+                throw new Exception("location exception\n");
             }
             if(s != null)
             {
-                throw new Exception("duplicated id error\n");
+                throw new Exception("store duplicated id error\n");
             }
         }
     }
 
-    public static boolean checkLocation(int x, int y) {
+    public static boolean checkLocationRange(int x, int y) {
         return (x > 50 || x< 1 ||  y > 50 || y < 1);
 
     }
@@ -121,15 +121,15 @@ public class SuperXML {
             }
             if(p != null)
             {
-                throw new Exception("duplicated id error\n");
+                throw new Exception("product duplicated id error\n");
             }
         }
     }
 
     private void storeProductCheck() throws Exception {
         for(Store store : tempAllStores.values()) {
-            for (Product product : store.getProductPrices().keySet()) {
-                Product p = tempAllProducts.get(product.getSerialNumber());
+            for (Integer serialNumber : store.getProductPrices().keySet()) {
+                Product p = tempAllProducts.get(serialNumber);
                 if(p== null) {
                     throw new Exception("store sells an item that doesn't exist\n");
                 }

@@ -27,10 +27,11 @@ public class Engine {
 
     public void initMembers(){
         allProducts = superXML.getTempAllProducts();
-        initStores();
+        allStores = superXML.getTempAllStores();
+  //      initStores();
     }
 
-    private void initStores() {
+ /*   private void initStores() {
         allStores = superXML.getTempAllStores();
         for(SDMStore store : superXML.getSuperMarket().getSDMStores().getSDMStore()){
             Store s = allStores.get(store.getId());
@@ -39,7 +40,7 @@ public class Engine {
                 s.getProductsSold().put(allProducts.get(item.getItemId()),0);
             }
         }
-    }
+    }*/
 
 
     public void executeCommand() {
