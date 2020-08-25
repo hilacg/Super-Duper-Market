@@ -10,7 +10,9 @@ public class Product {
     private int serialNumber;
     private String name;
     private SellingMethod method;
-
+    private int storeCount = 0;
+    private double avgPrice = 0;
+    private double soldAmount = 0;
     public Product(){
 
     }
@@ -22,10 +24,17 @@ public class Product {
         method  = item.getPurchaseCategory().equals("Weight") ? SellingMethod.WEIGHT: SellingMethod.QUANTITY;
     }
 
-    public SellingMethod getMethod() {
-        return method;
+    public void setSoldAmount(double soldAmount) {
+        this.soldAmount += soldAmount;
     }
 
+    public void setAvgPrice(double price) {
+        this.avgPrice = price/storeCount;
+    }
+
+    public void setStoreCount() {
+        this.storeCount++;
+    }
     public void setName(String name) {
         this.name = name;
     }
@@ -36,6 +45,22 @@ public class Product {
 
     public String getName() {
         return name;
+    }
+
+    public SellingMethod getMethod() {
+        return method;
+    }
+
+    public double getAvgPrice() {
+        return avgPrice;
+    }
+
+    public double getSoldAmount() {
+        return soldAmount;
+    }
+
+    public int getStoreCount() {
+        return storeCount;
     }
 
     public enum SellingMethod {

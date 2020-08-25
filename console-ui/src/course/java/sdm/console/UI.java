@@ -14,14 +14,14 @@ import java.util.Scanner;
     public class UI {
         Scanner scanner = new Scanner(System.in);
         private final Engine engine = new Engine();
-
+        private final Printer printer = new Printer(engine);
         public void start() {
             boolean exit = false;
             int input = 0;
 
             while(input != 6) {
                 try {
-                    Printer.printMenu();
+                    printer.printMenu();
                     input = getInput();
                     executeCommand(input);
                 }catch(Exception e){
@@ -51,10 +51,10 @@ import java.util.Scanner;
                         this.loadXml();
                         break;
                     case 2:
-                        Printer.printStoreDetails(engine);
+                        printer.printStoreDetails();
                         break;
                     case 3:
-                        Printer.printProductDetails(engine);
+                        printer.printProductDetails();
                         break;
                     case 4:
                         newOrder();
@@ -63,7 +63,7 @@ import java.util.Scanner;
                         printOrderHistory();
                         break;
                     case 6:
-                        Printer.goodbye();
+                        printer.goodbye();
                         break;
             }
             }catch(Exception e){
@@ -72,13 +72,21 @@ import java.util.Scanner;
         }
 
         private void printOrderHistory() {
+            if(engine.getisXMLLoaded()) {
+                for (Order order : engine.getOrders()) {
+                    printer.printOrderDetails(order);
+                }
+            }
+            else{
+                System.out.println("There is no XML loaded!\n");
+            }
         }
 
         private void newOrder() throws Exception {
-            Order newOrder;
             Date deliveryDate;
             Store chosenStore = null;
             Point customerLocation;
+            String confirm;
             Map<Integer, Float> productsToOrder = new HashMap<>();
 
             if(engine.getisXMLLoaded()) {
@@ -87,7 +95,24 @@ import java.util.Scanner;
                     deliveryDate = getDeliveryDate();
                     customerLocation = getCustomerLocation();
                     productsToOrder = getOrderProducts(chosenStore);
- //                   newOrder = new Order(deliveryDate, productsToOrder);
+                    Order newOrder = engine.setNewOrder(chosenStore,deliveryDate, productsToOrder, customerLocation);
+                    printer.printNewOrder(newOrder);
+                    System.out.println("Do you wish to confirm? (Y/N)");
+                    while (scanner.hasNext()) {
+                        confirm = scanner.nextLine();
+                        if(confirm.equalsIgnoreCase("Y")) {
+                            engine.addOrder(newOrder);
+                            System.out.println("Order completed!");
+                            break;
+                        }
+                        else if(confirm.equalsIgnoreCase("N")) {
+                            System.out.println("Order is cancelled");
+                            break;
+                        }
+                        else
+                            System.out.println("Invalid input! please enter (Y/N)");
+
+                    }
 
 
                 } catch (NumberFormatException e) {
@@ -107,7 +132,7 @@ import java.util.Scanner;
             Store chosenStore = null ;
 
             System.out.println("Please choose desired store serial number:\n ");
-            Printer.printStoresList(engine);
+            printer.printStoresList();
             input = Integer.parseInt(scanner.nextLine());
             chosenStore = engine.getStores().get(input);
             if (chosenStore == null) {
@@ -162,25 +187,17 @@ import java.util.Scanner;
         }
 
         private Map<Integer, Float> getOrderProducts(Store chosenStore) {
-            Integer price = 0;
             int chosenSerial = 0;
             Product chosenProduct;
             float amount = 0;
             Map<Integer, Float> orderProducts = new HashMap<>();
-
-            System.out.println("Please choose products and an amount to order. enter 'q' to finish.\n");
-
-            for (Product product : engine.getProducts().values()) {
-                price = chosenStore.getProductPrices().get(product.getSerialNumber());
-                System.out.printf("Serial number:%d\n Name:%s\n Selling method:%s\n Price:%d%n",
-                        product.getSerialNumber(), product.getName(), product.getMethod(), price);
-            }
+            printer.printProducts(chosenStore);
 
             System.out.println("\nProduct serial number:\n");
-            while (scanner.hasNext()) {
+            while (scanner.hasNextLine()) {
                 try {
                     if (scanner.hasNextInt()) {
-                        chosenSerial = Integer.parseInt(scanner.nextLine());
+                        chosenSerial = Integer.parseInt((scanner.nextLine()).replaceAll("\\s+",""));
                         chosenProduct = getChosenProduct(chosenStore, chosenSerial);
                         amount = getAmountToBuy(chosenProduct);
                         orderProducts.put(chosenProduct.getSerialNumber(), orderProducts.getOrDefault(chosenProduct.getSerialNumber(), 0f) + amount);
@@ -211,7 +228,6 @@ import java.util.Scanner;
 
         private float getAmountToBuy(Product chosenProduct) throws Exception {
             String amount;
-            float validAmount;
             Product.SellingMethod method;
             method = chosenProduct.getMethod();
             System.out.println("Enter " + method + ": ");
