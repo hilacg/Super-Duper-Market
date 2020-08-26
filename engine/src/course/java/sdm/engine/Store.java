@@ -13,8 +13,8 @@ public class Store {
     private int serialNumber;
     private String name;
     private Map<Integer,Integer> productPrices = new HashMap<>();
-    private Map<Integer,Integer> productsSold = new HashMap<>();
-    private List<Order> orders;
+    private Map<Integer,Float> productsSold = new HashMap<>();
+    private List<Order> orders = new ArrayList<>();
     private int PPK;
     private float deliveryEarnings;
     private Point location;
@@ -26,7 +26,7 @@ public class Store {
         name = store.getName();
         for(SDMSell sell : store.getSDMPrices().getSDMSell()){
             productPrices.put(sell.getItemId(), sell.getPrice());
-            productsSold.put(sell.getItemId(),0);
+            productsSold.put(sell.getItemId(),0f);
         }
         PPK = store.getDeliveryPpk();
         location = new Point(store.getLocation().getX(),store.getLocation().getY());
@@ -69,12 +69,21 @@ public class Store {
         this.PPK = PPK;
     }
 
+    public void setProductsSold(Map.Entry<Integer, Float> productsSold) {
+        this.productsSold.put(productsSold.getKey(), this.productsSold.get(productsSold.getKey()) + productsSold.getValue());
+    }
+
     public Map<Integer, Integer> getProductPrices() {
         return productPrices;
     }
 
-    public Map<Integer, Integer> getProductsSold() {
+    public Map<Integer, Float> getProductsSold() {
         return productsSold;
+    }
+
+    public void deleteProduct(int chosenProductSerial) {
+        productPrices.remove(chosenProductSerial);
+        productsSold.remove(chosenProductSerial);
     }
 
     public String printStore(Map<Integer, Product> allProducts) {
@@ -88,9 +97,9 @@ public class Store {
             res += "\n  " + i++ + ". " + (allProducts.get(product.getKey()).getName()) +  "\n     price: "+(product.getValue().toString()) +
             "\n     amount sold: " + (productsSold.get(product.getKey()));
         }
-        res = res + "\n     orders=" + orders +
-                "\nPPK:" + PPK +
-                "\ndeliveryEarnings:" + deliveryEarnings;
+        res = res + "\norders:" + (orders.size() > 0 ? orders : " none") +
+                "\nPPK: " + PPK +
+                "\ndeliveryEarnings: " + deliveryEarnings;
 
         return res;
     }

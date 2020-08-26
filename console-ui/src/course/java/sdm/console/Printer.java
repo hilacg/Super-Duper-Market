@@ -14,7 +14,8 @@ public class Printer {
     public Printer(Engine engine){
         this.engine = engine;
     }
-    public static void printMenu()
+
+    public void printMenu()
     {
         System.out.println("\nWelcome!\n" +
                 "please choose your desired action:\n" +
@@ -23,24 +24,32 @@ public class Printer {
                 "3. Exhibit Products Details\n" +
                 "4. Make A New Order\n" +
                 "5. Exhibit Orders History\n" +
-                "6. Exit\n");
+                "6. Update Store Products\n" +
+                "7. Exit\n");
+    }
+
+    public void printProductUpdateChoices() {
+        System.out.println("\nplease choose your desired action:\n" +
+                "1. Delete Product\n" +
+                "2. Add Product\n" +
+                "3. Update Product Price\n");
     }
 
     public void printStoresList()
     {
         for (Store store : this.engine.getStores().values()) {
-            System.out.printf("serial number: %d\n name: %s\n PPK: %d\n ------------------------\n%n",
+            System.out.printf("------------------------\nserial number: %d\nname: %s\nPPK: %d\n",
                     store.getSerialNumber(),store.getName(),store.getPPK());
         }
+        System.out.println("");
     }
     public void printProductDetails() {
         if(engine.getisXMLLoaded()) {
+            System.out.println("The Products are:");
             for (Product product : engine.getProducts().values()) {
-                System.out.println("\n---------------------");
                 System.out.println(product.toString() +
-                        "\nSold in: " + product.getStoreCount()+" stores"+
-                        "\nAverage price: " + product.getAvgPrice());
-                System.out.printf("Sold amount: %.2f\n",product.getSoldAmount());
+                        "\nSold in: " + product.getStoreCount()+" stores");
+                System.out.printf("Average price: %.2f \nSold amount: %.2f\n\n",product.getAvgPrice(), product.getSoldAmount());
             }
         }
         else{
@@ -50,6 +59,7 @@ public class Printer {
 
     public void printStoreDetails() {
         if(engine.getisXMLLoaded()) {
+            System.out.println("The stores are:");
             for (Store store : engine.getStores().values()) {
                 System.out.println(store.printStore(engine.getProducts()) + '\n');
             }
@@ -66,11 +76,9 @@ public class Printer {
     public void printProducts(Store chosenStore) {
         Integer price = 0;
 
-        System.out.println("Please choose products and an amount to order. enter 'q' to finish.\n");
-
         for (Product product : engine.getProducts().values()) {
             price = chosenStore.getProductPrices().get(product.getSerialNumber());
-            System.out.printf("Serial number:%d\n Name:%s\n Selling method:%s\n Price:%d%n",
+            System.out.printf("------------------\nSerial number: %d\nName: %s\nSelling method: %s\nPrice: %d\n\n",
                     product.getSerialNumber(), product.getName(), product.getMethod(), price);
         }
     }
@@ -80,15 +88,15 @@ public class Printer {
         for(Map.Entry<Integer, Map<Integer, Float>> storeProduct : newOrder.getStoreProducts().entrySet()){
             Store store = engine.getStores().get(storeProduct.getKey());
             System.out.println(store.getName() + ":\n");
-            for(Integer productSerial : storeProduct.getValue().keySet()){
+            for(Integer productSerial : storeProduct.getValue().keySet()) {
                 float amount = storeProduct.getValue().get(productSerial);
                 int price = store.getProductPrices().get(productSerial);
                 System.out.println(engine.getProducts().get(productSerial));
-                System.out.printf("price: %d\namount: %.2f\ntotal product price: %.2f\n", price, amount,(price*amount));
-                System.out.println("--------------------------\n");
+                System.out.printf("price: %d\namount: %.2f\ntotal product price: %.2f\n", price, amount, (price * amount));
             }
-            System.out.printf("Distance from store: %.2f\nStore PPK: %d\nStore delivery price: %.2f\n", newOrder.getDistance(), store.getPPK(),( newOrder.getDistance()*store.getPPK()));
-            System.out.println("--------------------------\n");
+            System.out.println("\n===============================");
+            System.out.printf("Distance from store: %.2f\nStore PPK: %d\nStore delivery price: %.2f\n", newOrder.getDistance().get(storeProduct.getKey()), store.getPPK(), (newOrder.getDistance().get(storeProduct.getKey()) * store.getPPK()));
+            System.out.println("===============================\n");
         }
     }
 
@@ -96,14 +104,14 @@ public class Printer {
 
             int productsTypes = 0;
             int productsAmount = 0;
-            SimpleDateFormat dateformat = new SimpleDateFormat();
-            dateformat.applyPattern("dd/MM-HH:mm");
+            SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM-HH:mm");
+            System.out.println("-----------------------");
             System.out.println("Order serial number: " + order.getSerial() +
                     "\nDate: " + dateformat.format(order.getDate()));
             for (Map.Entry<Integer, Map<Integer, Float>> storeProduct : order.getStoreProducts().entrySet()) {
                 Store store = engine.getStores().get(storeProduct.getKey());
                 System.out.println("Store serial number: " + store.getSerialNumber() +
-                        "\nstore name: " + store.getName());
+                        "\nStore name: " + store.getName());
 
                 for (Map.Entry<Integer, Float> product : storeProduct.getValue().entrySet()) {
                     productsAmount += engine.getProducts().get(product.getKey()).getMethod().equals(Product.SellingMethod.QUANTITY) ? product.getValue() : 1;
@@ -112,8 +120,9 @@ public class Printer {
             }
             System.out.println("Number of products types: " + productsTypes +
                     "\nNumber of products sold: " + productsAmount);
-            System.out.printf("\nTotal products' price: %.2f\nDelivery price: %.2f\nTotal order price: %.2f\n\n", order.getPrice(), order.getDeliveryPrice(), order.getTotalPrice());
+            System.out.printf("Total products' price: %.2f\nDelivery price: %.2f\nTotal order price: %.2f\n\n", order.getPrice(), order.getDeliveryPrice(), order.getTotalPrice());
     }
+
 }
 
 

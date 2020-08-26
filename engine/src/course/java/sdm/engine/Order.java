@@ -9,8 +9,8 @@ public class Order {
     private Map<Integer, Float> products;
     private Map<Integer,  Map<Integer, Float>> storeProducts = new HashMap<>(); //store serial, and list of products serials to buy and amounts for each
     private float price;
-    private double deliveryPrice;
-    private double distance;
+    private Map<Integer, Double> deliveryPrices = new HashMap<>();
+    private Map<Integer, Double> distance = new HashMap<>();
     private double totalPrice;
     private Point customerLocation;
 
@@ -34,6 +34,10 @@ public class Order {
     }
 
     public double getDeliveryPrice() {
+        double deliveryPrice = 0;
+        for(double price : deliveryPrices.values()) {
+            deliveryPrice += price;
+        }
         return deliveryPrice;
     }
 
@@ -45,17 +49,20 @@ public class Order {
         return price;
     }
 
-    public double getDistance() {
+    public Map<Integer, Double> getDistance() {
         return distance;
     }
 
     public void updateStoreProducts(int storeSerial){
         storeProducts.put(storeSerial, products);
     }
+
     public void calculateDistance(Map<Integer,Store>allStores) {
-        for(Store store : allStores.values()) {
-            distance = Math.sqrt((Math.pow(customerLocation.x - store.getLocation().getX(),2) + Math.pow(customerLocation.y - store.getLocation().getY(),2)));
-            deliveryPrice = distance * store.getPPK();
+        for(Integer storeSerial : storeProducts.keySet()) {
+            Store store = allStores.get(storeSerial);
+            double storeDistance = Math.sqrt((Math.pow(customerLocation.x - store.getLocation().getX(),2) + Math.pow(customerLocation.y - store.getLocation().getY(),2)));
+            distance.put(storeSerial,storeDistance);
+            deliveryPrices.put(storeSerial, storeDistance * store.getPPK());
         }
     }
     public void calculatePrice(Map<Integer,Store> allStores){
@@ -69,6 +76,9 @@ public class Order {
         }
     }
     public void calculateTotalPrice(){
-        totalPrice= price+deliveryPrice;
+        totalPrice = price;
+        for(Double deliveryPrice : deliveryPrices.values()){
+            totalPrice += deliveryPrice;
+        }
     }
 }

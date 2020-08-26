@@ -100,7 +100,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return "serialNumber: " + serialNumber +
+        return "--------------------\nserialNumber: " + serialNumber +
                 "\nname: " + name  +
                 "\nmethod: " + method ;
     }

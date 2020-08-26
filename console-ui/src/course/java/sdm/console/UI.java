@@ -15,6 +15,7 @@ import java.util.Scanner;
         Scanner scanner = new Scanner(System.in);
         private final Engine engine = new Engine();
         private final Printer printer = new Printer(engine);
+
         public void start() {
             boolean exit = false;
             int input = 0;
@@ -27,7 +28,6 @@ import java.util.Scanner;
                 }catch(Exception e){
                     System.out.println((e.getMessage()));
                 }
-
            }
         }
 
@@ -36,8 +36,6 @@ import java.util.Scanner;
             String str;
             try {
                 input = Integer.parseInt(scanner.nextLine());
-                if(input<0 || input > 6)
-                    throw new Exception("Invalid input, Please enter a number between 1 to 6\n");
                 return input;
             }catch(NumberFormatException exception) {
                 throw new Exception("Invalid input, Please enter a number\n");
@@ -45,7 +43,6 @@ import java.util.Scanner;
         }
 
         private void executeCommand(int input) throws Exception {
-            try {
             switch (input){
                     case 1:
                         this.loadXml();
@@ -63,12 +60,86 @@ import java.util.Scanner;
                         printOrderHistory();
                         break;
                     case 6:
+                        updateProducts();
+                        break;
+                    case 7:
                         printer.goodbye();
                         break;
+                    default:
+                        throw new Exception("Invalid input, Please enter a number between 1 to 7\n");
             }
-            }catch(Exception e){
-                throw  e;
+        }
+
+        private void updateProducts() throws Exception {
+            int input;
+            Store chosenStore;
+            try {
+                if (engine.getisXMLLoaded()) {
+                    System.out.println("Please choose a store serial number to update its' products");
+                    printer.printStoreDetails();
+                    chosenStore = getChosenStore();
+                    printer.printProductUpdateChoices();
+                    input = getInput();
+                    executeUpdate(input,chosenStore);
+                } else {
+                    System.out.println("There is no XML loaded!\n");
+                }
+            }catch(NumberFormatException e) {
+                throw new Exception("Invalid input, Please enter a number\n");
             }
+        }
+
+        private void executeUpdate(int input, Store chosenStore) throws Exception {
+            switch (input) {
+                case 1:
+                    deleteProduct(chosenStore);
+                    break;
+                case 2:
+                    addProduct(chosenStore);
+                    break;
+                case 3:
+    //                updateProduct(chosenStore);
+                    break;
+                default:
+                    throw new Exception("Invalid input, Please enter a number between 1 to 3\n");
+            }
+        }
+
+        private void addProduct(Store chosenStore) throws Exception {
+            int input;
+            if (engine.getisXMLLoaded()) {
+                System.out.println("Choose product serial number to add:");
+                printer.printProductDetails();
+                input = getInput();
+            }
+            else{
+                System.out.println("There is no XML loaded!\n");
+            }
+
+        }
+
+        private void deleteProduct(Store chosenStore) throws Exception {
+            int chosenSerial;
+            Product chosenProduct;
+            if (engine.getisXMLLoaded()) {
+
+                try {
+                    System.out.println("Choose product serial number to remove:");
+                    printer.printProducts(chosenStore);
+                    chosenSerial = Integer.parseInt((scanner.nextLine()).replaceAll("\\s+", ""));
+                    chosenProduct = engine.getChosenProduct(chosenStore, chosenSerial);
+                    if (engine.productSoldInOtherStore(chosenProduct, chosenStore.getSerialNumber())) {
+                        chosenStore.deleteProduct(chosenProduct.getSerialNumber());
+                    } else
+                        throw new Exception("Can't delete product, The chosen product is sold in the chosen store only.\n");
+                } catch (NumberFormatException e) {
+                    throw new Exception("Invalid input, Please enter a number\n");
+                }
+            }
+            else{
+                System.out.println("There is no XML loaded!\n");
+            }
+
         }
 
         private void printOrderHistory() {
@@ -91,7 +162,9 @@ import java.util.Scanner;
 
             if(engine.getisXMLLoaded()) {
                 try {
-                    chosenStore = getDeliveryStore();
+                    System.out.println("Please choose desired store serial number:\n ");
+                    printer.printStoresList();
+                    chosenStore = getChosenStore();
                     deliveryDate = getDeliveryDate();
                     customerLocation = getCustomerLocation();
                     productsToOrder = getOrderProducts(chosenStore);
@@ -127,12 +200,10 @@ import java.util.Scanner;
             }
         }
 
-        private Store getDeliveryStore() throws Exception {
+        private Store getChosenStore() throws Exception {
             int input;
             Store chosenStore = null ;
 
-            System.out.println("Please choose desired store serial number:\n ");
-            printer.printStoresList();
             input = Integer.parseInt(scanner.nextLine());
             chosenStore = engine.getStores().get(input);
             if (chosenStore == null) {
@@ -149,7 +220,7 @@ import java.util.Scanner;
             date.setLenient(false);
 
             try{
-                System.out.println("Please enter delivery date (in dd/mm-hh:mm format)\n");
+                System.out.println("Please enter delivery date (in dd/mm-hh:mm format)");
                 dateInput = scanner.nextLine();
                 Date deliveryDate = date.parse(dateInput);
                 deliveryDate.setYear(today.getYear());
@@ -168,10 +239,11 @@ import java.util.Scanner;
             Point location;
 
             try{
-                System.out.println("Please enter your location:\nx:");
+                System.out.print("Please enter your location:\nx:");
                 x = Integer.parseInt(scanner.nextLine());
-                System.out.println("y:");
+                System.out.print("y:");
                 y  = Integer.parseInt(scanner.nextLine());
+                System.out.println("");
                 if(SuperXML.checkLocationRange(x,y))
                     throw new Exception("Location is out of range!\n");
                 location = new Point(x,y);
@@ -191,20 +263,21 @@ import java.util.Scanner;
             Product chosenProduct;
             float amount = 0;
             Map<Integer, Float> orderProducts = new HashMap<>();
-            printer.printProducts(chosenStore);
 
-            System.out.println("\nProduct serial number:\n");
+            System.out.println("Please choose products and an amount to order. enter 'q' to finish.\n");
+            printer.printProducts(chosenStore);
+            System.out.println("Product serial number:");
             while (scanner.hasNextLine()) {
                 try {
                     if (scanner.hasNextInt()) {
                         chosenSerial = Integer.parseInt((scanner.nextLine()).replaceAll("\\s+",""));
-                        chosenProduct = getChosenProduct(chosenStore, chosenSerial);
+                        chosenProduct = engine.getChosenProduct(chosenStore, chosenSerial);
                         amount = getAmountToBuy(chosenProduct);
                         orderProducts.put(chosenProduct.getSerialNumber(), orderProducts.getOrDefault(chosenProduct.getSerialNumber(), 0f) + amount);
                     } else {
                         String input = scanner.nextLine();
                         if (input.equalsIgnoreCase("Q")) {
-                            System.out.println("Exiting");
+                            System.out.println("Order finished\n");
                             break;
                         } else {
                             System.out.println("You did not enter a valid value. Please enter a number or \"q\" to quit.");
@@ -213,19 +286,10 @@ import java.util.Scanner;
                 }catch (Exception exception) {
                     System.out.println(exception.getMessage());
                 }
-                System.out.println("Product serial number:\n");
+                System.out.println("Product serial number:");
             }
             return orderProducts;
         }
-
-        private Product getChosenProduct(Store chosenStore, int chosenSerial) throws Exception {
-            if (chosenStore.getProductPrices().containsKey(chosenSerial))
-                return engine.getProducts().get(chosenSerial);
-            else
-                throw new Exception("the chosen store doesn't sell this product\n");
-
-        }
-
         private float getAmountToBuy(Product chosenProduct) throws Exception {
             String amount;
             Product.SellingMethod method;
@@ -236,14 +300,15 @@ import java.util.Scanner;
         }
 
         private void loadXml() {
-            System.out.println("please enter full path name of an XML file\n");
+            System.out.println("please enter full path name of an XML file");
             try {
                 engine.loadXML(scanner.nextLine());
+                System.out.println("XML file loaded successfully!");
             }catch (FileNotFoundException e){
-                System.out.println("file does not exists\n");
+                System.out.println("file does not exists");
             }
             catch (Exception e){
-                System.out.println(e.getMessage() + "\n");
+                System.out.println(e.getMessage());
             }
 
         }

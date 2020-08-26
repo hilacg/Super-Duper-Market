@@ -1,19 +1,17 @@
 package course.java.sdm.engine;
 
 import java.awt.*;
-import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.List;
 
-import generatedClasses.*;
 
 public class Engine {
     private static int orderNum = 0;
     private Map<Integer, Product> allProducts;
     private Map<Integer, Store> allStores;
     private boolean isXMLLoaded = false;
-    private SuperXML superXML = new SuperXML();
-    private List<Order> orders = new ArrayList<>();
+    private final SuperXML superXML = new SuperXML();
+    private final List<Order> orders = new ArrayList<>();
 
     public void loadXML(String filePath) throws Exception {
         try {
@@ -75,14 +73,36 @@ public class Engine {
         newOrder.calculatePrice(allStores);
         newOrder.calculateTotalPrice();
         updateProductSoldAmount(newOrder);
+
         orders.add(newOrder);
     }
 
     private void updateProductSoldAmount(Order newOrder) {
-        for(Map<Integer, Float> soldProduct : newOrder.getStoreProducts().values()){
-            for(Map.Entry <Integer, Float> productSerial : soldProduct.entrySet()){
-                allProducts.get(productSerial.getKey()).setSoldAmount(soldProduct.get(productSerial.getKey()));
+        for (Map.Entry<Integer, Map<Integer, Float>> storeSoldProduct : newOrder.getStoreProducts().entrySet()) {
+            for (Map.Entry<Integer, Float> productSold : storeSoldProduct.getValue().entrySet()) {
+                allProducts.get(productSold.getKey()).setSoldAmount(productSold.getValue());
+                allStores.get(storeSoldProduct.getKey()).setProductsSold(productSold);
             }
         }
+    }
+
+    public Product getChosenProduct(Store chosenStore, int chosenSerial) throws Exception {
+        if (chosenStore.getProductPrices().containsKey(chosenSerial))
+            return allProducts.get(chosenSerial);
+        else
+            throw new Exception("the chosen store doesn't sell this product\n");
+
+    }
+
+
+    public boolean productSoldInOtherStore(Product chosenProduct, int chosenStoreSerial) {
+        boolean res = false;
+        for(Store store : allStores.values()){
+            if(store.getSerialNumber() != chosenStoreSerial && store.getProductPrices().containsKey(chosenProduct.getSerialNumber())){
+                res = true;
+                break;
+            }
+        }
+        return res;
     }
 }
