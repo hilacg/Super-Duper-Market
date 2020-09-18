@@ -21,7 +21,7 @@ public class App extends Application {
 
             FXMLLoader fxmlLoader = getFXML();
             Parent superRoot = getSuperRoot(fxmlLoader);
-            SuperController playersController = getSuperController(fxmlLoader, primaryStage);
+            SuperController superController = getSuperController(fxmlLoader, primaryStage);
 
             Scene scene = new Scene(superRoot, 800, 600);
 
