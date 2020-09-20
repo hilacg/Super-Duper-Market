@@ -1,0 +1,46 @@
+*{
+	theme-primary-color:#7b68ee;
+	theme-secondery-color:#E7BD25;
+}
+
+#title{
+-fx-background-color: theme-primary-color;
+-fx-text-fill: #ffffff;
+-fx-font-size:30px;
+-fx-alignment: center;
+-fx-font-weight:900;
+-fx-padding:0 0 0 190;
+}
+
+.subTitle{
+	-fx-text-fill: theme-secondery-color;
+	-fx-font-size:20px;
+	-fx-font-weight:700;
+	-fx-alignment: center;
+}
+
+#menu{
+-fx-background-color: theme-primary-color;
+-fx-padding: 0;
+}
+
+.menuButton{
+	-fx-background-color: theme-primary-color;
+	-fx-text-fill:#ffffff;
+	-fx-cursor: "hand";
+	-fx-font-weight:900;
+	-fx-font-size:15px;
+}
+
+.menuButton:hover{
+	-fx-background-color: "white";
+	-fx-text-fill: theme-primary-color;
+}
+
+.card{
+	-fx-effect: dropshadow( three-pass-box , rgba(131,131,131,131.5) , 10, 0.0 , 2 , 2);
+	 -fx-padding: 10px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
+	-fx-background-color: whitesmoke;
+}

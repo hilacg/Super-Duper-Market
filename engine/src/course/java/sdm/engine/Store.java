@@ -1,4 +1,5 @@
 package course.java.sdm.engine;
+import generatedClasses.SDMDiscount;
 import generatedClasses.SDMSell;
 import generatedClasses.SDMStore;
 
@@ -12,9 +13,10 @@ import java.util.List;
 public class Store {
     private int serialNumber;
     private String name;
-    private Map<Integer,Integer> productPrices = new HashMap<>();
-    private Map<Integer,Float> productsSold = new HashMap<>();
+    private Map<Integer,Integer> productPrices = new HashMap<>();//serial price
+    private Map<Integer,Float> productsSold = new HashMap<>(); //serial total earnings
     private List<Order> orders = new ArrayList<>();
+    private List<Discount> discounts =  new ArrayList<>();
     private int PPK;
     private float deliveryEarnings;
     private Point location;
@@ -28,9 +30,17 @@ public class Store {
             productPrices.put(sell.getItemId(), sell.getPrice());
             productsSold.put(sell.getItemId(),0f);
         }
+        if(store.getSDMDiscounts() !=null)
+            for(SDMDiscount discount: store.getSDMDiscounts().getSDMDiscount()) {
+               discounts.add(new Discount(discount));
+            }
         PPK = store.getDeliveryPpk();
         location = new Point(store.getLocation().getX(),store.getLocation().getY());
 
+    }
+
+    public List<Discount> getDiscounts() {
+        return discounts;
     }
 
     public int getSerialNumber() {
@@ -103,4 +113,6 @@ public class Store {
 
         return res;
     }
+
+
 }

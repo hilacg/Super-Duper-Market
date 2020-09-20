@@ -1,20 +1,23 @@
 package app;
 
+import components.load.LoadController;
 import course.java.sdm.engine.Engine;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import scenes.init.SuperController;
+import components.main.SuperController;
 
 import java.io.IOException;
 import java.net.URL;
 
 public class App extends Application {
 
-        private static final String FXML_PATH = "/scenes/init/MainScene.fxml";
-        private final Engine engine = new Engine();
+        private static final String FXML_PATH = "/components/main/MainScene.fxml";
+        private Engine engine;
 
         @Override
         public void start(Stage primaryStage) throws IOException {
@@ -23,11 +26,14 @@ public class App extends Application {
             Parent superRoot = getSuperRoot(fxmlLoader);
             SuperController superController = getSuperController(fxmlLoader, primaryStage);
 
-            Scene scene = new Scene(superRoot, 800, 600);
 
+            Scene scene = new Scene(superRoot);
             primaryStage.setTitle("Super Duper");
             primaryStage.setScene(scene);
             primaryStage.show();
+
+
+
         }
 
     private FXMLLoader getFXML() {
@@ -38,8 +44,9 @@ public class App extends Application {
     }
 
     private SuperController getSuperController(FXMLLoader fxmlLoader, final Stage primaryStage) {
-        SuperController superController = (SuperController) fxmlLoader.getController();
-        superController.setEngine(engine);
+        SuperController superController = fxmlLoader.getController();
+        this.engine = new Engine(superController);
+        superController.setEngine(this.engine);
         superController.setPrimaryStage(primaryStage);
    /*     superController.finishedInit().addListener((source, oldValue, newValue) -> {
             if (newValue) {

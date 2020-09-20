@@ -10,7 +10,6 @@ package generatedClasses;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
@@ -25,11 +24,11 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
+ *       &lt;all>
  *         &lt;element ref="{}name"/>
- *         &lt;element ref="{}purchase-category"/>
- *       &lt;/sequence>
- *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
+ *         &lt;element ref="{}if-you-buy"/>
+ *         &lt;element ref="{}then-you-get"/>
+ *       &lt;/all>
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -39,18 +38,17 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "name",
-    "purchaseCategory"
+
 })
-@XmlRootElement(name = "SDM-item")
-public class SDMItem {
+@XmlRootElement(name = "SDM-discount")
+public class SDMDiscount {
 
     @XmlElement(required = true)
     protected String name;
-    @XmlElement(name = "purchase-category", required = true)
-    protected String purchaseCategory;
-    @XmlAttribute(name = "id", required = true)
-    protected int id;
+    @XmlElement(name = "if-you-buy", required = true)
+    protected IfYouBuy ifYouBuy;
+    @XmlElement(name = "then-you-get", required = true)
+    protected ThenYouGet thenYouGet;
 
     /**
      * Gets the value of the name property.
@@ -77,43 +75,51 @@ public class SDMItem {
     }
 
     /**
-     * Gets the value of the purchaseCategory property.
+     * Gets the value of the ifYouBuy property.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link IfYouBuy }
      *     
      */
-    public String getPurchaseCategory() {
-        return purchaseCategory;
+    public IfYouBuy getIfYouBuy() {
+        return ifYouBuy;
     }
 
     /**
-     * Sets the value of the purchaseCategory property.
+     * Sets the value of the ifYouBuy property.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link IfYouBuy }
      *     
      */
-    public void setPurchaseCategory(String value) {
-        this.purchaseCategory = value;
+    public void setIfYouBuy(IfYouBuy value) {
+        this.ifYouBuy = value;
     }
 
     /**
-     * Gets the value of the id property.
+     * Gets the value of the thenYouGet property.
      * 
+     * @return
+     *     possible object is
+     *     {@link ThenYouGet }
+     *     
      */
-    public int getId() {
-        return id;
+    public ThenYouGet getThenYouGet() {
+        return thenYouGet;
     }
 
     /**
-     * Sets the value of the id property.
+     * Sets the value of the thenYouGet property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link ThenYouGet }
+     *     
      */
-    public void setId(int value) {
-        this.id = value;
+    public void setThenYouGet(ThenYouGet value) {
+        this.thenYouGet = value;
     }
 
 }

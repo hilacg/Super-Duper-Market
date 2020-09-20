@@ -1,27 +1,41 @@
 package course.java.sdm.engine;
 
+import components.main.SuperController;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.concurrent.Task;
+
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Consumer;
 
 
 public class Engine {
+    private SuperController controller;
     private static int orderNum = 0;
     private Map<Integer, Product> allProducts;
     private Map<Integer, Store> allStores;
+    private Map<Integer, Customer> allCustomers;
     private boolean isXMLLoaded = false;
     private final SuperXML superXML = new SuperXML();
     private final List<Order> orders = new ArrayList<>();
 
-    public void loadXML(String filePath) throws Exception {
-        try {
-            superXML.load(filePath);
-            initMembers();
-            isXMLLoaded = true;
-        }
-        catch (Exception e){
-            throw e;
-        }
+    public Engine(SuperController superController) {
+        this.controller = superController;
+    }
+
+    public void loadXML(String filePath ,Runnable onFinish){
+
+        Task<Boolean> currentRunningTask = new LoadTask(filePath, superXML);
+
+        controller.bindTaskToUIComponents(currentRunningTask,onFinish);
+
+        new Thread(currentRunningTask).start();
+
+    }
+
+    public Map<Integer, Customer> getAllCustomers() {
+        return allCustomers;
     }
 
     public boolean getisXMLLoaded() {
@@ -29,8 +43,10 @@ public class Engine {
     }
 
     public void initMembers(){
+        isXMLLoaded = true;
         allProducts = superXML.getTempAllProducts();
         allStores = superXML.getTempAllStores();
+        allCustomers = superXML.getTempAllCustomers();
         setProductAvgAndStoreCount();
     }
 

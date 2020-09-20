@@ -1,16 +1,13 @@
 package course.java.sdm.engine;
 
-import generatedClasses.SDMItem;
-import generatedClasses.SDMSell;
-import generatedClasses.SDMStore;
-import generatedClasses.SuperDuperMarketDescriptor;
+import generatedClasses.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import java.awt.*;
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -20,6 +17,8 @@ public class SuperXML {
     private SuperDuperMarketDescriptor superMarket = null;
     private Map<Integer, Store> tempAllStores = new HashMap<>();
     private Map<Integer, Product> tempAllProducts = new HashMap<>();
+    private Map<Integer, Customer> tempAllCustomers = new HashMap<>();
+    private Map<Point,Integer> tempAllLocations = new HashMap<>();
 
 
     public SuperDuperMarketDescriptor getSuperMarket() {
@@ -34,15 +33,14 @@ public class SuperXML {
         return tempAllStores;
     }
 
-    public void load(String filePath) throws Exception {
+    public boolean load(String filePath) throws Exception {
         try {
             if (filePath.length() < 4 || filePath.substring(filePath.length() - 4).toLowerCase().compareTo(".xml") != 0) {
                 throw new Exception("file is not an XML\n");
             }
             superMarket = this.XMLToObject(filePath);
-            if (superMarket != null) {
-                validateXML();
-            }
+            return superMarket != null;
+
         }catch (Exception e){
             throw e;
         }
@@ -62,12 +60,37 @@ public class SuperXML {
         return  superMarket;
     }
 
-    private void validateXML() throws Exception {
+    public void validateXML() throws Exception {
         checkStores();
         checkProducts();
         storeProductCheck();
         productSoldTwice(); //in a single store
+        checkCustomers();
+        checkSales();
 
+    }
+
+
+
+    private void checkCustomers() throws Exception {
+        tempAllCustomers = new HashMap<>();
+        for(SDMCustomer customer : superMarket.getSDMCustomers().getSDMCustomer()){
+            Customer c = tempAllCustomers.putIfAbsent(customer.getId(),new Customer(customer));
+            if(checkLocationRange(customer.getLocation().getX(), customer.getLocation().getY()))
+            {
+                throw new Exception("location exception\n");
+            }
+            else{
+                Integer p = tempAllLocations.putIfAbsent(new Point(customer.getLocation().getX(),customer.getLocation().getY()),customer.getId());
+                if(p!=null){
+                    throw new Exception("duplicated location error\n");
+                }
+            }
+            if(c != null)
+            {
+                throw new Exception("customer duplicated id error\n");
+            }
+        }
     }
 
     private void productSoldTwice() throws Exception {
@@ -90,9 +113,29 @@ public class SuperXML {
             {
                 throw new Exception("location exception\n");
             }
+           else{
+               Integer p = tempAllLocations.putIfAbsent(new Point(store.getLocation().getX(),store.getLocation().getY()),store.getId());
+               if(p!=null){
+                   throw new Exception("duplicated location error\n");
+               }
+           }
             if(s != null)
             {
                 throw new Exception("store duplicated id error\n");
+            }
+        }
+    }
+
+
+    private void checkSales() throws Exception {
+        for (Store store : tempAllStores.values()) {
+            for (Discount discount : store.getDiscounts()) {
+                for (Offer offer : discount.getOffers()) {
+                    if (this.tempAllProducts.get(discount.getItemId()) == null || (this.tempAllProducts.get(offer.getItemId()) == null))
+                        throw new Exception("discount product does not exist!\n");
+                    if (store.getProductPrices().get(discount.getItemId()) == null || store.getProductPrices().get(offer.getItemId()) == null)
+                        throw new Exception("store doesn't sell discount product!\n");
+                }
             }
         }
     }
@@ -135,5 +178,9 @@ public class SuperXML {
                 }
             }
         }
+    }
+
+    public Map<Integer, Customer> getTempAllCustomers() {
+        return tempAllCustomers;
     }
 }

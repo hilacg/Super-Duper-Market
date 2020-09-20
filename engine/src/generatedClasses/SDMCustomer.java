@@ -25,10 +25,10 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType>
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
+ *       &lt;all>
  *         &lt;element ref="{}name"/>
- *         &lt;element ref="{}purchase-category"/>
- *       &lt;/sequence>
+ *         &lt;element ref="{}location"/>
+ *       &lt;/all>
  *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -39,16 +39,15 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "name",
-    "purchaseCategory"
+
 })
-@XmlRootElement(name = "SDM-item")
-public class SDMItem {
+@XmlRootElement(name = "SDM-customer")
+public class SDMCustomer {
 
     @XmlElement(required = true)
     protected String name;
-    @XmlElement(name = "purchase-category", required = true)
-    protected String purchaseCategory;
+    @XmlElement(required = true)
+    protected Location location;
     @XmlAttribute(name = "id", required = true)
     protected int id;
 
@@ -77,27 +76,27 @@ public class SDMItem {
     }
 
     /**
-     * Gets the value of the purchaseCategory property.
+     * Gets the value of the location property.
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link Location }
      *     
      */
-    public String getPurchaseCategory() {
-        return purchaseCategory;
+    public Location getLocation() {
+        return location;
     }
 
     /**
-     * Sets the value of the purchaseCategory property.
+     * Sets the value of the location property.
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link Location }
      *     
      */
-    public void setPurchaseCategory(String value) {
-        this.purchaseCategory = value;
+    public void setLocation(Location value) {
+        this.location = value;
     }
 
     /**

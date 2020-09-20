@@ -13,7 +13,6 @@ import java.util.Scanner;
 
     public class UI {
         Scanner scanner = new Scanner(System.in);
-        private final Engine engine = new Engine();
         private final Printer printer = new Printer(engine);
 
         public void start() {
@@ -300,9 +299,9 @@ import java.util.Scanner;
         }
 
         private void loadXml() {
-            System.out.println("please enter full path name of an XML file");
+    /*        System.out.println("please enter full path name of an XML file");
             try {
-                engine.loadXML(scanner.nextLine());
+              engine.loadXML(scanner.nextLine());
                 System.out.println("XML file loaded successfully!");
             }catch (FileNotFoundException e){
                 System.out.println("file does not exists");
@@ -310,7 +309,7 @@ import java.util.Scanner;
             catch (Exception e){
                 System.out.println(e.getMessage());
             }
-
+*/
         }
 
     }

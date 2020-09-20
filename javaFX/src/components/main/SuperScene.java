@@ -1,4 +1,4 @@
-package scenes.superScene;
+package components.main;
 
 import course.java.sdm.engine.Engine;
 import javafx.scene.Scene;

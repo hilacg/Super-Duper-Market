@@ -15,6 +15,14 @@ public class ProductController {
 
     public void setDetails(Product product) {
         nameLabel.textProperty().bind(Bindings.concat(product.getName()));
- //       detailsLabel.textProperty().bind(product.toString());
+        detailsLabel.textProperty().bind(Bindings.concat(getDetails(product)));
+    }
+
+    public String getDetails( Product product){
+        String s =
+             product.toString() +
+                    "\nSold in: " + product.getStoreCount()+" stores\n";
+             s = s.concat( String.format("Average price: %.2f \nSold amount: %.2f\n",product.getAvgPrice(), product.getSoldAmount())) ;
+             return s;
     }
 }
