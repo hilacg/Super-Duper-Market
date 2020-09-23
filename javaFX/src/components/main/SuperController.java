@@ -150,7 +150,7 @@ public class SuperController {
                 Parent root = loader.load();
 
                 OrderController orderController = loader.getController();
-                orderController.setDetails(engine);
+                orderController.setDetails(engine,this.primaryStage);
 
                 content.getChildren().add(root);
             } catch (IOException e) {

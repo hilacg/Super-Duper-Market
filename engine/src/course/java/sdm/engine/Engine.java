@@ -119,4 +119,22 @@ public class Engine {
         }
         return res;
     }
+
+    public  Map<Integer,  Map<Integer, Float>> findOptimalOrder(Map<Integer, Float> productsToOrder) {
+        Map<Integer,  Map<Integer, Float>> storeProducts = new HashMap<>();
+        for(Map.Entry<Integer, Float> productToBuy : productsToOrder.entrySet()){
+            Map<Integer, Float> newProductAndPrice = new HashMap<>();
+            Optional<Store> cheapestStore = allStores.values().stream()
+                    .filter(store -> store.getProductPrices().get(productToBuy.getKey())!=null).min(Comparator.comparing(store -> store.getProductPrices().get(productToBuy.getKey())));
+
+            newProductAndPrice.put(productToBuy.getKey(),productToBuy.getValue());
+            Map<Integer, Float> productAndPrice = storeProducts.get(cheapestStore.get().getSerialNumber());
+            if(productAndPrice!=null){
+                productAndPrice.putAll(newProductAndPrice);
+            }
+            else
+                storeProducts.put(cheapestStore.get().getSerialNumber(),newProductAndPrice);
+        }
+        return storeProducts;
+    }
 }

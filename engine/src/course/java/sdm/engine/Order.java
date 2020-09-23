@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.List;
 
 public class Order {
-    private int serial;
     private Date date;
     private Map<Integer, Float> products;
     private Map<Integer,  Map<Integer, Float>> storeProducts = new HashMap<>(); //store serial, and list of products serials to buy and amounts for each
@@ -15,7 +14,6 @@ public class Order {
     private Point customerLocation;
 
     public Order(int serial,Date date,Map<Integer, Float> products, Point customerLocation){
-        this.serial = serial;
         this.date = date;
         this.products = products;
         this.customerLocation = customerLocation;
@@ -29,9 +27,6 @@ public class Order {
         return date;
     }
 
-    public int getSerial() {
-        return serial;
-    }
 
     public double getDeliveryPrice() {
         double deliveryPrice = 0;

@@ -82,6 +82,7 @@ public class Product {
         }};
 
         public abstract float validateAmount(String amount) throws Exception;
+
     }
 
 

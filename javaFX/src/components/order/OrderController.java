@@ -1,10 +1,8 @@
 package components.order;
 
-import java.awt.*;
-import course.java.sdm.engine.Customer;
-import course.java.sdm.engine.Engine;
-import course.java.sdm.engine.Product;
-import course.java.sdm.engine.Store;
+
+import components.product.ProductController;
+import course.java.sdm.engine.*;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -16,25 +14,43 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class OrderController {
 
     private Engine engine;
+    private Stage primaryStage;
     private Map<Integer, Customer> customers = new HashMap<>();
     private ObservableList<TableItem> productsList =FXCollections.observableArrayList();
     private Map<Integer, Float> productsToOrder = new HashMap<>();
+    private Map<Integer,  Map<Integer, Float>> storeProductsToOrder;
     private SimpleBooleanProperty disableFinish;
     private SimpleStringProperty chosenCustomer;
     private SimpleStringProperty chosenType;
@@ -75,8 +91,9 @@ public class OrderController {
         chosenDate = new SimpleDateFormat();
       //  disableFinish = new SimpleBooleanProperty(customerCombo.getValue()==null || datePicker.getValue() == null || orderType.getSelectedToggle()==null);
     }
-    public void setDetails(Engine engine){
+    public void setDetails(Engine engine, Stage primaryStage){
         this.engine = engine;
+        this.primaryStage = primaryStage;
         this.customers = engine.getAllCustomers();
         final ObservableList customerObservable = FXCollections.observableArrayList();
         for(Customer customer : customers.values()){
@@ -154,22 +171,96 @@ public class OrderController {
 
         });
         orderPane.add(storeCombo,1,3);
-        chosenStore.bind(Bindings.concat(storeCombo.getSelectionModel().getSelectedItem().toString().split(" ")[0]));
+//        chosenStore.bind(Bindings.concat(storeCombo.getSelectionModel().getSelectedItem().toString().split(" ")[0]));
     }
 
     @FXML
     void addToCart(ActionEvent event) {
         TableItem productToAdd = products.getSelectionModel().getSelectedItem();
-        productsToOrder.put(productToAdd.getSerial(), productsToOrder.getOrDefault(productToAdd.getSerial(), 0f) + 1);
+        final Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.initOwner(primaryStage);
+        dialog.setTitle("Set Amount");
+        VBox dialogVbox = new VBox(10);
+  //      dialogVbox.setStyle(primaryStage.getScene().getRoot().getStyle());
+        dialogVbox.setPadding(new Insets(10, 10, 10, 10));
+        dialogVbox.getChildren().add(new Text("Please Enter " + productToAdd.getName() + " Amount:"));
+        Label errorLabel = new Label();
+        errorLabel.setTextFill(Paint.valueOf("red"));
+        TextField amount = new TextField();
+        dialogVbox.getChildren().add(amount);
+        Button confirm = new Button();
+        confirm.setText("Confirm");
+        confirm.setOnAction((evt)->{
+            String input = amount.getText();
+            try {
+                engine.getProducts().get(productToAdd.getSerial()).getMethod().validateAmount(input);
+                productsToOrder.put(productToAdd.getSerial(), productsToOrder.getOrDefault(productToAdd.getSerial(), 0f) + Integer.parseInt(input));
+                dialog.close();
+            }catch (Exception e){
+                errorLabel.setText(e.getMessage());
+            }
+
+        });
+        dialogVbox.getChildren().add(errorLabel);
+        dialogVbox.getChildren().add(confirm);
+        Scene dialogScene = new Scene(dialogVbox, 300, 200);
+    //   dialogScene.getStylesheets().add(primaryStage.getScene().getRoot().getStylesheets());
+        dialog.setScene(dialogScene);
+        dialog.show();
     }
     @FXML
     void finishOrder(ActionEvent event) {
-        datePicker.getValue();
-
-  //      engine.setNewOrder(chosenStore.getValue(),chosenDate.getValue(), productsToOrder, new Point(4,6));
+      //  Order newOrder = engine.setNewOrder(chosenStore,deliveryDate, customerLocation);
+        storeProductsToOrder = new HashMap<>();
+        if(orderType.getSelectedToggle() == dynamicRadio){
+            storeProductsToOrder = engine.findOptimalOrder(productsToOrder);
+        }
+        else{
+            storeProductsToOrder.put(Integer.parseInt(storeCombo.getValue().toString().split(" ")[0]), productsToOrder);
+        }
+        FlowPane content = (FlowPane)primaryStage.getScene().lookup("#content");
+        content.getChildren().clear();
+        showDiscountsPage(content);
     }
 
-public static class TableItem{
+    private void showDiscountsPage(FlowPane content) {
+        VBox discountsBox = new VBox(10);
+        discountsBox.setPadding(new Insets(10, 10, 10, 10));
+        discountsBox.setPrefHeight(content.getPrefHeight());
+        discountsBox.setPrefWidth(content.getPrefHeight());
+        content.getChildren().add(discountsBox);
+
+        addDiscounts(discountsBox);
+    }
+
+    private void addDiscounts(VBox discountsBox) {
+        for(Map.Entry<Integer,  Map<Integer, Float>> storeAndProduct : storeProductsToOrder.entrySet()){
+            Store store = engine.getStores().get(storeAndProduct.getKey());
+            List<Discount> discounts = store.getDiscounts().stream()
+                    .filter(discount-> storeAndProduct.getValue().containsKey(discount.getItemId())
+                    &&storeAndProduct.getValue().get(discount.getItemId())>=discount.getQuantity())
+                    .collect(Collectors.toList());
+            discounts.forEach(discount->{
+                try {
+                    FXMLLoader loader = new FXMLLoader();
+                    loader.setLocation(getClass().getResource("/components/order/discount.fxml"));
+                    Parent root = loader.load();
+
+                    DiscountController discountController = loader.getController();
+                    discountController.setDetails(discount,engine);
+
+                    discountsBox.getChildren().add(root);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                    }
+            );
+
+        }
+    }
+
+    public static class TableItem{
     private final SimpleIntegerProperty serial;
     private final SimpleStringProperty name;
     private final SimpleStringProperty price;

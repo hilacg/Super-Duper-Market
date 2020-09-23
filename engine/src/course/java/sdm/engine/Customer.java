@@ -17,6 +17,8 @@ public class Customer {
     private int totalOrders = 0; //number of orders for customer
     private double avgOrdersPrice = 0; //without shipping
     private double avgShippingPrice = 0;
+    private List<Order> orders = new ArrayList<>();
+
     public Customer(){}
 
     public Customer(SDMCustomer customer){
