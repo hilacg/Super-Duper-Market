@@ -8,26 +8,29 @@ import java.util.function.Consumer;
 
 public class LoadTask extends Task<Boolean> {
 
-    private String filePath;
+    private final String filePath;
     private final SuperXML superXML;
+    private Engine engine;
 
     private final int SLEEP_TIME = 10;
 
-    public LoadTask(String filePath,SuperXML superXML) {
+    public LoadTask(String filePath,SuperXML superXML, Engine engine) {
         this.filePath = filePath;
         this.superXML = superXML;
+        this.engine = engine;
     }
 
     @Override
     protected Boolean call() throws Exception {
         try {
+            updateProgress(10,100);
             updateMessage("Fetching file...");
             sleepForAWhile(SLEEP_TIME);
             if (superXML.load(this.filePath)) {
-                updateProgress(10,100);
+                updateProgress(20,100);
                 updateMessage("Validating file...");
                 superXML.validateXML();
-                for(int i=10; i<=100;i++) {
+                for(int i=20; i<=100;i++) {
                     sleepForAWhile(SLEEP_TIME);
                     updateProgress(i, 100);
                 }
@@ -36,11 +39,9 @@ public class LoadTask extends Task<Boolean> {
         }
         catch (Exception e){
             updateMessage(e.getMessage());
-  //          return Boolean.FALSE;
-            //   tasks.clear()
- //           updateProgress(10,10);
-            throw e;
-  //          this.cancel();
+            updateProgress(0,100);
+            this.cancel();
+            return Boolean.FALSE;
         }
         return Boolean.TRUE;
     }

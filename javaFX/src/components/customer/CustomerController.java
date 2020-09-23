@@ -1,4 +1,4 @@
-package components;
+package components.customer;
 
 import course.java.sdm.engine.Customer;
 import course.java.sdm.engine.Product;

@@ -1,9 +1,8 @@
 *{
-	theme-primary-color:#7b68ee;
-	theme-secondery-color:#E7BD25;
+	theme: "monospace";
 }
-
-#title{
+}
+#title {
 -fx-background-color: theme-primary-color;
 -fx-text-fill: #ffffff;
 -fx-font-size:30px;
@@ -12,35 +11,66 @@
 -fx-padding:0 0 0 190;
 }
 
-.subTitle{
-	-fx-text-fill: theme-secondery-color;
+.subTitle {
+	-fx-text-fill: theme-titles-color;
 	-fx-font-size:20px;
 	-fx-font-weight:700;
 	-fx-alignment: center;
 }
 
-#menu{
+#menu {
 -fx-background-color: theme-primary-color;
 -fx-padding: 0;
 }
 
+
 .menuButton{
 	-fx-background-color: theme-primary-color;
-	-fx-text-fill:#ffffff;
+	-fx-text-fill: white;
 	-fx-cursor: "hand";
 	-fx-font-weight:900;
 	-fx-font-size:15px;
 }
 
-.menuButton:hover{
-	-fx-background-color: "white";
+.combo-box-popup .list-view .list-cell:filled:hover{
+	-fx-background-color: theme-secondery-color;
 	-fx-text-fill: theme-primary-color;
 }
 
-.card{
-	-fx-effect: dropshadow( three-pass-box , rgba(131,131,131,131.5) , 10, 0.0 , 2 , 2);
-	 -fx-padding: 10px;
+.combo-box-popup .list-view .list-cell:filled:selected{
+	 -fx-background-color: theme-secondery-color;
+}
+
+
+.combo-box-popup .list-view .list-cell{
+	-fx-text-fill: theme-primary-color;
+	-fx-background-color: white;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: theme-secondery-color;
+	-fx-background-color: theme-primary-color;
+}
+
+.menuButton:hover {
+	-fx-background-color: theme-secondery-color;
+	-fx-text-fill: theme-primary-color;
+}
+
+#content {
+	-fx-background-color: theme-backround-color;
+}
+
+.card {
+	-fx-background-color: theme-secondery-color;
+	-fx-effect: dropshadow( three-pass-box , rgba(131,131,131,131.5) , 10, 0.0 , 1 , 1);
+	-fx-padding: 10px;
     -fx-border-insets: 10px;
     -fx-background-insets: 10px;
-	-fx-background-color: whitesmoke;
+}
+
+.store {
+	-fx-padding: 10px;
+    -fx-border-insets: 10px;
+    -fx-background-insets: 10px;
 }

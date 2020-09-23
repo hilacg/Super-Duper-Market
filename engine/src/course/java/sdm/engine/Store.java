@@ -114,5 +114,12 @@ public class Store {
         return res;
     }
 
-
+    @Override
+    public String toString() {
+        return
+                "serialNumber: " + serialNumber +
+                "\nPPK: " + PPK +
+                "\ndeliveryEarnings: " + deliveryEarnings +
+                "\nlocation: (" + location.x + ", " + location.y + ")" ;
+    }
 }

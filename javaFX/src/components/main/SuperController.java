@@ -1,16 +1,22 @@
 package components.main;
 
-import components.CustomerController;
-import components.ProductController;
+import components.customer.CustomerController;
+import components.order.OrderController;
+import components.product.ProductController;
 import components.load.LoadController;
+import components.store.StoreController;
 import course.java.sdm.engine.Customer;
 import course.java.sdm.engine.Engine;
 import course.java.sdm.engine.Product;
+import course.java.sdm.engine.Store;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -30,6 +36,7 @@ public class SuperController {
     private Engine engine;
     private Stage primaryStage;
     private LoadController loadComponentController;
+    private String currentTheme="themes/default.css";
 
 
     public void setEngine(Engine engine) {
@@ -55,6 +62,22 @@ public class SuperController {
     private Button historyBtn;
     @FXML
     private FlowPane content;
+    @FXML
+    private ComboBox themeCombo;
+    @FXML
+    private ScrollPane root;
+    @FXML
+    protected void initialize() {
+        themeCombo.setItems(FXCollections.observableArrayList("default", "dark","theme2"));
+    }
+
+    @FXML
+    void changeTheme(ActionEvent event) {
+        root.getStylesheets().remove(getClass().getResource(currentTheme).toExternalForm());
+        currentTheme = "themes/" + themeCombo.getSelectionModel().getSelectedItem().toString() +".css";
+        root.getStylesheets().add(getClass().getResource(currentTheme).toExternalForm());
+        primaryStage.show();
+    }
 
 
     @FXML
@@ -72,9 +95,13 @@ public class SuperController {
     }
 
 
+
+
     void loadXML() throws IOException {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Open XML");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("XML Files", "*.xml"));
             File chosenFile = fileChooser.showOpenDialog(primaryStage);
 
             if(chosenFile != null) {
@@ -100,7 +127,7 @@ public class SuperController {
         for (Customer customer : engine.getAllCustomers().values()) {
             try {
                 FXMLLoader loader = new FXMLLoader();
-                loader.setLocation(getClass().getResource("/components/Customer.fxml"));
+                loader.setLocation(getClass().getResource("/components/customer/Customer.fxml"));
                 Parent root = loader.load();
 
                 CustomerController customerController = loader.getController();
@@ -115,7 +142,20 @@ public class SuperController {
 
     @FXML
     void showNewOrder(ActionEvent event) {
+        content.getChildren().clear();
+        title.setText("New Order");
+            try {
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getResource("/components/order/newOrder.fxml"));
+                Parent root = loader.load();
 
+                OrderController orderController = loader.getController();
+                orderController.setDetails(engine);
+
+                content.getChildren().add(root);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
     }
 
     @FXML
@@ -130,11 +170,11 @@ public class SuperController {
         for (Product product : engine.getProducts().values()) {
             try {
                 FXMLLoader loader = new FXMLLoader();
-               loader.setLocation(getClass().getResource("/components/Product.fxml"));
+               loader.setLocation(getClass().getResource("/components/product/Product.fxml"));
                 Parent root = loader.load();
 
                 ProductController productController = loader.getController();
-                productController.setDetails(product);
+                productController.setDetails(product,"");
 
                 content.getChildren().add(root);
             } catch (IOException e) {
@@ -145,6 +185,22 @@ public class SuperController {
 
     @FXML
     void showStores(ActionEvent event) {
+        content.getChildren().clear();
+        title.setText("Stores");
+        for (Store store : engine.getStores().values()) {
+            try {
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getResource("/components/store/Store.fxml"));
+                Parent root = loader.load();
+
+                StoreController storeController = loader.getController();
+                storeController.setDetails(store,engine.getProducts());
+
+                content.getChildren().add(root);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 

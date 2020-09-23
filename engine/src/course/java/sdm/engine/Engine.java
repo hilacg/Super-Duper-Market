@@ -17,7 +17,7 @@ public class Engine {
     private Map<Integer, Store> allStores;
     private Map<Integer, Customer> allCustomers;
     private boolean isXMLLoaded = false;
-    private final SuperXML superXML = new SuperXML();
+    private SuperXML superXML;
     private final List<Order> orders = new ArrayList<>();
 
     public Engine(SuperController superController) {
@@ -25,11 +25,9 @@ public class Engine {
     }
 
     public void loadXML(String filePath ,Runnable onFinish){
-
-        Task<Boolean> currentRunningTask = new LoadTask(filePath, superXML);
-
+        this.superXML  = new SuperXML();
+        Task<Boolean> currentRunningTask = new LoadTask(filePath, superXML,this);
         controller.bindTaskToUIComponents(currentRunningTask,onFinish);
-
         new Thread(currentRunningTask).start();
 
     }
@@ -78,9 +76,9 @@ public class Engine {
         return orders;
     }
 
-    public Order setNewOrder(Store chosenStore, Date deliveryDate, Map<Integer, Float> productsToOrder, Point customerLocation) {
+    public Order setNewOrder(String chosenStore, Date deliveryDate, Map<Integer, Float> productsToOrder, Point customerLocation) {
         Order newOrder = new Order(++orderNum,deliveryDate, productsToOrder, customerLocation);
-        newOrder.updateStoreProducts(chosenStore.getSerialNumber());
+        newOrder.updateStoreProducts(Integer.parseInt(chosenStore));
         newOrder.calculateDistance(allStores);
         return newOrder;
     }
