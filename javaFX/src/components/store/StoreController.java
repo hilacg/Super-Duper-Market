@@ -69,7 +69,7 @@ public class StoreController {
         content.setSpacing(10);
         content.setId("content");
         content.setPadding(new Insets(10, 10, 10, 10));
-        content.getChildren().add(new Text("Please choose a product and enter a price"));
+        content.getChildren().add(new Text("Please choose a product and enter a price:"));
         TextField amount = new TextField();
         amount.setPrefWidth(Region.USE_COMPUTED_SIZE);
         amount.setPromptText("Amount");
@@ -93,7 +93,10 @@ public class StoreController {
 
             }
             catch(Exception exp){
-                showAlerts(Alert.AlertType.ERROR, "Error adding product!", exp.getMessage());
+                if(exp.getMessage() != null)
+                  showAlerts(Alert.AlertType.ERROR, "Error adding product!", exp.getMessage());
+                else
+                    showAlerts(Alert.AlertType.ERROR, "Error adding product!","Please select an item and a price");
             }
         });
         content.getChildren().add(amount);
