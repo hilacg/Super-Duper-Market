@@ -7,8 +7,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 public class Offer {
 
     protected double quantity;
-    protected int itemId;
-    protected int forAdditional;
+    protected Integer itemId;
+    protected Integer forAdditional;
 
     public Offer(){}
     public Offer(SDMOffer offer) {
@@ -17,8 +17,15 @@ public class Offer {
         this.forAdditional = offer.getForAdditional();
     }
 
-    public int getItemId() {
+    public Integer getItemId() {
         return itemId;
     }
 
+    public double getQuantity() {
+        return quantity;
+    }
+
+    public int getForAdditional() {
+        return forAdditional;
+    }
 }

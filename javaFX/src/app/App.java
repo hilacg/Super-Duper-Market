@@ -48,12 +48,6 @@ public class App extends Application {
         this.engine = new Engine(superController);
         superController.setEngine(this.engine);
         superController.setPrimaryStage(primaryStage);
-   /*     superController.finishedInit().addListener((source, oldValue, newValue) -> {
-            if (newValue) {
-                final SuperScene superScene = new SuperScene(engine);
-                primaryStage.setScene(superScene);
-            }
-        });*/
         return superController;
     }
 

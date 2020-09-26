@@ -9,9 +9,13 @@
 -fx-padding:0 0 0 190;
 }
 
-.subTitle {
+
+#content .label{
+	-fx-text-fill:theme-text-color;
+}
+
+#content .subTitle {
 	-fx-text-fill: theme-titles-color;
-	-fx-font-size:20px;
 	-fx-font-weight:700;
 	-fx-alignment: center;
 }
@@ -20,7 +24,6 @@
 -fx-background-color: theme-primary-color;
 -fx-padding: 0;
 }
-
 
 .menuButton{
 	-fx-background-color: theme-primary-color;
@@ -59,16 +62,21 @@
 	-fx-background-color: theme-backround-color;
 }
 
+
 .card {
 	-fx-background-color: theme-secondery-color;
 	-fx-effect: dropshadow( three-pass-box , rgba(131,131,131,131.5) , 10, 0.0 , 1 , 1);
-	-fx-padding: 10px;
+	-fx-padding: 10;
     -fx-border-insets: 10px;
     -fx-background-insets: 10px;
 }
 
+.selected {
+	-fx-background-color: theme-selected-color;
+}
+
 .store {
-	-fx-padding: 10px;
+	-fx-padding: 10;
     -fx-border-insets: 10px;
     -fx-background-insets: 10px;
 }

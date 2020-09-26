@@ -37,14 +37,15 @@
                   <Button fx:id="productsBtn" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showProducts" prefHeight="50.0" styleClass="menuButton" text="Products" />
                   <Button fx:id="orderBtn" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showNewOrder" prefHeight="50.0" styleClass="menuButton" text="New Order" />
                   <Button fx:id="historyBtn" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showOrderHistory" prefHeight="50.0" styleClass="menuButton" text="Previous Orders" />
+                  <Button fx:id="mapBtn" disable="true" layoutX="10.0" layoutY="260.0" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#showMap" prefHeight="50.0" styleClass="menuButton" text="Map" />
                   <ComboBox id="themeCombo" fx:id="themeCombo" maxWidth="1.7976931348623157E308" onAction="#changeTheme" promptText="Theme" />
                </children>
             </VBox>
          </left>
          <center>
-            <ScrollPane prefHeight="400.0" prefWidth="610.0" BorderPane.alignment="CENTER">
+            <ScrollPane fitToHeight="true" fitToWidth="true" prefHeight="400.0" prefWidth="610.0" BorderPane.alignment="CENTER">
                <content>
-                  <FlowPane id="content" fx:id="content" alignment="TOP_CENTER" columnHalignment="CENTER" prefHeight="598.0" prefWidth="896.0" rowValignment="TOP">
+                  <FlowPane id="content" fx:id="content" alignment="TOP_CENTER" columnHalignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="598.0" prefWidth="896.0" rowValignment="TOP">
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>

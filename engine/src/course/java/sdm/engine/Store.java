@@ -14,7 +14,7 @@ public class Store {
     private int serialNumber;
     private String name;
     private Map<Integer,Integer> productPrices = new HashMap<>();//serial price
-    private Map<Integer,Float> productsSold = new HashMap<>(); //serial total earnings
+    private Map<Integer,Double> productsSold = new HashMap<>(); //serial total earnings
     private List<Order> orders = new ArrayList<>();
     private List<Discount> discounts =  new ArrayList<>();
     private int PPK;
@@ -28,11 +28,11 @@ public class Store {
         name = store.getName();
         for(SDMSell sell : store.getSDMPrices().getSDMSell()){
             productPrices.put(sell.getItemId(), sell.getPrice());
-            productsSold.put(sell.getItemId(),0f);
+            productsSold.put(sell.getItemId(),0.0);
         }
         if(store.getSDMDiscounts() !=null)
             for(SDMDiscount discount: store.getSDMDiscounts().getSDMDiscount()) {
-               discounts.add(new Discount(discount));
+               discounts.add(new Discount(discount,serialNumber));
             }
         PPK = store.getDeliveryPpk();
         location = new Point(store.getLocation().getX(),store.getLocation().getY());
@@ -79,7 +79,7 @@ public class Store {
         this.PPK = PPK;
     }
 
-    public void setProductsSold(Map.Entry<Integer, Float> productsSold) {
+    public void setProductsSold(Map.Entry<Integer, Double> productsSold) {
         this.productsSold.put(productsSold.getKey(), this.productsSold.get(productsSold.getKey()) + productsSold.getValue());
     }
 
@@ -87,7 +87,7 @@ public class Store {
         return productPrices;
     }
 
-    public Map<Integer, Float> getProductsSold() {
+    public Map<Integer, Double> getProductsSold() {
         return productsSold;
     }
 
@@ -95,6 +95,12 @@ public class Store {
         productPrices.remove(chosenProductSerial);
         productsSold.remove(chosenProductSerial);
     }
+
+    public double calculateDistance(Point location) {
+
+          return Math.sqrt((Math.pow(location.x - this.location.x,2) + Math.pow(location.y -this.location.y,2)));
+
+        }
 
     public String printStore(Map<Integer, Product> allProducts) {
         int i = 1;

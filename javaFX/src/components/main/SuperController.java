@@ -9,25 +9,32 @@ import course.java.sdm.engine.Customer;
 import course.java.sdm.engine.Engine;
 import course.java.sdm.engine.Product;
 import course.java.sdm.engine.Store;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 
 import javafx.event.ActionEvent;
 
+import java.awt.*;
 import java.io.File;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Set;
 
 import javafx.stage.Stage;
 
@@ -37,6 +44,7 @@ public class SuperController {
     private Stage primaryStage;
     private LoadController loadComponentController;
     private String currentTheme="themes/default.css";
+    private SimpleStringProperty chosenFileProperty = new SimpleStringProperty();
 
 
     public void setEngine(Engine engine) {
@@ -61,9 +69,11 @@ public class SuperController {
     @FXML
     private Button historyBtn;
     @FXML
+    private Button mapBtn;
+    @FXML
     private FlowPane content;
     @FXML
-    private ComboBox themeCombo;
+    private ComboBox<String> themeCombo;
     @FXML
     private ScrollPane root;
     @FXML
@@ -76,7 +86,6 @@ public class SuperController {
         root.getStylesheets().remove(getClass().getResource(currentTheme).toExternalForm());
         currentTheme = "themes/" + themeCombo.getSelectionModel().getSelectedItem().toString() +".css";
         root.getStylesheets().add(getClass().getResource(currentTheme).toExternalForm());
-        primaryStage.show();
     }
 
 
@@ -90,11 +99,11 @@ public class SuperController {
         loadComponentController = fxmlLoader.getController();
         loadComponentController.setMainController(this);
         content.getChildren().add(loadComponent);
+        Label filePath = (Label)loadComponent.lookup("#filePath");
+        filePath.textProperty().bind(chosenFileProperty);
         this.loadXML();
 
     }
-
-
 
 
     void loadXML() throws IOException {
@@ -111,6 +120,8 @@ public class SuperController {
                             engine.initMembers();
                         }
                 );
+                String absolutePath = chosenFile.getAbsolutePath();
+                chosenFileProperty.set(absolutePath);
             }
 
 
@@ -194,7 +205,7 @@ public class SuperController {
                 Parent root = loader.load();
 
                 StoreController storeController = loader.getController();
-                storeController.setDetails(store,engine.getProducts());
+                storeController.setDetails(store,engine.getProducts(),primaryStage,engine);
 
                 content.getChildren().add(root);
             } catch (IOException e) {
@@ -203,5 +214,46 @@ public class SuperController {
         }
 
     }
+
+
+    @FXML
+    void showMap(ActionEvent event) {
+        content.getChildren().clear();
+        title.setText("Map");
+        GridPane map = new GridPane();
+        map.setPadding(new Insets(10));
+        Point limits = engine.findMapLimits();
+        buildMap(map,limits);
+        addCustomers(map);
+        addStores(map);
+        map.setHgap(20);
+        map.setVgap(20);
+        content.getChildren().add(map);
+
+    }
+
+    private void addCustomers(GridPane map) {
+        engine.getAllCustomers().values().forEach(customer->{
+            Point location = customer.getLocation();
+            map.add(new Label("c"),(int)location.getX(),(int)location.getY());
+        });
+    }
+
+    private void addStores(GridPane map) {
+        engine.getStores().values().forEach(store->{
+            Point location = store.getLocation();
+            map.add(new Label("s"),(int)location.getX(),(int)location.getY());
+        });
+    }
+
+    private void buildMap(GridPane map,Point limits) {
+        for(int i=0; i< limits.x;i++){
+            map.addRow(i);
+            for(int j=0; j< limits.y;j++){
+                map.addColumn(j);
+            }
+        }
+    }
+
 
 }

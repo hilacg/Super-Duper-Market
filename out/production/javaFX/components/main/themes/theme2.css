@@ -1,9 +1,10 @@
 *{
 	theme-primary-color:#c94c4c;
 	theme-secondery-color:#b1cbbb;
+	theme-selected-color: #66997a;
 	theme-titles-color:#eea29a;
 	theme-backround-color:#deeaee;
-
+	theme-text-color:#4f1717;
 }
 
 .root{
@@ -12,6 +13,14 @@
 
 #content .label{
 	-fx-font-size: 15px;
+}
+
+#content .subTitle {
+	-fx-font-size: 18px;
+}
+
+#filePath{
+	-fx-font-size: 9px;
 }
 
 

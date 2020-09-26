@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
 
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
@@ -76,9 +77,8 @@ public class Engine {
         return orders;
     }
 
-    public Order setNewOrder(String chosenStore, Date deliveryDate, Map<Integer, Float> productsToOrder, Point customerLocation) {
-        Order newOrder = new Order(++orderNum,deliveryDate, productsToOrder, customerLocation);
-        newOrder.updateStoreProducts(Integer.parseInt(chosenStore));
+    public Order setNewOrder(Customer selectedCustomer, Map<Integer, Map<Integer, Double>> storeProductsToOrder, LocalDate date) {
+        Order newOrder = new Order(++orderNum,date, storeProductsToOrder, selectedCustomer.getLocation());
         newOrder.calculateDistance(allStores);
         return newOrder;
     }
@@ -92,8 +92,8 @@ public class Engine {
     }
 
     private void updateProductSoldAmount(Order newOrder) {
-        for (Map.Entry<Integer, Map<Integer, Float>> storeSoldProduct : newOrder.getStoreProducts().entrySet()) {
-            for (Map.Entry<Integer, Float> productSold : storeSoldProduct.getValue().entrySet()) {
+        for (Map.Entry<Integer, Map<Integer, Double>> storeSoldProduct : newOrder.getStoreProducts().entrySet()) {
+            for (Map.Entry<Integer, Double> productSold : storeSoldProduct.getValue().entrySet()) {
                 allProducts.get(productSold.getKey()).setSoldAmount(productSold.getValue());
                 allStores.get(storeSoldProduct.getKey()).setProductsSold(productSold);
             }
@@ -120,15 +120,15 @@ public class Engine {
         return res;
     }
 
-    public  Map<Integer,  Map<Integer, Float>> findOptimalOrder(Map<Integer, Float> productsToOrder) {
-        Map<Integer,  Map<Integer, Float>> storeProducts = new HashMap<>();
-        for(Map.Entry<Integer, Float> productToBuy : productsToOrder.entrySet()){
-            Map<Integer, Float> newProductAndPrice = new HashMap<>();
+    public  Map<Integer,  Map<Integer, Double>> findOptimalOrder(Map<Integer, Double> productsToOrder) {
+        Map<Integer,  Map<Integer, Double>> storeProducts = new HashMap<>();
+        for(Map.Entry<Integer, Double> productToBuy : productsToOrder.entrySet()){
+            Map<Integer, Double> newProductAndPrice = new HashMap<>();
             Optional<Store> cheapestStore = allStores.values().stream()
                     .filter(store -> store.getProductPrices().get(productToBuy.getKey())!=null).min(Comparator.comparing(store -> store.getProductPrices().get(productToBuy.getKey())));
 
             newProductAndPrice.put(productToBuy.getKey(),productToBuy.getValue());
-            Map<Integer, Float> productAndPrice = storeProducts.get(cheapestStore.get().getSerialNumber());
+            Map<Integer, Double> productAndPrice = storeProducts.get(cheapestStore.get().getSerialNumber());
             if(productAndPrice!=null){
                 productAndPrice.putAll(newProductAndPrice);
             }
@@ -136,5 +136,15 @@ public class Engine {
                 storeProducts.put(cheapestStore.get().getSerialNumber(),newProductAndPrice);
         }
         return storeProducts;
+    }
+
+    public Point findMapLimits() {
+        int maxCustomerX = allCustomers.values().stream().max(Comparator.comparing(customer -> customer.getLocation().x)).get().getLocation().x;
+        int maxStoreX = allStores.values().stream().max(Comparator.comparing(store -> store.getLocation().x)).get().getLocation().x;
+        int maxCustomerY = allCustomers.values().stream().max(Comparator.comparing(customer -> customer.getLocation().x)).get().getLocation().y;
+        int maxStoreY = allStores.values().stream().max(Comparator.comparing(store -> store.getLocation().x)).get().getLocation().y;
+        int maxX = Math.max(maxCustomerX,maxStoreX);
+        int maxY = Math.max(maxCustomerY,maxStoreY);
+        return new Point(maxX,maxY);
     }
 }

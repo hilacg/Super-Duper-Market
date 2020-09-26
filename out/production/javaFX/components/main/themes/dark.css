@@ -1,8 +1,10 @@
 *{
 	theme-primary-color:#563f46;
-	theme-secondery-color:#c8c3cc;
+	theme-secondery-color:#675e6e;
+	theme-selected-color: #342f37;
 	theme-titles-color:#8ca3a3;
 	theme-backround-color:#484f4f;
+	theme-text-color:#ffffff;
 }
 
 .root{
@@ -10,8 +12,14 @@
 }
 
 #content .label{
-	-fx-text-fill: #ffffff;
+	-fx-font-size: 20px;
+}
+
+#content .subTitle {
 	-fx-font-size: 25px;
+}
+#filePath{
+	-fx-font-size: 9px;
 }
 
 #content .button{

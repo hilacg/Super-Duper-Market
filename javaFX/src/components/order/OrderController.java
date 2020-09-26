@@ -1,21 +1,14 @@
 package components.order;
 
 
-import components.product.ProductController;
 import course.java.sdm.engine.*;
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.animation.PathTransition;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -25,21 +18,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Polyline;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -47,17 +40,19 @@ public class OrderController {
 
     private Engine engine;
     private Stage primaryStage;
+    private Customer selectedCustomer;
+    private Order newOrder;
+    private List<Discount> discounts = new ArrayList<>();
     private Map<Integer, Customer> customers = new HashMap<>();
     private ObservableList<TableItem> productsList =FXCollections.observableArrayList();
-    private Map<Integer, Float> productsToOrder = new HashMap<>();
-    private Map<Integer,  Map<Integer, Float>> storeProductsToOrder;
-    private SimpleBooleanProperty disableFinish;
-    private SimpleStringProperty chosenCustomer;
-    private SimpleStringProperty chosenType;
-    private SimpleDateFormat chosenDate;
-    private SimpleStringProperty chosenStore;
+    private ObservableList<TableItem> cartList =FXCollections.observableArrayList();
+    private Map<Integer, Double> productsToOrder = new HashMap<>();
+    private Map<Integer,  Map<Integer, Double>> storeProductsToOrder;
+    private SimpleBooleanProperty isCartEmpty = new SimpleBooleanProperty(true);
     private ComboBox<?> storeCombo;
     private DatePicker datePicker;
+    private PathTransition transition = new PathTransition();
+    private SimpleBooleanProperty animation = new SimpleBooleanProperty(false);
 
     @FXML
     private GridPane orderPane;
@@ -76,21 +71,88 @@ public class OrderController {
     @FXML
     private Button finishBtn;
     @FXML
-    private TableColumn<TableItem, String> productId;
+    private TableColumn<TableItem, Integer> productId;
     @FXML
     private TableColumn<TableItem, String>  productName;
     @FXML
     private TableColumn<TableItem, String> productMethod;
     @FXML
     private TableColumn<TableItem, String> productPrice;
+    @FXML
+    private TableView<TableItem> cartProducts;
+    @FXML
+    private TableColumn<TableItem, Integer>cartId;
+    @FXML
+    private TableColumn<TableItem, String> cartName;
+    @FXML
+    private TableColumn<TableItem, String> cartMethod;
+    @FXML
+    private TableColumn<TableItem, Integer> cartAmount;
+    @FXML
+    private ImageView productImg;
+    @FXML
+    private ImageView fillCartImg;
+    @FXML
+    private Button  enableAnimation;
 
 
-    public OrderController(){
-        chosenCustomer = new SimpleStringProperty();
-        chosenType = new SimpleStringProperty();
-        chosenDate = new SimpleDateFormat();
-      //  disableFinish = new SimpleBooleanProperty(customerCombo.getValue()==null || datePicker.getValue() == null || orderType.getSelectedToggle()==null);
+    @FXML
+    protected void initialize() {
+        setAnimation();
+        animation.addListener((observable, oldValue, newValue) -> {
+            enableAnimation.setText("Animation ".concat(newValue ? "enabled" : "disabled"));
+        });
+        fillCartImg.visibleProperty().bind(isCartEmpty.not());
+        productId.setCellValueFactory(new PropertyValueFactory<>("Id"));
+        productName.setCellValueFactory(new PropertyValueFactory<>("Name"));
+        productMethod.setCellValueFactory(new PropertyValueFactory<>("Method"));
+        productPrice.setCellValueFactory(new PropertyValueFactory<>("Price"));
+        products.setItems(productsList);
+        cartId.setCellValueFactory(new PropertyValueFactory<>("Id"));
+        cartName.setCellValueFactory(new PropertyValueFactory<>("Name"));
+        cartMethod.setCellValueFactory(new PropertyValueFactory<>("Method"));
+        cartAmount.setCellValueFactory(new PropertyValueFactory<>("Amount"));
+        cartProducts.setItems(cartList);
+        addBtn.disableProperty().bind(products.getSelectionModel().selectedItemProperty().isNull());
+        datePicker = new DatePicker();
+        datePicker.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                LocalDate today = LocalDate.now();
+
+                setDisable(empty || date.compareTo(today) < 0 );
+            }
+        });
+        datePicker.setEditable(false);
+        orderPane.add(datePicker,1,1);
+
+        finishBtn.disableProperty().bind(customerCombo.valueProperty().isNull()
+                .or(datePicker.valueProperty().isNull())
+                .or(isCartEmpty));
     }
+
+    @FXML
+    void enableAnimation(ActionEvent event) {
+        animation.setValue(!animation.get());
+        if(animation.get())
+            setAnimation();
+        else
+        {
+
+            transition = new PathTransition();
+        }
+    }
+
+    private void setAnimation() {
+        Polyline polyLine = new Polyline(-50.0,50.0,150.0,-100.0,330.0,0.0);
+  //      Polyline polyLine = new Polyline(0.0,0.0,150,-350.0,380.0,-180.0);
+        transition.setNode(productImg);
+        transition.setDuration(Duration.seconds(2));
+        transition.setPath(polyLine);
+        transition.setCycleCount(1);
+    }
+
     public void setDetails(Engine engine, Stage primaryStage){
         this.engine = engine;
         this.primaryStage = primaryStage;
@@ -106,72 +168,45 @@ public class OrderController {
 
 
     @FXML
-    protected void initialize() {
-        productId.setCellValueFactory(new PropertyValueFactory<>("Id"));
-        productName.setCellValueFactory(new PropertyValueFactory<>("Name"));
-        productMethod.setCellValueFactory(new PropertyValueFactory<>("Method"));
-        productPrice.setCellValueFactory(new PropertyValueFactory<>("Price"));
-        products.setItems(productsList);
-
-      /*  chosenCustomer.bind(Bindings.concat(customerCombo.getSelectionModel()));
-   //     chosenDate.bind(Bindings.concat(datePicker.getValue().toString()));
-        chosenType.bind(Bindings.concat(orderType.selectedToggleProperty()));*/
-
-       /* chosenCustomer.bind(Bindings.concat(customerCombo.getValue()));
-        chosenType.bind(Bindings.concat(orderType.selectedToggleProperty()));
-        chosenDate.bind(Bindings.concat(datePicker.getValue()));
-        disableFinish.bind(Bindings.chosenCustomer!= null || chosenType!= null || chosenDate!= null);
-        finishBtn.disableProperty().bind(disableFinish);*/
-        datePicker = new DatePicker();
-        datePicker.setDayCellFactory(picker -> new DateCell() {
-            @Override
-            public void updateItem(LocalDate date, boolean empty) {
-                super.updateItem(date, empty);
-                LocalDate today = LocalDate.now();
-
-                setDisable(empty || date.compareTo(today) < 0 );
-            }
-        });
-        datePicker.setEditable(false);
-        orderPane.add(datePicker,1,1);
-    }
-
-
-    @FXML
     void dynamicOrder(ActionEvent event) {
+        productsToOrder.clear();
+        cartList.clear();
+        isCartEmpty.set(true);
         productPrice.setVisible(false);
         productsList.clear();
         orderPane.getChildren().remove(storeCombo);
         for(Product product : engine.getProducts().values()){
-            productsList.add(new TableItem(product.getSerialNumber(), product.getName(), product.getMethod().toString(), " "));
+            productsList.add(new TableItem(product.getSerialNumber(), product.getName(), product.getMethod().toString(), " ",0.0));
         }
     }
 
 
     @FXML
     void showStores(ActionEvent event) {
+        productsToOrder.clear();
+        isCartEmpty.set(true);
         productPrice.setVisible(true);
         productsList.clear();
+        cartList.clear();
         storeCombo = new ComboBox();
         final ObservableList storeObservable = FXCollections.observableArrayList();
-        for(Store store : engine.getStores().values()){
-            String item = store.getSerialNumber() + " " + store.getName()+ " (" + store.getLocation().x+ ", " + store.getLocation().y + ")";
+        for (Store store : engine.getStores().values()) {
+            String item = store.getSerialNumber() + " " + store.getName() + " (" + store.getLocation().x + ", " + store.getLocation().y + ")";
             storeObservable.add(item);
         }
         storeCombo.setItems(storeObservable);
         storeCombo.setPromptText("Select Store");
-        storeCombo.setOnAction((ActionEvent)->{
+        storeCombo.setOnAction((ActionEvent) -> {
             productsList.clear();
-            int serial =  Integer.parseInt(storeCombo.getValue().toString().split(" ")[0]);
+            int serial = Integer.parseInt(storeCombo.getValue().toString().split(" ")[0]);
             Store store = engine.getStores().get(serial);
-            for(Map.Entry<Integer,Integer> productPrice : store.getProductPrices().entrySet()){
+            for (Map.Entry<Integer, Integer> productPrice : store.getProductPrices().entrySet()) {
                 Product product = engine.getProducts().get(productPrice.getKey());
-                productsList.add(new TableItem(product.getSerialNumber(), product.getName(), product.getMethod().toString(), String.valueOf(productPrice.getValue())));
+                productsList.add(new TableItem(product.getSerialNumber(), product.getName(), product.getMethod().toString(), String.valueOf(productPrice.getValue()), 0.0));
             }
 
         });
-        orderPane.add(storeCombo,1,3);
-//        chosenStore.bind(Bindings.concat(storeCombo.getSelectionModel().getSelectedItem().toString().split(" ")[0]));
+        orderPane.add(storeCombo, 1, 3);
     }
 
     @FXML
@@ -182,7 +217,8 @@ public class OrderController {
         dialog.initOwner(primaryStage);
         dialog.setTitle("Set Amount");
         VBox dialogVbox = new VBox(10);
-  //      dialogVbox.setStyle(primaryStage.getScene().getRoot().getStyle());
+        dialogVbox.getStylesheets().addAll(primaryStage.getScene().getRoot().getStylesheets());
+        dialogVbox.setId("content");
         dialogVbox.setPadding(new Insets(10, 10, 10, 10));
         dialogVbox.getChildren().add(new Text("Please Enter " + productToAdd.getName() + " Amount:"));
         Label errorLabel = new Label();
@@ -195,8 +231,19 @@ public class OrderController {
             String input = amount.getText();
             try {
                 engine.getProducts().get(productToAdd.getSerial()).getMethod().validateAmount(input);
-                productsToOrder.put(productToAdd.getSerial(), productsToOrder.getOrDefault(productToAdd.getSerial(), 0f) + Integer.parseInt(input));
+                productsToOrder.put(productToAdd.getSerial(), productsToOrder.getOrDefault(productToAdd.getSerial(), 0.0) + Double.parseDouble(input));
+                cartList.add(new TableItem(productToAdd.getSerial(), productToAdd.getName(), productToAdd.getMethod(), " ",Double.parseDouble(input)));
                 dialog.close();
+                if(animation.getValue()) {
+                    productImg.setVisible(true);
+                    transition.play();
+                    transition.setOnFinished(e -> {
+                        productImg.setVisible(false);
+                        isCartEmpty.set(false);
+                    });
+                }
+                else
+                    isCartEmpty.set(false);
             }catch (Exception e){
                 errorLabel.setText(e.getMessage());
             }
@@ -205,106 +252,177 @@ public class OrderController {
         dialogVbox.getChildren().add(errorLabel);
         dialogVbox.getChildren().add(confirm);
         Scene dialogScene = new Scene(dialogVbox, 300, 200);
-    //   dialogScene.getStylesheets().add(primaryStage.getScene().getRoot().getStylesheets());
         dialog.setScene(dialogScene);
         dialog.show();
+
     }
     @FXML
     void finishOrder(ActionEvent event) {
-      //  Order newOrder = engine.setNewOrder(chosenStore,deliveryDate, customerLocation);
         storeProductsToOrder = new HashMap<>();
+        selectedCustomer = engine.getAllCustomers().get(Integer.parseInt(customerCombo.getValue().toString().split(" ")[0]));
         if(orderType.getSelectedToggle() == dynamicRadio){
             storeProductsToOrder = engine.findOptimalOrder(productsToOrder);
+            newOrder = engine.setNewOrder(selectedCustomer,storeProductsToOrder,datePicker.getValue());
+            showOptimalOrder(newOrder);
         }
         else{
             storeProductsToOrder.put(Integer.parseInt(storeCombo.getValue().toString().split(" ")[0]), productsToOrder);
+            newOrder = engine.setNewOrder(selectedCustomer,storeProductsToOrder,datePicker.getValue());
         }
         FlowPane content = (FlowPane)primaryStage.getScene().lookup("#content");
         content.getChildren().clear();
         showDiscountsPage(content);
     }
 
+
+    private void showOptimalOrder(Order newOrder) {
+        final Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.initOwner(primaryStage);
+        dialog.setTitle("Order");
+
+        ScrollPane scroll  = new ScrollPane();
+        scroll.setPannable(true);
+        scroll.setPrefWidth(500);
+        scroll.setPrefHeight(700);
+        scroll.setFitToWidth(true);
+
+
+        scroll.getStylesheets().addAll(primaryStage.getScene().getRoot().getStylesheets());
+        VBox dialogVbox = new VBox(10);
+        dialogVbox.setPrefHeight(700);
+        scroll.setContent(dialogVbox);
+        dialogVbox.setPadding(new Insets(10));
+        dialogVbox.setId("content");
+        dialogVbox.getStylesheets().addAll(primaryStage.getScene().getRoot().getStylesheets());
+        for(Map.Entry<Integer,  Map<Integer, Double>> storeAndProduct : storeProductsToOrder.entrySet()){
+            Store store = engine.getStores().get(storeAndProduct.getKey());
+            Label storeName = new Label(store.getName() + " serial: " + store.getSerialNumber());
+            storeName.getStyleClass().add("subTitle");
+            Label location = new Label("Store location: ("+ store.getLocation().x + ", "+ store.getLocation().y+")");
+            Label delivery = new Label("PKK: " + store.getPPK() + String.format(", Distance: %.2f" , store.calculateDistance(selectedCustomer.getLocation()))
+            + String.format(", Delivery price: %.2f" , store.getPPK()*store.calculateDistance(selectedCustomer.getLocation())));
+            Label numOfTypes = new Label("Number of product types: " + storeAndProduct.getValue().size());
+            newOrder.calculatePrice(engine.getStores());
+            Label productsPrice = new Label(String.format("Products price: %.2f" , newOrder.calculateStorePrice(store.getSerialNumber())));
+            dialogVbox.getChildren().addAll(storeName,location,delivery,numOfTypes,productsPrice);
+        }
+        Scene dialogScene = new Scene(scroll);
+        dialog.setScene(dialogScene);
+        dialog.show();
+    }
+
     private void showDiscountsPage(FlowPane content) {
         VBox discountsBox = new VBox(10);
         discountsBox.setPadding(new Insets(10, 10, 10, 10));
-        discountsBox.setPrefHeight(content.getPrefHeight());
-        discountsBox.setPrefWidth(content.getPrefHeight());
         content.getChildren().add(discountsBox);
-
         addDiscounts(discountsBox);
+        Button confirm = new Button("Confirm");
+        confirm.setOnAction(e->{
+            RadioButton chosenRadio = null;
+            Set<Node> discountNodes = discountsBox.lookupAll(".selected");
+            for(Node node :discountNodes){
+                if(node.lookup(".operator").toString() == "on of"){
+                    Set<Node> radioSet = node.lookupAll(".toggle-button");
+                   for(Node radio : radioSet){
+                        RadioButton r = (RadioButton)radio;
+                       if( r.isSelected())
+                           chosenRadio = r;
+                    }
+                }
+               GridPane discountPane = (GridPane)node;
+                Discount selectedDiscount = this.discounts.stream().filter(discount-> discount.getName().equals(discountPane.getChildren().get(0).toString())).collect(Collectors.toList()).get(0);
+                newOrder.addDiscounts(selectedDiscount,chosenRadio);
+            }
+        });
+        discountsBox.getChildren().add(confirm);
     }
 
     private void addDiscounts(VBox discountsBox) {
-        for(Map.Entry<Integer,  Map<Integer, Float>> storeAndProduct : storeProductsToOrder.entrySet()){
+        for(Map.Entry<Integer,  Map<Integer, Double>> storeAndProduct : storeProductsToOrder.entrySet()){
             Store store = engine.getStores().get(storeAndProduct.getKey());
-            List<Discount> discounts = store.getDiscounts().stream()
-                    .filter(discount-> storeAndProduct.getValue().containsKey(discount.getItemId())
-                    &&storeAndProduct.getValue().get(discount.getItemId())>=discount.getQuantity())
-                    .collect(Collectors.toList());
-            discounts.forEach(discount->{
-                try {
-                    FXMLLoader loader = new FXMLLoader();
-                    loader.setLocation(getClass().getResource("/components/order/discount.fxml"));
-                    Parent root = loader.load();
-
-                    DiscountController discountController = loader.getController();
-                    discountController.setDetails(discount,engine);
-
-                    discountsBox.getChildren().add(root);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            store.getDiscounts().forEach(discount -> {
+                double amountBought = storeAndProduct.getValue().get(discount.getItemId());
+                if(storeAndProduct.getValue().containsKey(discount.getItemId())&& amountBought >= discount.getQuantity()){
+                    while(amountBought >= discount.getQuantity()){
+                        discounts.add(discount);
+                        amountBought -=discount.getQuantity();
                     }
-            );
-
+                }
+            });
         }
+        discounts.forEach(discount->{
+                    try {
+                        FXMLLoader loader = new FXMLLoader();
+                        loader.setLocation(getClass().getResource("/components/order/discount.fxml"));
+                        Parent root = loader.load();
+
+                        DiscountController discountController = loader.getController();
+                        discountController.setDetails(discount,engine);
+
+                        discountsBox.getChildren().add(root);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
     }
 
-    public static class TableItem{
-    private final SimpleIntegerProperty serial;
-    private final SimpleStringProperty name;
-    private final SimpleStringProperty price;
-    private final SimpleStringProperty method;
+    public static class TableItem {
+        private final SimpleIntegerProperty serial;
+        private final SimpleStringProperty name;
+        private final SimpleStringProperty price;
+        private final SimpleStringProperty method;
+        private final SimpleDoubleProperty amount;
 
 
-        protected TableItem(int serial, String name, String method,String price){
-         this.serial = new SimpleIntegerProperty(serial);
-         this.name =new SimpleStringProperty( name);
-         this.method =new SimpleStringProperty( method);
-         this.price = new SimpleStringProperty(price);
+        protected TableItem(Integer serial, String name, String method, String price, Double amount) {
+            this.serial = new SimpleIntegerProperty(serial);
+            this.name = new SimpleStringProperty(name);
+            this.method = new SimpleStringProperty(method);
+            this.price = new SimpleStringProperty(price);
+            this.amount = new SimpleDoubleProperty(amount);
         }
 
-    public String getName() {
-        return name.getValue();
-    }
+        public String getName() {
+            return name.getValue();
+        }
 
-    public String getPrice() {
-        return price.getValue();
-    }
+        public String getPrice() {
+            return price.getValue();
+        }
 
-    public String getMethod() {
-        return method.getValue();
-    }
+        public String getMethod() {
+            return method.getValue();
+        }
 
-    public Integer getSerial() {
-        return serial.getValue();
-    }
+        public Integer getSerial() {
+            return serial.getValue();
+        }
 
-    public void setMethod(String method) {
-        this.method.set(method);
-    }
+        public Double getAmount() {
+            return amount.get();
+        }
 
-    public void setName(String name) {
-        this.name.set(name);
-    }
+        public void setMethod(String method) {
+            this.method.set(method);
+        }
 
-    public void setPrice(String price) {
-        this.price.set(price);
-    }
+        public void setName(String name) {
+            this.name.set(name);
+        }
 
-    public void setSerial(int serial) {
-        this.serial.set(serial);
-    }
+        public void setPrice(String price) {
+            this.price.set(price);
+        }
 
-}
+        public void setSerial(Integer serial) {
+            this.serial.set(serial);
+        }
+
+        public void setAmount(Float amount) {
+            this.amount.set(amount);
+        }
+
+    }
 }
