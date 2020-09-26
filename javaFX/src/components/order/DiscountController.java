@@ -12,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 
+import javax.swing.*;
 import java.util.List;
 
 public class DiscountController {
@@ -49,7 +50,7 @@ public class DiscountController {
     private void setOffers(List<Offer> offers, Discount.Operator operator) {
         ToggleGroup group = new ToggleGroup();
         offers.forEach(offer->{
-            String of = (offer.getQuantity()+" "+ engine.getProducts().get(offer.getItemId()).getName()+ "for additional "+ offer.getForAdditional()+" Nis");
+            String of = (offer.getQuantity()+" "+ engine.getProducts().get(offer.getItemId()).getName()+ " for additional "+ offer.getForAdditional()+" Nis");
             switch (operator) {
                 case ONE_OF:{
                     RadioButton radio = new RadioButton(of);

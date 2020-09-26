@@ -4,18 +4,18 @@ import javafx.scene.control.RadioButton;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.List;
 
 public class Order {
     private LocalDate date;
     private Map<Integer, Double> products;
     private Map<Integer,  Map<Integer, Double>> storeProducts = new HashMap<>(); //store serial, and list of products serials to buy and amounts for each
     private double price;
+    private double discountsPrice;
     private Map<Integer, Double> deliveryPrices = new HashMap<>();
     private Map<Integer, Double> distance = new HashMap<>();
     private double totalPrice;
     private Point customerLocation;
-    private List<Discount> discounts = new ArrayList<>();
+    private Map<Integer,  Map<Integer, Double>> discountsProducts = new HashMap<>();
 
     public Order(int serial, LocalDate date, Map<Integer, Map<Integer, Double>> storeProductsToOrder, Point location){
         this.date = date;
@@ -40,6 +40,10 @@ public class Order {
         return deliveryPrice;
     }
 
+    public Map<Integer, Map<Integer, Double>> getDiscountsProducts() {
+        return discountsProducts;
+    }
+
     public double getTotalPrice() {
         return totalPrice;
     }
@@ -48,8 +52,8 @@ public class Order {
         return price;
     }
 
-    public Map<Integer, Double> getDistance() {
-        return distance;
+    public Double getDistance(int storeSerial) {
+        return distance.get(storeSerial);
     }
 
     public void updateStoreProducts(int storeSerial){
@@ -87,11 +91,34 @@ public class Order {
     }
 
     public void saveDiscounts(Discount selectedDiscount, RadioButton radio) {
-
+        Map<Integer, Double> productsFromStore = discountsProducts.get(selectedDiscount.getStoreSerial());
+        if(productsFromStore == null) {
+            productsFromStore = new HashMap<>();
+            discountsProducts.put(selectedDiscount.getStoreSerial(),productsFromStore);
+        }
+        if(radio == null){
+            for(Offer offer : selectedDiscount.getOffers()) {
+                productsFromStore.put(offer.itemId, productsFromStore.getOrDefault(offer.itemId, 0.0) + offer.quantity);
+                discountsPrice += offer.quantity* offer.forAdditional;
+            }
+        }
+        else{
+            String[] parts = radio.getText().split(" ");
+            Double quantity = Double.parseDouble(parts[0]);
+            productsFromStore.put(Integer.parseInt(radio.getId()),productsFromStore.getOrDefault(Integer.parseInt(radio.getId()), 0.0 ) + quantity);
+            discountsPrice += quantity* Double.parseDouble(parts[parts.length - 2]);
+        }
     }
 
-    public void addDiscounts(Discount selectedDiscount, RadioButton radio) {
-        Map<Integer, Double> productsFromStore = storeProducts.get(selectedDiscount.getStoreSerial());
+    public void addDiscounts() {
+        for( Map.Entry<Integer,  Map<Integer, Double>> discountsProducts : discountsProducts.entrySet()){
+            Map<Integer, Double> productsFromStore = storeProducts.get(discountsProducts.getKey());
+            for( Map.Entry<Integer, Double> product : discountsProducts.getValue().entrySet()){
+                productsFromStore.put(product.getKey(), productsFromStore.getOrDefault(product.getKey(), 0.0) + product.getValue());
+            }
+        }
+        price += discountsPrice;
+    /*    Map<Integer, Double> productsFromStore = storeProducts.get(selectedDiscount.getStoreSerial());
         if(radio == null){
             selectedDiscount.getOffers().forEach(offer->{
                 productsFromStore.put(offer.itemId,productsFromStore.getOrDefault(offer.itemId, 0.0 ) + offer.quantity);
@@ -102,6 +129,6 @@ public class Order {
             Double quantity = Double.parseDouble(radio.getText().split(" ")[0]);
             productsFromStore.put(Integer.parseInt(radio.getId()),productsFromStore.getOrDefault(Integer.parseInt(radio.getId()), 0.0 ) + quantity);
             price += quantity* Double.parseDouble(radio.getText().substring(radio.getText().lastIndexOf(" ")+1));
-        }
+        }*/
     }
 }

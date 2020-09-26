@@ -1,12 +1,15 @@
 package components.order;
 
 
+import components.main.SuperController;
+import components.map.MapController;
 import course.java.sdm.engine.*;
 import javafx.animation.PathTransition;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -42,6 +45,7 @@ public class OrderController {
     private Stage primaryStage;
     private Customer selectedCustomer;
     private Order newOrder;
+    FlowPane content;
     private List<Discount> discounts = new ArrayList<>();
     private Map<Integer, Customer> customers = new HashMap<>();
     private ObservableList<TableItem> productsList =FXCollections.observableArrayList();
@@ -156,6 +160,7 @@ public class OrderController {
     public void setDetails(Engine engine, Stage primaryStage){
         this.engine = engine;
         this.primaryStage = primaryStage;
+        content = (FlowPane)primaryStage.getScene().lookup("#content");
         this.customers = engine.getAllCustomers();
         final ObservableList customerObservable = FXCollections.observableArrayList();
         for(Customer customer : customers.values()){
@@ -269,9 +274,8 @@ public class OrderController {
             storeProductsToOrder.put(Integer.parseInt(storeCombo.getValue().toString().split(" ")[0]), productsToOrder);
             newOrder = engine.setNewOrder(selectedCustomer,storeProductsToOrder,datePicker.getValue());
         }
-        FlowPane content = (FlowPane)primaryStage.getScene().lookup("#content");
         content.getChildren().clear();
-        showDiscountsPage(content);
+        showDiscountsPage();
     }
 
 
@@ -312,31 +316,61 @@ public class OrderController {
         dialog.show();
     }
 
-    private void showDiscountsPage(FlowPane content) {
+    private void showDiscountsPage() {
         VBox discountsBox = new VBox(10);
         discountsBox.setPadding(new Insets(10, 10, 10, 10));
         content.getChildren().add(discountsBox);
         addDiscounts(discountsBox);
         Button confirm = new Button("Confirm");
-        confirm.setOnAction(e->{
-            RadioButton chosenRadio = null;
+        confirm.setOnAction(  e-> {
             Set<Node> discountNodes = discountsBox.lookupAll(".selected");
-            for(Node node :discountNodes){
-                if(node.lookup(".operator").toString() == "on of"){
-                    Set<Node> radioSet = node.lookupAll(".toggle-button");
-                   for(Node radio : radioSet){
-                        RadioButton r = (RadioButton)radio;
-                       if( r.isSelected())
-                           chosenRadio = r;
+            for (Node node : discountNodes) {
+                RadioButton chosenRadio = null;
+                Label operatorLabel = (Label)node.lookup(".operator");
+                if (operatorLabel.getText().equals("on of")) {
+                    FlowPane offersPane = (FlowPane)node.lookup(".offersPane");
+                    Set<Node> radioSet = offersPane.lookupAll(".radio-button");
+                    for (Node radio : radioSet) {
+                        RadioButton r = (RadioButton) radio;
+                        if (r.isSelected())
+                            chosenRadio = r;
                     }
                 }
-               GridPane discountPane = (GridPane)node;
-                Discount selectedDiscount = this.discounts.stream().filter(discount-> discount.getName().equals(discountPane.getChildren().get(0).toString())).collect(Collectors.toList()).get(0);
-                newOrder.addDiscounts(selectedDiscount,chosenRadio);
+                GridPane discountPane = (GridPane) node;
+                Label nameLabel = (Label)discountPane.getChildren().get(0).lookup("#discountName");
+                Discount selectedDiscount = this.discounts.stream().filter(discount -> discount.getName().equals(nameLabel.getText())).collect(Collectors.toList()).get(0);
+                newOrder.saveDiscounts(selectedDiscount, chosenRadio);
             }
+            showOrderSum();
         });
         discountsBox.getChildren().add(confirm);
     }
+
+
+    private void showOrderSum() {
+        content.getChildren().clear();
+        for(Map.Entry<Integer, Map<Integer, Double>> storeOrder : newOrder.getStoreProducts().entrySet()){
+            try {
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getResource("/components/order/OrderSummary.fxml"));
+                Parent root = loader.load();
+
+                SummaryContoller summaryContoller = loader.getController();
+                summaryContoller.setDetails(newOrder, storeOrder.getKey(), engine);
+
+                content.getChildren().add(root);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        Button confirm = new Button("confirm");
+        confirm.setOnAction(e-> {
+            newOrder.addDiscounts();
+            engine.addOrder(newOrder);
+        });
+        content.getChildren().add(confirm);
+    }
+
 
     private void addDiscounts(VBox discountsBox) {
         for(Map.Entry<Integer,  Map<Integer, Double>> storeAndProduct : storeProductsToOrder.entrySet()){

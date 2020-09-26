@@ -15,6 +15,9 @@
 	-fx-font-size: 15px;
 }
 
+#content .text-id{
+	-fx-font-size: 15px;
+}
 #content .subTitle {
 	-fx-font-size: 18px;
 }

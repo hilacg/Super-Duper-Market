@@ -80,12 +80,10 @@
     -fx-border-insets: 10px;
     -fx-background-insets: 10px;
 }
-#mapPane{
-	-fx-border-color: theme-primary-color;
-}
-#map{
+
+#map-container{
 	 -fx-background-image: url("../../resources/map.jpg");
-    -fx-background-size: cover;
+    -fx-background-size: "stretch";
 }
 #mapDetails{
 	-fx-background-color: theme-secondery-color;

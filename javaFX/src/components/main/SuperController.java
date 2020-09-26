@@ -6,10 +6,7 @@ import components.order.OrderController;
 import components.product.ProductController;
 import components.load.LoadController;
 import components.store.StoreController;
-import course.java.sdm.engine.Customer;
-import course.java.sdm.engine.Engine;
-import course.java.sdm.engine.Product;
-import course.java.sdm.engine.Store;
+import course.java.sdm.engine.*;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -238,8 +235,5 @@ public class SuperController {
             e.printStackTrace();
         }
     }
-
-
-
 
 }

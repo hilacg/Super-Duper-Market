@@ -118,8 +118,8 @@ public class StoreController {
         String res = "";
         for (Map.Entry<Integer, Integer> product : store.getProductPrices().entrySet()) {
             res = "";
-            res += "\n  " + (allProducts.get(product.getKey()).getName()) + "\n     price: " + (product.getValue().toString()) +
-                    "\n     amount sold: " + (store.getProductsSold().get(product.getKey()));
+            res += "\n" + (allProducts.get(product.getKey()).getName()) + "\nprice: " + (product.getValue().toString()) +
+                    "\namount sold: " + (store.getProductsSold().get(product.getKey()));
 
             try {
                 FXMLLoader loader = new FXMLLoader();

@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 public class Customer {
-    private int id;
+    private Integer id;
     private String name;
     private Point location;
-    private int totalOrders = 0; //number of orders for customer
+    private Integer totalOrders = 0; //number of orders for customer
     private double avgOrdersPrice = 0; //without shipping
     private double avgShippingPrice = 0;
     private List<Order> orders = new ArrayList<>();
@@ -28,7 +28,7 @@ public class Customer {
 
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -39,6 +39,10 @@ public class Customer {
 
     public Point getLocation() {
         return location;
+    }
+
+    public Integer getTotalOrders() {
+        return totalOrders;
     }
 
     @Override

@@ -139,10 +139,10 @@ public class Engine {
     }
 
     public Point findMapLimits() {
-        int maxCustomerX = allCustomers.values().stream().max(Comparator.comparing(customer -> customer.getLocation().x)).get().getLocation().x;
+        int maxCustomerX = allCustomers.values().stream().max(Comparator.comparing(customer -> customer.getLocation().y)).get().getLocation().x;
         int maxStoreX = allStores.values().stream().max(Comparator.comparing(store -> store.getLocation().x)).get().getLocation().x;
-        int maxCustomerY = allCustomers.values().stream().max(Comparator.comparing(customer -> customer.getLocation().x)).get().getLocation().y;
-        int maxStoreY = allStores.values().stream().max(Comparator.comparing(store -> store.getLocation().x)).get().getLocation().y;
+        int maxCustomerY = allCustomers.values().stream().max(Comparator.comparing(customer -> customer.getLocation().y)).get().getLocation().y;
+        int maxStoreY = allStores.values().stream().max(Comparator.comparing(store -> store.getLocation().y)).get().getLocation().y;
         int maxX = Math.max(maxCustomerX,maxStoreX);
         int maxY = Math.max(maxCustomerY,maxStoreY);
         return new Point(maxX,maxY);

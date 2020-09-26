@@ -23,14 +23,14 @@
       <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
    </rowConstraints>
    <children>
-      <Label fx:id="discountName" maxWidth="1.7976931348623157E308" styleClass="subTitle" GridPane.columnIndex="1" GridPane.columnSpan="2">
+      <Label fx:id="discountName" alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="subTitle" GridPane.columnSpan="2147483647">
          <GridPane.margin>
             <Insets />
          </GridPane.margin>
       </Label>
       <ScrollPane prefHeight="63.0" prefWidth="356.0" GridPane.columnSpan="5" GridPane.rowIndex="2">
          <content>
-            <FlowPane fx:id="offersPane" prefHeight="65.0" prefWidth="586.0" />
+            <FlowPane fx:id="offersPane" prefHeight="65.0" prefWidth="586.0" styleClass="offersPane" />
          </content>
       </ScrollPane>
       <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1">
