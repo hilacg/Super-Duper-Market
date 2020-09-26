@@ -1,6 +1,7 @@
 package components.main;
 
 import components.customer.CustomerController;
+import components.map.MapController;
 import components.order.OrderController;
 import components.product.ProductController;
 import components.load.LoadController;
@@ -21,6 +22,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
@@ -32,6 +35,8 @@ import javafx.event.ActionEvent;
 import java.awt.*;
 import java.io.File;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Set;
@@ -220,40 +225,21 @@ public class SuperController {
     void showMap(ActionEvent event) {
         content.getChildren().clear();
         title.setText("Map");
-        GridPane map = new GridPane();
-        map.setPadding(new Insets(10));
-        Point limits = engine.findMapLimits();
-        buildMap(map,limits);
-        addCustomers(map);
-        addStores(map);
-        map.setHgap(20);
-        map.setVgap(20);
-        content.getChildren().add(map);
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/components/map/map.fxml"));
+            Parent root = loader.load();
 
-    }
+            MapController mapController = loader.getController();
+            mapController.setDetails(engine);
 
-    private void addCustomers(GridPane map) {
-        engine.getAllCustomers().values().forEach(customer->{
-            Point location = customer.getLocation();
-            map.add(new Label("c"),(int)location.getX(),(int)location.getY());
-        });
-    }
-
-    private void addStores(GridPane map) {
-        engine.getStores().values().forEach(store->{
-            Point location = store.getLocation();
-            map.add(new Label("s"),(int)location.getX(),(int)location.getY());
-        });
-    }
-
-    private void buildMap(GridPane map,Point limits) {
-        for(int i=0; i< limits.x;i++){
-            map.addRow(i);
-            for(int j=0; j< limits.y;j++){
-                map.addColumn(j);
-            }
+            content.getChildren().add(root);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+
+
 
 
 }
