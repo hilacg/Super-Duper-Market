@@ -32,8 +32,8 @@ public class Product {
         this.avgPrice = price/storeCount;
     }
 
-    public void setStoreCount() {
-        this.storeCount++;
+    public void setStoreCount(int count) {
+        this.storeCount = count;
     }
     public void setName(String name) {
         this.name = name;
