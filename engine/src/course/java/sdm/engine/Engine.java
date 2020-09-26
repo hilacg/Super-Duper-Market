@@ -53,10 +53,11 @@ public class Engine {
         int price = 0;
         for(Product product : allProducts.values()){
             price = 0;
+            product.setStoreCount(0);
             for(Store store : allStores.values()){
                 if(store.getProductPrices().containsKey(product.getSerialNumber())) {
                     price += store.getProductPrices().get(product.getSerialNumber());
-                    product.setStoreCount();
+                    product.setStoreCount(product.getStoreCount()+1);
                 }
             }
             product.setAvgPrice(price);
@@ -108,6 +109,39 @@ public class Engine {
 
     }
 
+    public void deleteProduct(Store chosenStore, Product chosenProduct) throws Exception {
+        if (chosenProduct.getStoreCount() > 1){
+            if(chosenStore.getProductPrices().size()>1) {
+                allProducts.put(chosenProduct.getSerialNumber(),chosenProduct);
+                chosenStore.getProductPrices().remove(chosenProduct.getSerialNumber());
+                allStores.put(chosenStore.getSerialNumber(),chosenStore);
+                setProductAvgAndStoreCount();
+            }
+            else
+                throw new Exception("Can't delete product, The chosen store sells only in chosen product.\n");
+        }
+        else
+            throw new Exception("Can't delete product, The chosen product is sold only in the chosen store.\n");
+    }
+
+    public void updateProductPrice(Store chosenStore, Product chosenProduct, int price) {
+        chosenStore.getProductPrices().put(chosenProduct.getSerialNumber(),price);
+        allStores.put(chosenStore.getSerialNumber(),chosenStore);
+        setProductAvgAndStoreCount();
+
+    }
+
+    public void addProductToStore(int chosenSerial, Store chosenStore,int price) throws Exception {
+        if(allProducts.containsKey(chosenSerial)){
+            if(chosenStore.getProductPrices().containsKey(chosenSerial))
+                throw new Exception("The store already sells this product\n");
+            else{
+                chosenStore.getProductPrices().put(chosenSerial,price);
+                allStores.put(chosenStore.getSerialNumber(),chosenStore);
+                setProductAvgAndStoreCount();
+            }
+        }
+    }
 
     public boolean productSoldInOtherStore(Product chosenProduct, int chosenStoreSerial) {
         boolean res = false;
