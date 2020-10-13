@@ -7,7 +7,6 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -32,9 +31,6 @@
   </rowConstraints>
    <children>
       <ImageView fx:id="productImg" fitHeight="43.0" fitWidth="41.0" pickOnBounds="true" preserveRatio="true" visible="false" GridPane.columnIndex="2" GridPane.rowIndex="3">
-         <image>
-            <Image url="@../../resources/product.png" />
-         </image>
          <GridPane.margin>
             <Insets />
          </GridPane.margin></ImageView>
@@ -51,7 +47,7 @@
       </RadioButton>
       <TableView fx:id="products" GridPane.columnIndex="1" GridPane.rowIndex="4">
         <columns>
-            <TableColumn fx:id="productId" prefWidth="75.0" text="id" />
+            <TableColumn fx:id="productId" text="id" />
           <TableColumn fx:id="productName" text="name" />
             <TableColumn fx:id="productMethod" prefWidth="75.0" text="method" />
             <TableColumn fx:id="productPrice" prefWidth="75.0" text="price" />
@@ -64,20 +60,14 @@
       </Button>
       <Button fx:id="finishBtn" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#finishOrder" text="Finish order" GridPane.columnIndex="2" GridPane.rowIndex="5" />
       <ImageView fx:id="fillCartImg" fitHeight="48.0" fitWidth="54.0" pickOnBounds="true" preserveRatio="true" visible="false" GridPane.columnIndex="3" GridPane.rowIndex="3">
-         <image>
-            <Image url="@../../resources/fillCart.png" />
-         </image>
          <GridPane.margin>
             <Insets bottom="35.0" left="160.0" />
          </GridPane.margin>
       </ImageView>
-      <ImageView fitHeight="53.0" fitWidth="81.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.rowIndex="3">
+      <ImageView fx:id="cartImg" fitHeight="53.0" fitWidth="81.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="3" GridPane.rowIndex="3">
          <GridPane.margin>
             <Insets left="150.0" />
          </GridPane.margin>
-         <image>
-            <Image url="@../../resources/cart.png" />
-         </image>
       </ImageView>
       <TableView fx:id="cartProducts" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="3" GridPane.rowIndex="4">
         <columns>

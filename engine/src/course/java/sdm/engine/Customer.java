@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 public class Customer {
-    private int id;
+    private Integer id;
     private String name;
     private Point location;
-    private int totalOrders = 0; //number of orders for customer
+    private Integer totalOrders = 0; //number of orders for customer
     private double avgOrdersPrice = 0; //without shipping
     private double avgShippingPrice = 0;
     private List<Order> orders = new ArrayList<>();
@@ -28,10 +28,9 @@ public class Customer {
 
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
-
 
     public String getName() {
         return name;
@@ -41,13 +40,30 @@ public class Customer {
         return location;
     }
 
+    public Integer getTotalOrders() {
+        return totalOrders;
+    }
+    public void addOrder(Order newOrder){
+        this.orders.add(newOrder);
+        totalOrders++;
+        calculatePriceAvg();
+
+    }
+
+    private void calculatePriceAvg() {
+        double priceSum = orders.stream().mapToDouble(Order::getPrice).sum();
+        double deliverySum = orders.stream().mapToDouble(Order::getDeliveryPrice).sum();
+        this.avgOrdersPrice = priceSum/orders.size();
+        this.avgShippingPrice = deliverySum/orders.size();
+    }
+
     @Override
     public String toString() {
         return
                 "id:" + id +
                 "\nlocation: (" + location.x + ", " + location.y + ")" +
                 "\ntotal orders:" + totalOrders +
-                "\naverage orders price:" + avgOrdersPrice +
-                "\naverage shipping price:" + avgShippingPrice ;
+                String.format("\naverage orders price: %.2f", avgOrdersPrice) +
+                        String.format("\naverage shipping price: %.2f" , avgShippingPrice) ;
     }
 }

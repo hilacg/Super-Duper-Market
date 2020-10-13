@@ -39,6 +39,10 @@ public class Store {
 
     }
 
+    public Integer getTotalOrders(){
+        return orders.size();
+    }
+
     public List<Discount> getDiscounts() {
         return discounts;
     }

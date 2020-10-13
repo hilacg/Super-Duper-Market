@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fx:id="root" fitToHeight="true" fitToWidth="true" prefHeight="647.0" prefWidth="1091.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.main.SuperController">
+<ScrollPane fx:id="root" fitToHeight="true" fitToWidth="true" prefHeight="679.0" prefWidth="1110.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.main.SuperController">
    <content>
       <BorderPane prefWidth="1213.0">
          <top>

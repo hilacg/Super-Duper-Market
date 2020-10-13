@@ -13,7 +13,9 @@
 #content .label{
 	-fx-text-fill:theme-text-color;
 }
-
+#content .text-id{
+	-fx-fill:theme-text-color;
+}
 #content .subTitle {
 	-fx-text-fill: theme-titles-color;
 	-fx-font-weight:700;
@@ -80,12 +82,10 @@
     -fx-border-insets: 10px;
     -fx-background-insets: 10px;
 }
-#mapPane{
-	-fx-border-color: theme-primary-color;
-}
-#map{
+
+#map-container{
 	 -fx-background-image: url("../../resources/map.jpg");
-    -fx-background-size: cover;
+    -fx-background-size: stretch;
 }
 #mapDetails{
 	-fx-background-color: theme-secondery-color;

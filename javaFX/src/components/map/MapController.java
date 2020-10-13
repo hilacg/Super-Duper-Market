@@ -33,6 +33,8 @@ public class MapController {
 
     @FXML
     private Label detailsLabel;
+    @FXML
+    private AnchorPane mapContainer;
 
     @FXML
     protected void initialize() {
@@ -46,25 +48,25 @@ public class MapController {
 
     private void setMap() {
         GridPane map = new GridPane();
-        map.setPadding(new Insets(10));
+  //     map.setGridLinesVisible(true);
         map.setId("map");
         Point limits = engine.findMapLimits();
         buildMap(map,limits);
         addCustomers(map);
         addStores(map);
-        map.setHgap(20);
-        map.setVgap(20);
-        mapPane.setCenter(map);
+        mapContainer.getChildren().add(map);
     }
 
     private void addCustomers(GridPane map) {
         engine.getAllCustomers().values().forEach(customer->{
             Point location = customer.getLocation();
-            Image image = new Image(this.getClass().getResourceAsStream("../../resources/customer.png"));
+            Image image = new Image(this.getClass().getResourceAsStream("/resources/customer.png"));
             ImageView customerIcon = new ImageView(image);
             customerIcon.setOnMouseClicked(e->{
                 nameLabel.textProperty().bind(Bindings.concat(customer.getName()));
-                detailsLabel.textProperty().bind(Bindings.concat(customer.toString()));
+                String customerInf = "Location: " + "(" + customer.getLocation().x + ", " + customer.getLocation().y + ")"
+                       +"\nId: " + customer.getId() + "\nTotal orders: " + customer.getTotalOrders();
+                detailsLabel.textProperty().bind(Bindings.format(customerInf));
             });
             customerIcon.setPreserveRatio(true);
             customerIcon.setFitHeight(50);
@@ -76,11 +78,13 @@ public class MapController {
     private void addStores(GridPane map) {
         engine.getStores().values().forEach(store->{
             Point location = store.getLocation();
-            Image image = new Image(this.getClass().getResourceAsStream("../../resources/store.png"));
+            Image image = new Image(this.getClass().getResourceAsStream("/resources/store.png"));
             ImageView customerIcon = new ImageView(image);
             customerIcon.setOnMouseClicked(e->{
                 nameLabel.textProperty().bind(Bindings.concat(store.getName()));
-                detailsLabel.textProperty().bind(Bindings.concat(store.toString()));
+                String storeInf = "Location: " + "(" + store.getLocation().x + ", " + store.getLocation().y + ")"
+                + "\nId: " + store.getSerialNumber() + "\nPPK: " + store.getPPK() + "\nTotal orders: " + store.getTotalOrders();
+                detailsLabel.textProperty().bind(Bindings.concat(storeInf));
             });
             customerIcon.setPreserveRatio(true);
             customerIcon.setFitHeight(50);
@@ -90,11 +94,11 @@ public class MapController {
 
 
     private void buildMap(GridPane map,Point limits) {
-        for(int i=0; i< limits.x;i++){
-            map.addRow(i);
-            for(int j=0; j< limits.y;j++){
-                map.addColumn(j);
-            }
+        for(int i=0; i<= limits.x+1;i++){
+            map.getColumnConstraints().add(new ColumnConstraints(50));
+        }
+        for(int j=0; j<= limits.y+1;j++){
+            map.getRowConstraints().add(new RowConstraints(50));
         }
     }
 }

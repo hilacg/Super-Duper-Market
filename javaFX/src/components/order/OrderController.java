@@ -1,12 +1,15 @@
 package components.order;
 
 
+import components.main.SuperController;
+import components.map.MapController;
 import course.java.sdm.engine.*;
 import javafx.animation.PathTransition;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -18,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -42,6 +46,7 @@ public class OrderController {
     private Stage primaryStage;
     private Customer selectedCustomer;
     private Order newOrder;
+    FlowPane content;
     private List<Discount> discounts = new ArrayList<>();
     private Map<Integer, Customer> customers = new HashMap<>();
     private ObservableList<TableItem> productsList =FXCollections.observableArrayList();
@@ -71,7 +76,7 @@ public class OrderController {
     @FXML
     private Button finishBtn;
     @FXML
-    private TableColumn<TableItem, Integer> productId;
+    private TableColumn<TableItem, String> productId;
     @FXML
     private TableColumn<TableItem, String>  productName;
     @FXML
@@ -93,7 +98,11 @@ public class OrderController {
     @FXML
     private ImageView fillCartImg;
     @FXML
+    private ImageView cartImg;
+    @FXML
     private Button  enableAnimation;
+
+
 
 
     @FXML
@@ -102,6 +111,7 @@ public class OrderController {
         animation.addListener((observable, oldValue, newValue) -> {
             enableAnimation.setText("Animation ".concat(newValue ? "enabled" : "disabled"));
         });
+        setPictures();
         fillCartImg.visibleProperty().bind(isCartEmpty.not());
         productId.setCellValueFactory(new PropertyValueFactory<>("Id"));
         productName.setCellValueFactory(new PropertyValueFactory<>("Name"));
@@ -132,6 +142,15 @@ public class OrderController {
                 .or(isCartEmpty));
     }
 
+    private void setPictures() {
+        Image image = new Image(this.getClass().getResourceAsStream("/resources/fillCart.png"));
+        fillCartImg.setImage(image);
+        image = new Image(this.getClass().getResourceAsStream("/resources/cart.png"));
+        cartImg.setImage(image);
+        image = new Image(this.getClass().getResourceAsStream("/resources/product.png"));
+        productImg.setImage(image);
+    }
+
     @FXML
     void enableAnimation(ActionEvent event) {
         animation.setValue(!animation.get());
@@ -156,6 +175,7 @@ public class OrderController {
     public void setDetails(Engine engine, Stage primaryStage){
         this.engine = engine;
         this.primaryStage = primaryStage;
+        content = (FlowPane)primaryStage.getScene().lookup("#content");
         this.customers = engine.getAllCustomers();
         final ObservableList customerObservable = FXCollections.observableArrayList();
         for(Customer customer : customers.values()){
@@ -176,7 +196,7 @@ public class OrderController {
         productsList.clear();
         orderPane.getChildren().remove(storeCombo);
         for(Product product : engine.getProducts().values()){
-            productsList.add(new TableItem(product.getSerialNumber(), product.getName(), product.getMethod().toString(), " ",0.0));
+            productsList.add(new TableItem(String.valueOf(product.getSerialNumber()), product.getName(), product.getMethod().toString(), " ",0.0));
         }
     }
 
@@ -202,7 +222,7 @@ public class OrderController {
             Store store = engine.getStores().get(serial);
             for (Map.Entry<Integer, Integer> productPrice : store.getProductPrices().entrySet()) {
                 Product product = engine.getProducts().get(productPrice.getKey());
-                productsList.add(new TableItem(product.getSerialNumber(), product.getName(), product.getMethod().toString(), String.valueOf(productPrice.getValue()), 0.0));
+                productsList.add(new TableItem(String.valueOf(product.getSerialNumber()), product.getName(), product.getMethod().toString(), String.valueOf(productPrice.getValue()), 0.0));
             }
 
         });
@@ -230,8 +250,8 @@ public class OrderController {
         confirm.setOnAction((evt)->{
             String input = amount.getText();
             try {
-                engine.getProducts().get(productToAdd.getSerial()).getMethod().validateAmount(input);
-                productsToOrder.put(productToAdd.getSerial(), productsToOrder.getOrDefault(productToAdd.getSerial(), 0.0) + Double.parseDouble(input));
+                engine.getProducts().get(Integer.parseInt(productToAdd.getSerial())).getMethod().validateAmount(input);
+                productsToOrder.put(Integer.parseInt(productToAdd.getSerial()), productsToOrder.getOrDefault(productToAdd.getSerial(), 0.0) + Double.parseDouble(input));
                 cartList.add(new TableItem(productToAdd.getSerial(), productToAdd.getName(), productToAdd.getMethod(), " ",Double.parseDouble(input)));
                 dialog.close();
                 if(animation.getValue()) {
@@ -269,9 +289,27 @@ public class OrderController {
             storeProductsToOrder.put(Integer.parseInt(storeCombo.getValue().toString().split(" ")[0]), productsToOrder);
             newOrder = engine.setNewOrder(selectedCustomer,storeProductsToOrder,datePicker.getValue());
         }
-        FlowPane content = (FlowPane)primaryStage.getScene().lookup("#content");
         content.getChildren().clear();
-        showDiscountsPage(content);
+
+        for(Map.Entry<Integer,  Map<Integer, Double>> storeAndProduct : storeProductsToOrder.entrySet()){
+            Store store = engine.getStores().get(storeAndProduct.getKey());
+            store.getDiscounts().forEach(discount -> {
+                if(storeAndProduct.getValue().containsKey(discount.getItemId())){
+                    double amountBought = storeAndProduct.getValue().get(discount.getItemId());
+                    if (amountBought >= discount.getQuantity()) {
+                        while (amountBought >= discount.getQuantity()) {
+                            discounts.add(discount);
+                            amountBought -= discount.getQuantity();
+                        }
+                    }
+                }
+            });
+        }
+
+        if(discounts.size()> 0)
+             showDiscountsPage();
+        else
+            showOrderSum();
     }
 
 
@@ -312,41 +350,104 @@ public class OrderController {
         dialog.show();
     }
 
-    private void showDiscountsPage(FlowPane content) {
+    private void showDiscountsPage() {
         VBox discountsBox = new VBox(10);
         discountsBox.setPadding(new Insets(10, 10, 10, 10));
         content.getChildren().add(discountsBox);
         addDiscounts(discountsBox);
         Button confirm = new Button("Confirm");
-        confirm.setOnAction(e->{
-            RadioButton chosenRadio = null;
+        confirm.setOnAction(  e-> {
             Set<Node> discountNodes = discountsBox.lookupAll(".selected");
-            for(Node node :discountNodes){
-                if(node.lookup(".operator").toString() == "on of"){
-                    Set<Node> radioSet = node.lookupAll(".toggle-button");
-                   for(Node radio : radioSet){
-                        RadioButton r = (RadioButton)radio;
-                       if( r.isSelected())
-                           chosenRadio = r;
+            for (Node node : discountNodes) {
+                RadioButton chosenRadio = null;
+                Label operatorLabel = (Label)node.lookup(".operator");
+                if (operatorLabel.getText().equals("on of")) {
+                    FlowPane offersPane = (FlowPane)node.lookup(".offersPane");
+                    Set<Node> radioSet = offersPane.lookupAll(".radio-button");
+                    for (Node radio : radioSet) {
+                        RadioButton r = (RadioButton) radio;
+                        if (r.isSelected())
+                            chosenRadio = r;
                     }
                 }
-               GridPane discountPane = (GridPane)node;
-                Discount selectedDiscount = this.discounts.stream().filter(discount-> discount.getName().equals(discountPane.getChildren().get(0).toString())).collect(Collectors.toList()).get(0);
-                newOrder.addDiscounts(selectedDiscount,chosenRadio);
+                GridPane discountPane = (GridPane) node;
+                Label nameLabel = (Label)discountPane.getChildren().get(0).lookup("#discountName");
+                Discount selectedDiscount = this.discounts.stream().filter(discount -> discount.getName().equals(nameLabel.getText())).collect(Collectors.toList()).get(0);
+                newOrder.saveDiscounts(selectedDiscount, chosenRadio);
             }
+            showOrderSum();
         });
         discountsBox.getChildren().add(confirm);
     }
+
+
+    private void showOrderSum() {
+        VBox contentBox = new VBox(10);
+        contentBox.setPadding(new Insets(10, 10, 10, 10));
+        contentBox.setPrefWidth(800);
+        contentBox.setPrefHeight(600);
+
+
+        FlowPane flowPane = new FlowPane();
+        contentBox.setPadding(new Insets(10, 10, 10, 10));
+        flowPane.setPrefWidth(800);
+        flowPane.setPrefHeight(600);
+        contentBox.getChildren().add(flowPane);
+
+        newOrder.calculatePrice(engine.getStores());
+
+        content.getChildren().clear();
+        Button confirm = new Button("confirm");
+        Button cancel = new Button("cancel");
+        cancel.setOnAction(e->{
+            Alert a = new Alert(Alert.AlertType.INFORMATION);
+            a.setTitle("Order Cancelled");
+            a.setContentText("Order was cancelled!");
+            a.setHeaderText(null);
+            a.show();
+            content.getChildren().clear();
+        });
+        confirm.setOnAction(e-> {
+            newOrder.addDiscounts();
+            engine.addOrder(newOrder);
+            Alert a = new Alert(Alert.AlertType.INFORMATION);
+            a.setTitle("Order Confirmed");
+            a.setContentText("Order was accepted successfully");
+            a.setHeaderText(null);
+            a.show();
+            content.getChildren().clear();
+        });
+        contentBox.getChildren().add(confirm);
+        contentBox.getChildren().add(cancel);
+        for(Map.Entry<Integer, Map<Integer, Double>> storeOrder : newOrder.getStoreProducts().entrySet()){
+            try {
+                FXMLLoader loader = new FXMLLoader();
+                loader.setLocation(getClass().getResource("/components/order/OrderSummary.fxml"));
+                Parent root = loader.load();
+
+                SummaryContoller summaryContoller = loader.getController();
+                summaryContoller.setDetails(newOrder, storeOrder.getKey(), engine);
+
+                flowPane.getChildren().add(root);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        content.getChildren().add(contentBox);
+    }
+
 
     private void addDiscounts(VBox discountsBox) {
         for(Map.Entry<Integer,  Map<Integer, Double>> storeAndProduct : storeProductsToOrder.entrySet()){
             Store store = engine.getStores().get(storeAndProduct.getKey());
             store.getDiscounts().forEach(discount -> {
-                double amountBought = storeAndProduct.getValue().get(discount.getItemId());
-                if(storeAndProduct.getValue().containsKey(discount.getItemId())&& amountBought >= discount.getQuantity()){
-                    while(amountBought >= discount.getQuantity()){
-                        discounts.add(discount);
-                        amountBought -=discount.getQuantity();
+                if(storeAndProduct.getValue().containsKey(discount.getItemId())){
+                    double amountBought = storeAndProduct.getValue().get(discount.getItemId());
+                    if (amountBought >= discount.getQuantity()) {
+                        while (amountBought >= discount.getQuantity()) {
+                            discounts.add(discount);
+                            amountBought -= discount.getQuantity();
+                        }
                     }
                 }
             });
@@ -369,15 +470,15 @@ public class OrderController {
     }
 
     public static class TableItem {
-        private final SimpleIntegerProperty serial;
+        private final SimpleStringProperty serial;
         private final SimpleStringProperty name;
         private final SimpleStringProperty price;
         private final SimpleStringProperty method;
         private final SimpleDoubleProperty amount;
 
 
-        protected TableItem(Integer serial, String name, String method, String price, Double amount) {
-            this.serial = new SimpleIntegerProperty(serial);
+        protected TableItem(String serial, String name, String method, String price, Double amount) {
+            this.serial = new SimpleStringProperty(serial);
             this.name = new SimpleStringProperty(name);
             this.method = new SimpleStringProperty(method);
             this.price = new SimpleStringProperty(price);
@@ -396,7 +497,7 @@ public class OrderController {
             return method.getValue();
         }
 
-        public Integer getSerial() {
+        public String getSerial() {
             return serial.getValue();
         }
 
@@ -416,7 +517,7 @@ public class OrderController {
             this.price.set(price);
         }
 
-        public void setSerial(Integer serial) {
+        public void setSerial(String serial) {
             this.serial.set(serial);
         }
 

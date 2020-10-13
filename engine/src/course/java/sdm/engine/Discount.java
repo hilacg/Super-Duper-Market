@@ -51,6 +51,10 @@ public class Discount {
         return operator;
     }
 
+    public void setOffers(List<Offer> offers) {
+        this.offers = offers;
+    }
+
     public enum Operator {
         IRRELEVANT{public String toString(){return "";}},
         ONE_OF{public String toString(){return "on of";}},
