@@ -1,8 +1,6 @@
 package course.java.sdm.engine;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /*
 Adding and retrieving users is synchronized and in that manner - these actions are thread safe
@@ -11,25 +9,25 @@ of the user of this class to handle the synchronization of isUserExists with oth
  */
 public class UserManager {
 
-    private final Set<String> usersSet;
+    private final Map<String,String> usersMap;
 
     public UserManager() {
-        usersSet = new HashSet<>();
+        usersMap = new HashMap<>();
     }
 
-    public synchronized void addUser(String username) {
-        usersSet.add(username);
+    public synchronized void addUser(String username,String type) {
+        usersMap.put(username,type);
     }
 
     public synchronized void removeUser(String username) {
-        usersSet.remove(username);
+        usersMap.remove(username);
     }
 
-    public synchronized Set<String> getUsers() {
-        return Collections.unmodifiableSet(usersSet);
+    public synchronized Map<String,String> getUsers() {
+        return Collections.unmodifiableMap(usersMap);
     }
 
     public boolean isUserExists(String username) {
-        return usersSet.contains(username);
+        return usersMap.containsKey(username);
     }
 }

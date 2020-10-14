@@ -19,8 +19,12 @@ public class Customer {
     private double avgShippingPrice = 0;
     private List<Order> orders = new ArrayList<>();
 
-    public Customer(){}
-
+    public Customer(){
+    }
+    public Customer(Integer id, String name){
+        this.id = id;
+        this.name = name;
+    }
     public Customer(SDMCustomer customer){
         id = customer.getId();
         name = customer.getName();

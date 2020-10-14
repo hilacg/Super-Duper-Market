@@ -14,14 +14,17 @@ import java.util.stream.Collectors;
 
 public class Engine {
     private static int orderNum = 0;
-    private Map<Integer, Product> allProducts;
-    private Map<Integer, Store> allStores;
-    private Map<Integer, Customer> allCustomers;
+    private static int userId = 0;
+    private Map<Integer, Product> allProducts = new HashMap<>();
+    private Map<Integer, Store> allStores = new HashMap<>();
+    private Map<Integer, Customer> allCustomers = new HashMap<>();
+    private Map<Integer, StoreOwner> allStoreOwners = new HashMap<>();
     private boolean isXMLLoaded = false;
     private SuperXML superXML;
     private final List<Order> orders = new ArrayList<>();
 
     public Engine() {
+
     }
 
     public void loadXML(String filePath ,SuperController controller,Runnable onFinish){
@@ -46,6 +49,13 @@ public class Engine {
         allStores = superXML.getTempAllStores();
         allCustomers = superXML.getTempAllCustomers();
         setProductAvgAndStoreCount();
+    }
+
+    public void addUser(String userName, String type){
+        if(type.equals("customer"))
+            allCustomers.put(++userId, new Customer(userId,userName));
+        else
+            allStoreOwners.put(++userId, new StoreOwner(userId,userName));
     }
 
     private void setProductAvgAndStoreCount() {
