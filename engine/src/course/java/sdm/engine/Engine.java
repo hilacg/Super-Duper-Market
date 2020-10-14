@@ -9,10 +9,10 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 
 public class Engine {
-    private SuperController controller;
     private static int orderNum = 0;
     private Map<Integer, Product> allProducts;
     private Map<Integer, Store> allStores;
@@ -21,11 +21,10 @@ public class Engine {
     private SuperXML superXML;
     private final List<Order> orders = new ArrayList<>();
 
-    public Engine(SuperController superController) {
-        this.controller = superController;
+    public Engine() {
     }
 
-    public void loadXML(String filePath ,Runnable onFinish){
+    public void loadXML(String filePath ,SuperController controller,Runnable onFinish){
         this.superXML  = new SuperXML();
         Task<Boolean> currentRunningTask = new LoadTask(filePath, superXML,this);
         controller.bindTaskToUIComponents(currentRunningTask,onFinish);
@@ -79,7 +78,7 @@ public class Engine {
     }
 
     public Order setNewOrder(Customer selectedCustomer, Map<Integer, Map<Integer, Double>> storeProductsToOrder, LocalDate date) {
-        Order newOrder = new Order(++orderNum,date, storeProductsToOrder, selectedCustomer.getLocation());
+        Order newOrder = new Order(++orderNum,date, storeProductsToOrder, selectedCustomer.getLocation(),selectedCustomer.getId());
         newOrder.calculateDistance(allStores);
         return newOrder;
     }
@@ -88,7 +87,8 @@ public class Engine {
         newOrder.calculatePrice(allStores);
         newOrder.calculateTotalPrice();
         updateProductSoldAmount(newOrder);
-
+        Customer c = allCustomers.get(newOrder.getCustomerId());
+        c.addOrder(newOrder);
         orders.add(newOrder);
     }
 
@@ -116,12 +116,21 @@ public class Engine {
                 chosenStore.getProductPrices().remove(chosenProduct.getSerialNumber());
                 allStores.put(chosenStore.getSerialNumber(),chosenStore);
                 setProductAvgAndStoreCount();
+                checkDiscounts(chosenStore,chosenProduct);
             }
             else
                 throw new Exception("Can't delete product, The chosen store sells only in chosen product.\n");
         }
         else
             throw new Exception("Can't delete product, The chosen product is sold only in the chosen store.\n");
+    }
+
+    private void checkDiscounts(Store chosenStore, Product chosenProduct) {
+        for(Discount discount: chosenStore.getDiscounts()){
+            discount.setOffers(discount.getOffers().stream().filter(offer->offer.getItemId()!= chosenProduct.getSerialNumber()).collect(Collectors.toList()));
+            if(discount.getOffers().size() == 0)
+                chosenStore.getDiscounts().remove(discount);
+            }
     }
 
     public void updateProductPrice(Store chosenStore, Product chosenProduct, int price) {

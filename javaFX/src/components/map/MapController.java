@@ -60,7 +60,7 @@ public class MapController {
     private void addCustomers(GridPane map) {
         engine.getAllCustomers().values().forEach(customer->{
             Point location = customer.getLocation();
-            Image image = new Image(this.getClass().getResourceAsStream("../../resources/customer.png"));
+            Image image = new Image(this.getClass().getResourceAsStream("/resources/customer.png"));
             ImageView customerIcon = new ImageView(image);
             customerIcon.setOnMouseClicked(e->{
                 nameLabel.textProperty().bind(Bindings.concat(customer.getName()));
@@ -78,7 +78,7 @@ public class MapController {
     private void addStores(GridPane map) {
         engine.getStores().values().forEach(store->{
             Point location = store.getLocation();
-            Image image = new Image(this.getClass().getResourceAsStream("../../resources/store.png"));
+            Image image = new Image(this.getClass().getResourceAsStream("/resources/store.png"));
             ImageView customerIcon = new ImageView(image);
             customerIcon.setOnMouseClicked(e->{
                 nameLabel.textProperty().bind(Bindings.concat(store.getName()));

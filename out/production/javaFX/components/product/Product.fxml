@@ -4,8 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 
-
-<VBox alignment="TOP_CENTER" prefHeight="280.0" prefWidth="250.0" spacing="10.0" styleClass="card" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.product.ProductController">
+<VBox alignment="TOP_CENTER" prefHeight="280.0" spacing="10.0" styleClass="card" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.product.ProductController">
    <children>
       <Label fx:id="nameLabel" alignment="CENTER" contentDisplay="CENTER" maxWidth="1.7976931348623157E308" styleClass="subTitle" textAlignment="CENTER">
          <opaqueInsets>

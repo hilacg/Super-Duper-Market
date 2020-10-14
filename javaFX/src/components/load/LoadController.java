@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -19,7 +20,7 @@ public class LoadController {
     private SuperController mainController;
 
     @FXML
-    private Label filePath;
+    private Text filePath;
 
     @FXML
     private ProgressBar taskProgressBar;

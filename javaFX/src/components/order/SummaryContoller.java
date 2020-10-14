@@ -23,7 +23,7 @@ public class SummaryContoller {
     private Label nameLabel;
 
     @FXML
-    private Label detailsLabel;
+    private Text detailsLabel;
     @FXML
     private VBox storePane;
 
@@ -37,22 +37,30 @@ public class SummaryContoller {
         order.getStoreProducts().get(storeSerial).forEach((productSerial,amount)->{
             Product product = engine.getProducts().get(productSerial);
             String s = getProductDetails(productSerial,product,amount);
-            Text productText = new Text(s+"\nFrom Discount");
+            Text productText = new Text(s+"\nNot from Discount");
             productText.getStyleClass().add("text-id");
             storePane.getChildren().add(productText);
 
         });
-        order.getDiscountsProducts().get(storeSerial).forEach((productSerial,amount)->{
-            Product product = engine.getProducts().get(productSerial);
-            String s = getProductDetails(productSerial,product,amount);
-            Text productText = new Text(s+"\nFrom Discount");
-            productText.getStyleClass().add("text-id");
-            storePane.getChildren().add(productText);
-        });
+        Map<Integer, Double> discountsProduct = order.getDiscountsProducts().get(storeSerial);
+        if(discountsProduct!=null) {
+            discountsProduct.forEach((productSerial, amount) -> {
+                Product product = engine.getProducts().get(productSerial);
+                String s = getProductDetails(productSerial, product, amount);
+                Text productText = new Text(s + "\nFrom Discount");
+                productText.getStyleClass().add("text-id");
+                storePane.getChildren().add(productText);
+            });
+        }
+        Text sumText = new Text(String.format("\nOrder price: %.2f  \nDelivery price: %.2f \nTotal order price: %.2f"
+                ,order.getPrice() ,order.getDeliveryPrices().get(storeSerial), (order.getPrice() + order.getDeliveryPrices().get(storeSerial))));
+        sumText.getStyleClass().add("text-id");
+        storePane.getChildren().add(sumText);
+
     }
 
     private String getProductDetails(int productSerial,Product product,Double amount) {
-        return product.getName() + "\nSerial: " + product.getSerialNumber()
+        return "\n" + product.getName() + "\nSerial: " + product.getSerialNumber()
                 + "\nBuying method: " + product.getMethod() + "\nAmount: " + amount + "\nPrice: " + store.getProductPrices().get(productSerial)
                 + " \nTotal price: " + (store.getProductPrices().get(productSerial) * amount);
     }

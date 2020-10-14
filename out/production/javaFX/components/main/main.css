@@ -13,7 +13,9 @@
 #content .label{
 	-fx-text-fill:theme-text-color;
 }
-
+#content .text-id{
+	-fx-fill:theme-text-color;
+}
 #content .subTitle {
 	-fx-text-fill: theme-titles-color;
 	-fx-font-weight:700;
@@ -83,7 +85,7 @@
 
 #map-container{
 	 -fx-background-image: url("../../resources/map.jpg");
-    -fx-background-size: "stretch";
+    -fx-background-size: stretch;
 }
 #mapDetails{
 	-fx-background-color: theme-secondery-color;

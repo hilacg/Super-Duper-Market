@@ -146,7 +146,7 @@ public class StoreController {
 
             try {
                 FXMLLoader loader = new FXMLLoader();
-                loader.setLocation(getClass().getResource("../product/Product.fxml"));
+                loader.setLocation(getClass().getResource("/components/product/Product.fxml"));
                 Pane root = loader.load();
                 ProductController productController = loader.getController();
                 HBox buttonsBox = new HBox();
@@ -189,7 +189,7 @@ public class StoreController {
         dialogVbox.getStylesheets().addAll(primaryStage.getScene().getRoot().getStylesheets());
         dialogVbox.setId("content");
         dialogVbox.setPadding(new Insets(10, 10, 10, 10));
-        dialogVbox.getChildren().add(new Text("Please Enter a new price for" + allProducts.get(product.getKey()).getName() + ": "));
+        dialogVbox.getChildren().add(new Text("Please Enter a new price for " + allProducts.get(product.getKey()).getName() + ": "));
         Label errorLabel = new Label();
         errorLabel.setTextFill(Paint.valueOf("red"));
         TextField amount = new TextField();

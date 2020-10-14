@@ -1,10 +1,7 @@
 package course.java.sdm.engine;
 
-import generatedClasses.SuperDuperMarketDescriptor;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 
-import java.util.function.Consumer;
 
 public class LoadTask extends Task<Boolean> {
 

@@ -3,6 +3,7 @@ package components.main;
 import components.customer.CustomerController;
 import components.map.MapController;
 import components.order.OrderController;
+import components.order.SummaryContoller;
 import components.product.ProductController;
 import components.load.LoadController;
 import components.store.StoreController;
@@ -25,6 +26,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
 import javafx.event.ActionEvent;
@@ -36,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Map;
 import java.util.Set;
 
 import javafx.stage.Stage;
@@ -95,13 +98,13 @@ public class SuperController {
     private void showLoad() throws IOException {
         content.getChildren().clear();
         FXMLLoader fxmlLoader = new FXMLLoader();
-        URL url = getClass().getResource("../load/Load.fxml");
+        URL url = getClass().getResource("/components/load/Load.fxml");
         fxmlLoader.setLocation(url);
         GridPane loadComponent = fxmlLoader.load(fxmlLoader.getLocation().openStream());
         loadComponentController = fxmlLoader.getController();
         loadComponentController.setMainController(this);
         content.getChildren().add(loadComponent);
-        Label filePath = (Label)loadComponent.lookup("#filePath");
+        Text filePath = (Text)loadComponent.lookup("#filePath");
         filePath.textProperty().bind(chosenFileProperty);
         this.loadXML();
 
@@ -116,7 +119,7 @@ public class SuperController {
             File chosenFile = fileChooser.showOpenDialog(primaryStage);
 
             if(chosenFile != null) {
-                engine.loadXML(chosenFile.getPath(),
+                engine.loadXML(chosenFile.getPath(),this,
                         () -> {
                             menu.getChildren().forEach(menuBtn -> menuBtn.setDisable(false));
                             engine.initMembers();
@@ -173,7 +176,24 @@ public class SuperController {
 
     @FXML
     void showOrderHistory(ActionEvent event) {
+        content.getChildren().clear();
+        title.setText("Order History");
+        for (Order order : engine.getOrders()) {
+            for (Map.Entry<Integer, Map<Integer, Double>> storeOrder : order.getStoreProducts().entrySet()) {
+                try {
+                    FXMLLoader loader = new FXMLLoader();
+                    loader.setLocation(getClass().getResource("/components/order/OrderSummary.fxml"));
+                    Parent root = loader.load();
 
+                    SummaryContoller summaryContoller = loader.getController();
+                    summaryContoller.setDetails(order, storeOrder.getKey(), engine);
+
+                    content.getChildren().add(root);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @FXML

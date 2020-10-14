@@ -45,7 +45,7 @@ public class App extends Application {
 
     private SuperController getSuperController(FXMLLoader fxmlLoader, final Stage primaryStage) {
         SuperController superController = fxmlLoader.getController();
-        this.engine = new Engine(superController);
+        this.engine = new Engine();
         superController.setEngine(this.engine);
         superController.setPrimaryStage(primaryStage);
         return superController;

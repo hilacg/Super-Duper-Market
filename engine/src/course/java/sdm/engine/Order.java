@@ -6,21 +6,25 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class Order {
+    private int serial;
     private LocalDate date;
     private Map<Integer, Double> products;
     private Map<Integer,  Map<Integer, Double>> storeProducts = new HashMap<>(); //store serial, and list of products serials to buy and amounts for each
-    private double price;
+    private double price = 0;
     private double discountsPrice;
     private Map<Integer, Double> deliveryPrices = new HashMap<>();
     private Map<Integer, Double> distance = new HashMap<>();
     private double totalPrice;
+    private int customerId;
     private Point customerLocation;
     private Map<Integer,  Map<Integer, Double>> discountsProducts = new HashMap<>();
 
-    public Order(int serial, LocalDate date, Map<Integer, Map<Integer, Double>> storeProductsToOrder, Point location){
+    public Order(int serial, LocalDate date, Map<Integer, Map<Integer, Double>> storeProductsToOrder, Point location,int customerId){
+        this.serial = serial;
         this.date = date;
         this.storeProducts = storeProductsToOrder;
         this.customerLocation = location;
+        this.customerId = customerId;
     }
 
     public Map<Integer, Map<Integer, Double>> getStoreProducts() {
@@ -31,6 +35,9 @@ public class Order {
         return date;
     }
 
+    public Map<Integer, Double> getDeliveryPrices() {
+        return deliveryPrices;
+    }
 
     public double getDeliveryPrice() {
         double deliveryPrice = 0;
@@ -54,6 +61,10 @@ public class Order {
 
     public Double getDistance(int storeSerial) {
         return distance.get(storeSerial);
+    }
+
+    public int getCustomerId() {
+        return customerId;
     }
 
     public void updateStoreProducts(int storeSerial){
@@ -118,17 +129,6 @@ public class Order {
             }
         }
         price += discountsPrice;
-    /*    Map<Integer, Double> productsFromStore = storeProducts.get(selectedDiscount.getStoreSerial());
-        if(radio == null){
-            selectedDiscount.getOffers().forEach(offer->{
-                productsFromStore.put(offer.itemId,productsFromStore.getOrDefault(offer.itemId, 0.0 ) + offer.quantity);
-                price += offer.quantity* offer.forAdditional;
-            });
-        }
-        else{
-            Double quantity = Double.parseDouble(radio.getText().split(" ")[0]);
-            productsFromStore.put(Integer.parseInt(radio.getId()),productsFromStore.getOrDefault(Integer.parseInt(radio.getId()), 0.0 ) + quantity);
-            price += quantity* Double.parseDouble(radio.getText().substring(radio.getText().lastIndexOf(" ")+1));
-        }*/
     }
+
 }

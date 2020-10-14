@@ -21,6 +21,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -75,7 +76,7 @@ public class OrderController {
     @FXML
     private Button finishBtn;
     @FXML
-    private TableColumn<TableItem, Integer> productId;
+    private TableColumn<TableItem, String> productId;
     @FXML
     private TableColumn<TableItem, String>  productName;
     @FXML
@@ -97,7 +98,11 @@ public class OrderController {
     @FXML
     private ImageView fillCartImg;
     @FXML
+    private ImageView cartImg;
+    @FXML
     private Button  enableAnimation;
+
+
 
 
     @FXML
@@ -106,6 +111,7 @@ public class OrderController {
         animation.addListener((observable, oldValue, newValue) -> {
             enableAnimation.setText("Animation ".concat(newValue ? "enabled" : "disabled"));
         });
+        setPictures();
         fillCartImg.visibleProperty().bind(isCartEmpty.not());
         productId.setCellValueFactory(new PropertyValueFactory<>("Id"));
         productName.setCellValueFactory(new PropertyValueFactory<>("Name"));
@@ -134,6 +140,15 @@ public class OrderController {
         finishBtn.disableProperty().bind(customerCombo.valueProperty().isNull()
                 .or(datePicker.valueProperty().isNull())
                 .or(isCartEmpty));
+    }
+
+    private void setPictures() {
+        Image image = new Image(this.getClass().getResourceAsStream("/resources/fillCart.png"));
+        fillCartImg.setImage(image);
+        image = new Image(this.getClass().getResourceAsStream("/resources/cart.png"));
+        cartImg.setImage(image);
+        image = new Image(this.getClass().getResourceAsStream("/resources/product.png"));
+        productImg.setImage(image);
     }
 
     @FXML
@@ -181,7 +196,7 @@ public class OrderController {
         productsList.clear();
         orderPane.getChildren().remove(storeCombo);
         for(Product product : engine.getProducts().values()){
-            productsList.add(new TableItem(product.getSerialNumber(), product.getName(), product.getMethod().toString(), " ",0.0));
+            productsList.add(new TableItem(String.valueOf(product.getSerialNumber()), product.getName(), product.getMethod().toString(), " ",0.0));
         }
     }
 
@@ -207,7 +222,7 @@ public class OrderController {
             Store store = engine.getStores().get(serial);
             for (Map.Entry<Integer, Integer> productPrice : store.getProductPrices().entrySet()) {
                 Product product = engine.getProducts().get(productPrice.getKey());
-                productsList.add(new TableItem(product.getSerialNumber(), product.getName(), product.getMethod().toString(), String.valueOf(productPrice.getValue()), 0.0));
+                productsList.add(new TableItem(String.valueOf(product.getSerialNumber()), product.getName(), product.getMethod().toString(), String.valueOf(productPrice.getValue()), 0.0));
             }
 
         });
@@ -235,8 +250,8 @@ public class OrderController {
         confirm.setOnAction((evt)->{
             String input = amount.getText();
             try {
-                engine.getProducts().get(productToAdd.getSerial()).getMethod().validateAmount(input);
-                productsToOrder.put(productToAdd.getSerial(), productsToOrder.getOrDefault(productToAdd.getSerial(), 0.0) + Double.parseDouble(input));
+                engine.getProducts().get(Integer.parseInt(productToAdd.getSerial())).getMethod().validateAmount(input);
+                productsToOrder.put(Integer.parseInt(productToAdd.getSerial()), productsToOrder.getOrDefault(productToAdd.getSerial(), 0.0) + Double.parseDouble(input));
                 cartList.add(new TableItem(productToAdd.getSerial(), productToAdd.getName(), productToAdd.getMethod(), " ",Double.parseDouble(input)));
                 dialog.close();
                 if(animation.getValue()) {
@@ -275,7 +290,26 @@ public class OrderController {
             newOrder = engine.setNewOrder(selectedCustomer,storeProductsToOrder,datePicker.getValue());
         }
         content.getChildren().clear();
-        showDiscountsPage();
+
+        for(Map.Entry<Integer,  Map<Integer, Double>> storeAndProduct : storeProductsToOrder.entrySet()){
+            Store store = engine.getStores().get(storeAndProduct.getKey());
+            store.getDiscounts().forEach(discount -> {
+                if(storeAndProduct.getValue().containsKey(discount.getItemId())){
+                    double amountBought = storeAndProduct.getValue().get(discount.getItemId());
+                    if (amountBought >= discount.getQuantity()) {
+                        while (amountBought >= discount.getQuantity()) {
+                            discounts.add(discount);
+                            amountBought -= discount.getQuantity();
+                        }
+                    }
+                }
+            });
+        }
+
+        if(discounts.size()> 0)
+             showDiscountsPage();
+        else
+            showOrderSum();
     }
 
 
@@ -348,7 +382,43 @@ public class OrderController {
 
 
     private void showOrderSum() {
+        VBox contentBox = new VBox(10);
+        contentBox.setPadding(new Insets(10, 10, 10, 10));
+        contentBox.setPrefWidth(800);
+        contentBox.setPrefHeight(600);
+
+
+        FlowPane flowPane = new FlowPane();
+        contentBox.setPadding(new Insets(10, 10, 10, 10));
+        flowPane.setPrefWidth(800);
+        flowPane.setPrefHeight(600);
+        contentBox.getChildren().add(flowPane);
+
+        newOrder.calculatePrice(engine.getStores());
+
         content.getChildren().clear();
+        Button confirm = new Button("confirm");
+        Button cancel = new Button("cancel");
+        cancel.setOnAction(e->{
+            Alert a = new Alert(Alert.AlertType.INFORMATION);
+            a.setTitle("Order Cancelled");
+            a.setContentText("Order was cancelled!");
+            a.setHeaderText(null);
+            a.show();
+            content.getChildren().clear();
+        });
+        confirm.setOnAction(e-> {
+            newOrder.addDiscounts();
+            engine.addOrder(newOrder);
+            Alert a = new Alert(Alert.AlertType.INFORMATION);
+            a.setTitle("Order Confirmed");
+            a.setContentText("Order was accepted successfully");
+            a.setHeaderText(null);
+            a.show();
+            content.getChildren().clear();
+        });
+        contentBox.getChildren().add(confirm);
+        contentBox.getChildren().add(cancel);
         for(Map.Entry<Integer, Map<Integer, Double>> storeOrder : newOrder.getStoreProducts().entrySet()){
             try {
                 FXMLLoader loader = new FXMLLoader();
@@ -358,17 +428,12 @@ public class OrderController {
                 SummaryContoller summaryContoller = loader.getController();
                 summaryContoller.setDetails(newOrder, storeOrder.getKey(), engine);
 
-                content.getChildren().add(root);
+                flowPane.getChildren().add(root);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        Button confirm = new Button("confirm");
-        confirm.setOnAction(e-> {
-            newOrder.addDiscounts();
-            engine.addOrder(newOrder);
-        });
-        content.getChildren().add(confirm);
+        content.getChildren().add(contentBox);
     }
 
 
@@ -376,11 +441,13 @@ public class OrderController {
         for(Map.Entry<Integer,  Map<Integer, Double>> storeAndProduct : storeProductsToOrder.entrySet()){
             Store store = engine.getStores().get(storeAndProduct.getKey());
             store.getDiscounts().forEach(discount -> {
-                double amountBought = storeAndProduct.getValue().get(discount.getItemId());
-                if(storeAndProduct.getValue().containsKey(discount.getItemId())&& amountBought >= discount.getQuantity()){
-                    while(amountBought >= discount.getQuantity()){
-                        discounts.add(discount);
-                        amountBought -=discount.getQuantity();
+                if(storeAndProduct.getValue().containsKey(discount.getItemId())){
+                    double amountBought = storeAndProduct.getValue().get(discount.getItemId());
+                    if (amountBought >= discount.getQuantity()) {
+                        while (amountBought >= discount.getQuantity()) {
+                            discounts.add(discount);
+                            amountBought -= discount.getQuantity();
+                        }
                     }
                 }
             });
@@ -403,15 +470,15 @@ public class OrderController {
     }
 
     public static class TableItem {
-        private final SimpleIntegerProperty serial;
+        private final SimpleStringProperty serial;
         private final SimpleStringProperty name;
         private final SimpleStringProperty price;
         private final SimpleStringProperty method;
         private final SimpleDoubleProperty amount;
 
 
-        protected TableItem(Integer serial, String name, String method, String price, Double amount) {
-            this.serial = new SimpleIntegerProperty(serial);
+        protected TableItem(String serial, String name, String method, String price, Double amount) {
+            this.serial = new SimpleStringProperty(serial);
             this.name = new SimpleStringProperty(name);
             this.method = new SimpleStringProperty(method);
             this.price = new SimpleStringProperty(price);
@@ -430,7 +497,7 @@ public class OrderController {
             return method.getValue();
         }
 
-        public Integer getSerial() {
+        public String getSerial() {
             return serial.getValue();
         }
 
@@ -450,7 +517,7 @@ public class OrderController {
             this.price.set(price);
         }
 
-        public void setSerial(Integer serial) {
+        public void setSerial(String serial) {
             this.serial.set(serial);
         }
 
