@@ -3,6 +3,7 @@ package chat.servlets;
 import chat.constants.Constants;
 import chat.utils.ServletUtils;
 import chat.utils.SessionUtils;
+import com.google.gson.Gson;
 import course.java.sdm.engine.Engine;
 import course.java.sdm.engine.UserManager;
 
@@ -17,15 +18,14 @@ import static chat.constants.Constants.USERNAME;
 public class LightweightLoginServlet extends HttpServlet {
 
     private Engine engine;
+    private UserManager userManager;
+    private static int userId = 0;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        engine = (Engine) getServletContext().getAttribute("engine");
-        if(engine==null){
-            engine = new Engine();
-            getServletContext().setAttribute("engine",engine);
-        }
+        engine = ServletUtils.getEngine(getServletContext());
+        userManager = engine.getUserManager();
     }
 
     // urls that starts with forward slash '/' are considered absolute
@@ -47,13 +47,38 @@ public class LightweightLoginServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String userAction = request.getParameter("action");
         response.setContentType("text/plain;charset=UTF-8");
-        String usernameFromSession = SessionUtils.getUsername(request);
-        UserManager userManager = ServletUtils.getUserManager(getServletContext());
 
-        if (usernameFromSession == null) { //user is not logged in yet
 
-            String usernameFromParameter = request.getParameter(USERNAME);
+        Integer userIdFromSession = SessionUtils.getUserId(request);
+   //     UserManager userManager = ServletUtils.getUserManager(getServletContext());
+
+        switch (userAction){
+            case "login": {
+                login(request,response,userIdFromSession,userManager);
+                break;
+            }
+            case "getUserType": {
+                response.setStatus(200);
+                response.getOutputStream().println(userManager.isCustomer(userIdFromSession));
+                break;
+            }
+            case "getUserName": {
+                response.setStatus(200);
+                response.getOutputStream().println(userManager.getUserName(userIdFromSession));
+                break;
+            }
+        }
+
+    }
+
+    private void getUser(HttpServletRequest request, HttpServletResponse response, String usernameFromSession, UserManager userManager) {
+    }
+
+    private void login(HttpServletRequest request, HttpServletResponse response, Integer userIdFromSession, UserManager userManager) throws IOException {
+        if (userIdFromSession == null) { //user is not logged in yet
+            String usernameFromParameter = request.getParameter("userName");
             if (usernameFromParameter == null || usernameFromParameter.isEmpty()) {
                 //no username in session and no username in parameter - not standard situation. it's a conflict
 
@@ -88,12 +113,12 @@ public class LightweightLoginServlet extends HttpServlet {
                     }
                     else {
                         //add the new user to the users list
-                        userManager.addUser(usernameFromParameter,request.getParameter("type"));
-                        engine.addUser(usernameFromParameter,request.getParameter("type"));
+                        userManager.addUser(++userId,usernameFromParameter,Boolean.parseBoolean(request.getParameter("isCustomer")));
+  //                      engine.addUser(usernameFromParameter,Boolean.parseBoolean(request.getParameter("isCustomer")));
                         //set the username in a session so it will be available on each request
                         //the true parameter means that if a session object does not exists yet
                         //create a new one
-                        request.getSession(true).setAttribute(USERNAME, usernameFromParameter);
+                        request.getSession(true).setAttribute("userId", userId);
 
                         //redirect the request to the chat room - in order to actually change the URL
                         System.out.println("On login, request URI is: " + request.getRequestURI());

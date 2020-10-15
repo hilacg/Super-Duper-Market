@@ -17,7 +17,7 @@ public class LogoutServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String usernameFromSession = SessionUtils.getUsername(request);
+   /*     String usernameFromSession = SessionUtils.getUsername(request);
         UserManager userManager = ServletUtils.getUserManager(getServletContext());
 
         if (usernameFromSession != null) {
@@ -30,10 +30,10 @@ public class LogoutServlet extends HttpServlet {
             (you can read about it here: https://tomcat.apache.org/tomcat-5.5-doc/servletapi/javax/servlet/http/HttpServletResponse.html#sendRedirect(java.lang.String))
 
             the best way (IMO) is to fetch the context path dynamically and build the redirection from it and on
-             */
+
 
             response.sendRedirect(request.getContextPath() + "/index.html");
-        }
+        }*/
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

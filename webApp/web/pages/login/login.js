@@ -2,8 +2,14 @@
 $(function() { // onload...do
     //add a function to the submit event
     $("#loginForm").submit(function() {
+        const userName = $("#userName").val();
+        const isCustomer = $("#customer").is(':checked');
         $.ajax({
-            data: $(this).serialize(),
+            data: {
+                action: "login",
+                userName: userName,
+                isCustomer: isCustomer
+            },
             url: this.action,
             timeout: 2000,
             error: function(errorObject) {

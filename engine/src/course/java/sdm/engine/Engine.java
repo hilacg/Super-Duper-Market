@@ -14,11 +14,9 @@ import java.util.stream.Collectors;
 
 public class Engine {
     private static int orderNum = 0;
-    private static int userId = 0;
     private Map<Integer, Product> allProducts = new HashMap<>();
     private Map<Integer, Store> allStores = new HashMap<>();
-    private Map<Integer, Customer> allCustomers = new HashMap<>();
-    private Map<Integer, StoreOwner> allStoreOwners = new HashMap<>();
+    private UserManager userManager = new UserManager();
     private boolean isXMLLoaded = false;
     private SuperXML superXML;
     private final List<Order> orders = new ArrayList<>();
@@ -27,7 +25,11 @@ public class Engine {
 
     }
 
-    public void loadXML(String filePath ,SuperController controller,Runnable onFinish){
+    public UserManager getUserManager() {
+        return userManager;
+    }
+
+    public void loadXML(String filePath , SuperController controller, Runnable onFinish){
         this.superXML  = new SuperXML();
         Task<Boolean> currentRunningTask = new LoadTask(filePath, superXML,this);
         controller.bindTaskToUIComponents(currentRunningTask,onFinish);
@@ -36,7 +38,7 @@ public class Engine {
     }
 
     public Map<Integer, Customer> getAllCustomers() {
-        return allCustomers;
+        return userManager.getAllCustomers();
     }
 
     public boolean getisXMLLoaded() {
@@ -47,16 +49,11 @@ public class Engine {
         isXMLLoaded = true;
         allProducts = superXML.getTempAllProducts();
         allStores = superXML.getTempAllStores();
-        allCustomers = superXML.getTempAllCustomers();
+    //    allCustomers = superXML.getTempAllCustomers();
         setProductAvgAndStoreCount();
     }
 
-    public void addUser(String userName, String type){
-        if(type.equals("customer"))
-            allCustomers.put(++userId, new Customer(userId,userName));
-        else
-            allStoreOwners.put(++userId, new StoreOwner(userId,userName));
-    }
+
 
     private void setProductAvgAndStoreCount() {
         int price = 0;
@@ -97,7 +94,7 @@ public class Engine {
         newOrder.calculatePrice(allStores);
         newOrder.calculateTotalPrice();
         updateProductSoldAmount(newOrder);
-        Customer c = allCustomers.get(newOrder.getCustomerId());
+        Customer c = userManager.getAllCustomers().get(newOrder.getCustomerId());
         c.addOrder(newOrder);
         orders.add(newOrder);
     }
@@ -192,9 +189,9 @@ public class Engine {
     }
 
     public Point findMapLimits() {
-        int maxCustomerX = allCustomers.values().stream().max(Comparator.comparing(customer -> customer.getLocation().y)).get().getLocation().x;
+        int maxCustomerX = userManager.getAllCustomers().values().stream().max(Comparator.comparing(customer -> customer.getLocation().y)).get().getLocation().x;
         int maxStoreX = allStores.values().stream().max(Comparator.comparing(store -> store.getLocation().x)).get().getLocation().x;
-        int maxCustomerY = allCustomers.values().stream().max(Comparator.comparing(customer -> customer.getLocation().y)).get().getLocation().y;
+        int maxCustomerY = userManager.getAllCustomers().values().stream().max(Comparator.comparing(customer -> customer.getLocation().y)).get().getLocation().y;
         int maxStoreY = allStores.values().stream().max(Comparator.comparing(store -> store.getLocation().y)).get().getLocation().y;
         int maxX = Math.max(maxCustomerX,maxStoreX);
         int maxY = Math.max(maxCustomerY,maxStoreY);

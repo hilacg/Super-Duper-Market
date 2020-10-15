@@ -2,7 +2,9 @@ package chat.servlets;
 
 import chat.utils.ServletUtils;
 import com.google.gson.Gson;
+import course.java.sdm.engine.Customer;
 import course.java.sdm.engine.Engine;
+import course.java.sdm.engine.StoreOwner;
 import course.java.sdm.engine.UserManager;
 
 import javax.servlet.ServletException;
@@ -14,6 +16,7 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class UsersListServlet extends HttpServlet {
 
@@ -23,9 +26,12 @@ public class UsersListServlet extends HttpServlet {
         response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
-            UserManager userManager = ServletUtils.getUserManager(getServletContext());
+            UserManager userManager = ServletUtils.getEngine(getServletContext()).getUserManager();
           //  Set<String> usersList = userManager.getUsers();
-            Map<String,String> usersList = userManager.getUsers();
+          //  Map<String,String> usersList = userManager.getUsers();
+            Map<String,String> usersList = new HashMap<>();
+            usersList.putAll(userManager.getAllCustomers().values().stream().collect( Collectors.toMap(Customer::getName,(customer)->"customer")));
+            usersList.putAll(userManager.getAllStoreOwners().values().stream().collect( Collectors.toMap(StoreOwner::getName,(owner)->"store owner")));
             String json = gson.toJson(usersList);
             out.println(json);
             out.flush();

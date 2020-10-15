@@ -1,6 +1,7 @@
 package chat.utils;
 
 
+import course.java.sdm.engine.Engine;
 import course.java.sdm.engine.UserManager;
 
 import javax.servlet.ServletContext;
@@ -18,6 +19,7 @@ public class ServletUtils {
 	the actual fetch of them is remained un-synchronized for performance POV
 	 */
 	private static final Object userManagerLock = new Object();
+	private static final Object engineLock = new Object();
 	private static final Object chatManagerLock = new Object();
 
 	public static UserManager getUserManager(ServletContext servletContext) {
@@ -28,6 +30,17 @@ public class ServletUtils {
 			}
 		}
 		return (UserManager) servletContext.getAttribute(USER_MANAGER_ATTRIBUTE_NAME);
+	}
+
+	public static Engine getEngine(ServletContext servletContext) {
+
+		synchronized (engineLock) {
+			if (servletContext.getAttribute("engine") == null) {
+				servletContext.setAttribute("engine", new Engine());
+				//servletContext.setAttribute(USER_MANAGER_ATTRIBUTE_NAME, new UserManager());
+			}
+		}
+		return (Engine) servletContext.getAttribute("engine");
 	}
 
 /*	public static ChatManager getChatManager(ServletContext servletContext) {

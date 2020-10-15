@@ -2,6 +2,11 @@ var refreshRate = 2000; //milli seconds
 var USER_LIST_URL = buildUrlWithContextPath("userslist");
 var LOGIN_URL = buildUrlWithContextPath("pages/login/loginShortResponse");
 
+var user={
+    name:"",
+    isCustomer:true,
+};
+
 function refreshUsersList(users) {
     //clear all current users
     $("#userlist").empty();
@@ -41,16 +46,54 @@ function isStoreOwner() {
 }
 
 function showFileChooser(){
-    if(isStoreOwner()){
-        $('<input type="file" id="xmlFile" name="xmlFile">')
+    if(!user.isCustomer){
+        $('<input type="file" id="xmlFile" name="xmlFile" accept=".xml">')
             .appendTo($("#fileChooser"));
     }
 }
 
+function getUser(){
+    getUserType();
+    getUserName();
+}
+
+function getUserType(){
+      $.ajax({
+      async: false,
+      url: LOGIN_URL,
+      data: {
+          action: "getUserType"
+      },
+      type: 'GET',
+      success: function (json) {
+          user.isCustomer = JSON.parse(json);
+          $("#userType").append(user.isCustomer ? "customer" : "store owner");
+          showFileChooser();
+      }
+  });
+  return false;
+}
+
+function getUserName(){
+    $.ajax({
+        async: false,
+        url: LOGIN_URL,
+        data: {
+            action: "getUserName"
+        },
+        type: 'GET',
+        success: function (json) {
+            user.name = json;
+            $("#hello").append(json);
+        }
+    });
+    return false;
+}
+
+
 $(function() {
-    $("#welcome").text("Welcome")
+    getUser();
     //The users list is refreshed automatically every second
     setInterval(ajaxUsersList, refreshRate);
-    showFileChooser();
 
 });
