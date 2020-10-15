@@ -48,7 +48,7 @@ function showFileChooser(){
 }
 
 $(function() {
-
+    $("#welcome").text("Welcome")
     //The users list is refreshed automatically every second
     setInterval(ajaxUsersList, refreshRate);
     showFileChooser();

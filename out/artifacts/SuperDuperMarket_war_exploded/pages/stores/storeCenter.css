@@ -1,0 +1,30 @@
+#toolBar{
+    background-color: #333;
+    display: flow-root;
+    color: white;
+    height: 50px;
+}
+
+#logo{
+    width: 100px;
+}
+
+.container{
+    display: flex;
+    padding: 10px;
+    height: 90%;
+    overflow: auto;
+}
+
+#userlist{
+    list-style: none;
+    padding: 0;
+}
+
+.onlineUsers{
+    border: 1px solid #ccc;
+    width: 10%;
+    padding: 10px;
+    height: 90%;
+    overflow: auto;
+}

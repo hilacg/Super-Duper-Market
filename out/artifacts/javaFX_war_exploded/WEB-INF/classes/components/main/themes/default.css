@@ -1,0 +1,27 @@
+*{
+	theme-primary-color:#7b68ee;
+	theme-secondery-color:#d6d4e0;
+	theme-selected-color: #c2b6fb;
+	theme-titles-color:#E7BD25;
+	theme-backround-color:white;
+	theme-text-color:#220f8a;
+}
+
+#content .label{
+	-fx-font-size: 18px;
+}
+
+#content .subTitle {
+	-fx-font-size: 20px;
+}
+
+#filePath{
+	-fx-font-size: 9px;
+}
+
+#content .button{
+   -fx-background-color: theme-primary-color;
+    -fx-background-radius: 5;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+}

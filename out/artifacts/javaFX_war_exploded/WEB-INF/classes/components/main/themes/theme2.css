@@ -1,0 +1,35 @@
+*{
+	theme-primary-color:#c94c4c;
+	theme-secondery-color:#b1cbbb;
+	theme-selected-color: #66997a;
+	theme-titles-color:#eea29a;
+	theme-backround-color:#deeaee;
+	theme-text-color:#4f1717;
+}
+
+.root{
+	-fx-font: italic 15px monospace;
+}
+
+#content .label{
+	-fx-font-size: 15px;
+}
+
+#content .text-id{
+	-fx-font-size: 15px;
+}
+#content .subTitle {
+	-fx-font-size: 18px;
+}
+
+#filePath{
+	-fx-font-size: 9px;
+}
+
+
+#content .button{
+   -fx-background-color: linear-gradient(theme-primary-color, #b13535);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+}

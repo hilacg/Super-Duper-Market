@@ -8,7 +8,7 @@ $(function() { // onload...do
             timeout: 2000,
             error: function(errorObject) {
                 console.error("Failed to login !");
-                $("#error-placeholder").append(errorObject.responseText)
+                $("#error-placeholder").text(errorObject.responseText)
             },
             success: function(nextPageUrl) {
                 window.location.replace(nextPageUrl);
