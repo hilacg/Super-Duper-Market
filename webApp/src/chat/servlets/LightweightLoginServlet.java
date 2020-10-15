@@ -3,6 +3,7 @@ package chat.servlets;
 import chat.constants.Constants;
 import chat.utils.ServletUtils;
 import chat.utils.SessionUtils;
+import course.java.sdm.engine.Engine;
 import course.java.sdm.engine.UserManager;
 
 import javax.servlet.ServletException;
@@ -15,13 +16,24 @@ import static chat.constants.Constants.USERNAME;
 
 public class LightweightLoginServlet extends HttpServlet {
 
+    private Engine engine;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        engine = (Engine) getServletContext().getAttribute("engine");
+        if(engine==null){
+            engine = new Engine();
+            getServletContext().setAttribute("engine",engine);
+        }
+    }
 
     // urls that starts with forward slash '/' are considered absolute
     // urls that doesn't start with forward slash '/' are considered relative to the place where this servlet request comes from
     // you can use absolute paths, but then you need to build them from scratch, starting from the context path
     // ( can be fetched from request.getContextPath() ) and then the 'absolute' path from it.
     // Each method with it's pros and cons...
-    private final String CHAT_ROOM_URL = "../chatroom/chatroom.html";
+    private final String STORE_CENTER_URL = "../stores/storescenter.html";
     private final String SIGN_UP_URL = "../signup/signup.html";
     private final String LOGIN_ERROR_URL = "/pages/loginerror/login_attempt_after_error.jsp";  // must start with '/' since will be used in request dispatcher...
     /**
@@ -49,7 +61,7 @@ public class LightweightLoginServlet extends HttpServlet {
                 response.setStatus(409);
 
                 // returns answer to the browser to go back to the sign up URL page
-                response.getOutputStream().println(SIGN_UP_URL);
+                response.getOutputStream().println("Please enter user name");
             } else {
                 //normalize the username value
                 usernameFromParameter = usernameFromParameter.trim();
@@ -76,23 +88,24 @@ public class LightweightLoginServlet extends HttpServlet {
                     }
                     else {
                         //add the new user to the users list
-                        userManager.addUser(usernameFromParameter);
+                        userManager.addUser(usernameFromParameter,request.getParameter("type"));
+                        engine.addUser(usernameFromParameter,request.getParameter("type"));
                         //set the username in a session so it will be available on each request
                         //the true parameter means that if a session object does not exists yet
                         //create a new one
-                        request.getSession(true).setAttribute(Constants.USERNAME, usernameFromParameter);
+                        request.getSession(true).setAttribute(USERNAME, usernameFromParameter);
 
                         //redirect the request to the chat room - in order to actually change the URL
                         System.out.println("On login, request URI is: " + request.getRequestURI());
                         response.setStatus(200);
-                        response.getOutputStream().println(CHAT_ROOM_URL);
+                        response.getOutputStream().println(STORE_CENTER_URL);
                     }
                 }
             }
         } else {
             //user is already logged in
             response.setStatus(200);
-            response.getOutputStream().println(CHAT_ROOM_URL);
+            response.getOutputStream().println(STORE_CENTER_URL);
         }
     }
 

@@ -65,7 +65,7 @@ public class SuperXML {
         checkProducts();
         storeProductCheck();
         productSoldTwice(); //in a single store
-        checkCustomers();
+    //    checkCustomers();
         checkSales();
 
     }

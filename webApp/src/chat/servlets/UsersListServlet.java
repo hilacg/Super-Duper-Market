@@ -2,6 +2,7 @@ package chat.servlets;
 
 import chat.utils.ServletUtils;
 import com.google.gson.Gson;
+import course.java.sdm.engine.Engine;
 import course.java.sdm.engine.UserManager;
 
 import javax.servlet.ServletException;
@@ -10,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class UsersListServlet extends HttpServlet {
@@ -21,7 +24,8 @@ public class UsersListServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
             UserManager userManager = ServletUtils.getUserManager(getServletContext());
-            Set<String> usersList = userManager.getUsers();
+          //  Set<String> usersList = userManager.getUsers();
+            Map<String,String> usersList = userManager.getUsers();
             String json = gson.toJson(usersList);
             out.println(json);
             out.flush();
