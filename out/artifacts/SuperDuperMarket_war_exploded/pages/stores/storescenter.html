@@ -12,7 +12,8 @@
 <body>
 <div id="toolBar">
     <img src="../../common/images/logo.png" id="logo" alt="logo">
-    <span id="welcome"></span>
+    <span id="hello">Hello </span>
+    <span id="userType">connected as </span>
     <button style="float: right; height: 100%;">Logout</button>
 </div>
 <div class="container">
@@ -21,7 +22,12 @@
         <ul id="userlist">
         </ul>
     </div>
-    <div id="fileChooser"></div>
+    <div id="fileChooser">
+        <label for="xmlFile" class="custom-file-upload button">
+            <img id="uploadImg" src="../../common/images/upload.png" style="width: 20px; margin-right: 15px;" alt="upload"> Upload XML File
+            <input type="file" id="xmlFile" name="xmlFile" accept=".xml">
+        </label>
+    </div>
 </div>
 </body>
 </html>

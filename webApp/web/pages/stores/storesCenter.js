@@ -29,35 +29,37 @@ function ajaxUsersList() {
     });
 }
 
-function isStoreOwner() {
-  /*  $.ajax({
-        async: false,
-        url: LOGIN_URL,
-        data: {
-            action: "status" //check what to send
-        },
-        type: 'GET',
-        success: function (json) {
-            result = json.isComputer;
-        }
-    });
-    return result;*/
-    return true;
-}
 
 function showFileChooser(){
     if(!user.isCustomer){
-        $('<input type="file" id="xmlFile" name="xmlFile" accept=".xml">')
-            .appendTo($("#fileChooser"));
+        const uploadButton = document.getElementById("fileChooser");
+        const uploadImg = document.getElementById("uploadImg");
+        uploadButton.style.display = "block";
+        uploadButton.addEventListener("mouseenter",()=>(uploadImg.style.filter = "invert(1)"));
+        uploadButton.addEventListener("mouseleave",()=>(uploadImg.style.filter = "invert(0)"));
     }
 }
 
 function getUser(){
-    getUserType();
-    getUserName();
+    $.ajax({
+        async: false,
+        url: LOGIN_URL,
+        data: {
+            action: "getUser"
+        },
+        type: 'GET',
+        success: function (json) {
+            user =json;
+            $("#userType").append(user.isCustomer ? "customer" : "store owner");
+            $("#hello").append(user.name);
+            showFileChooser();
+        }
+    });
+    return false;
+
 }
 
-function getUserType(){
+/*function getUserType(){
       $.ajax({
       async: false,
       url: LOGIN_URL,
@@ -88,7 +90,7 @@ function getUserName(){
         }
     });
     return false;
-}
+}*/
 
 
 $(function() {

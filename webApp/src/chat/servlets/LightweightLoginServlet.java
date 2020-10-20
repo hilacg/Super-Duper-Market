@@ -4,6 +4,7 @@ import chat.constants.Constants;
 import chat.utils.ServletUtils;
 import chat.utils.SessionUtils;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import course.java.sdm.engine.Engine;
 import course.java.sdm.engine.UserManager;
 
@@ -48,7 +49,6 @@ public class LightweightLoginServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String userAction = request.getParameter("action");
-        response.setContentType("text/plain;charset=UTF-8");
 
 
         Integer userIdFromSession = SessionUtils.getUserId(request);
@@ -56,7 +56,17 @@ public class LightweightLoginServlet extends HttpServlet {
 
         switch (userAction){
             case "login": {
+                response.setContentType("text/plain;charset=UTF-8");
                 login(request,response,userIdFromSession,userManager);
+                break;
+            }
+            case "getUser":{
+                response.setContentType("application/json");
+                JsonObject json = new JsonObject();
+                json.addProperty("name",userManager.getUserName(userIdFromSession));
+                json.addProperty("isCustomer",userManager.isCustomer(userIdFromSession));
+                response.setStatus(200);
+                response.getOutputStream().print(json.toString());
                 break;
             }
             case "getUserType": {
