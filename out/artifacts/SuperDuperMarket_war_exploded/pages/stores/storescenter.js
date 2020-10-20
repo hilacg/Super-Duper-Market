@@ -1,8 +1,10 @@
 var refreshRate = 2000; //milli seconds
 var USER_LIST_URL = buildUrlWithContextPath("userslist");
 var LOGIN_URL = buildUrlWithContextPath("pages/login/loginShortResponse");
+var AREA_URL = buildUrlWithContextPath("area");
 
 var user={
+    id:0,
     name:"",
     isCustomer:true,
 };
@@ -59,39 +61,32 @@ function getUser(){
 
 }
 
-/*function getUserType(){
-      $.ajax({
-      async: false,
-      url: LOGIN_URL,
-      data: {
-          action: "getUserType"
-      },
-      type: 'GET',
-      success: function (json) {
-          user.isCustomer = JSON.parse(json);
-          $("#userType").append(user.isCustomer ? "customer" : "store owner");
-          showFileChooser();
-      }
-  });
-  return false;
+function loadXML(event) {
+    var file = event.target.files[0];
+    var reader = new FileReader();
+    var creatorId = this.user.id;
+
+    reader.readAsText(file);
+    reader.onload = function (e) {
+        $.ajax(
+            {
+                url: AREA_URL,
+                data: {
+                    action: "loadXML",
+                    file: e.target.result,
+                    owner: creatorId,
+                },
+                type: 'POST',
+                success: response=>{
+                    $("#errorMsg").append(response)
+                },
+                error: response=>{
+                    $("#errorMsg").append(response.responseText)
+                }
+            }
+        );
+    };
 }
-
-function getUserName(){
-    $.ajax({
-        async: false,
-        url: LOGIN_URL,
-        data: {
-            action: "getUserName"
-        },
-        type: 'GET',
-        success: function (json) {
-            user.name = json;
-            $("#hello").append(json);
-        }
-    });
-    return false;
-}*/
-
 
 $(function() {
     getUser();

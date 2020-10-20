@@ -7,6 +7,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.awt.*;
 import java.io.File;
+import java.io.FileReader;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -14,12 +16,16 @@ import java.util.stream.Stream;
 public class SuperXML {
 
     public static final String JAXB_XML = "generatedClasses";
+    private Engine engine;
     private SuperDuperMarketDescriptor superMarket = null;
     private Map<Integer, Store> tempAllStores = new HashMap<>();
     private Map<Integer, Product> tempAllProducts = new HashMap<>();
     private Map<Integer, Customer> tempAllCustomers = new HashMap<>();
     private Map<Point,Integer> tempAllLocations = new HashMap<>();
 
+    public SuperXML(Engine engine){
+        this.engine = engine;
+    }
 
     public SuperDuperMarketDescriptor getSuperMarket() {
         return superMarket;
@@ -33,23 +39,21 @@ public class SuperXML {
         return tempAllStores;
     }
 
-    public boolean load(String filePath) throws Exception {
+    public void load(String fileContent) throws Exception {
         try {
-            if (filePath.length() < 4 || filePath.substring(filePath.length() - 4).toLowerCase().compareTo(".xml") != 0) {
-                throw new Exception("file is not an XML\n");
+            superMarket = this.XMLToObject(fileContent);
+            if( superMarket != null){
+                validateXML();
             }
-            superMarket = this.XMLToObject(filePath);
-            return superMarket != null;
-
         }catch (Exception e){
             throw e;
         }
     }
 
-    private SuperDuperMarketDescriptor XMLToObject(String filePath) throws Exception {
+    private SuperDuperMarketDescriptor XMLToObject(String fileContent) throws Exception {
         SuperDuperMarketDescriptor superMarket = null;
         try {
-            File file = new File(filePath);
+            File file = new File(fileContent);
             JAXBContext jaxbContext = JAXBContext.newInstance(JAXB_XML);
 
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -61,6 +65,7 @@ public class SuperXML {
     }
 
     public void validateXML() throws Exception {
+        checkZone();
         checkStores();
         checkProducts();
         storeProductCheck();
@@ -70,25 +75,10 @@ public class SuperXML {
 
     }
 
-
-
-    private void checkCustomers() throws Exception {
-        tempAllCustomers = new HashMap<>();
-        for(SDMCustomer customer : superMarket.getSDMCustomers().getSDMCustomer()){
-            Customer c = tempAllCustomers.putIfAbsent(customer.getId(),new Customer(customer));
-            if(checkLocationRange(customer.getLocation().getX(), customer.getLocation().getY()))
-            {
-                throw new Exception("location exception\n");
-            }
-            else{
-                Integer p = tempAllLocations.putIfAbsent(new Point(customer.getLocation().getX(),customer.getLocation().getY()),customer.getId());
-                if(p!=null){
-                    throw new Exception("duplicated location error\n");
-                }
-            }
-            if(c != null)
-            {
-                throw new Exception("customer duplicated id error\n");
+    private void checkZone() throws Exception {
+        for (StoreOwner owner : engine.getUserManager().getAllStoreOwners().values()) {
+            if (owner.getZones().contains(superMarket.getSDMZone().getName())) {
+                throw new Exception("The Zone already exists in the system\n");
             }
         }
     }

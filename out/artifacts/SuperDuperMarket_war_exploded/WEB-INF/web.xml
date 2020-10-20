@@ -4,16 +4,24 @@
 
     <servlet>
         <servlet-name>LoginShortResponseServlet</servlet-name>
-        <servlet-class>chat.servlets.LightweightLoginServlet</servlet-class>
+        <servlet-class>superduper.servlets.LightweightLoginServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>UsersListServlet</servlet-name>
-        <servlet-class>chat.servlets.UsersListServlet</servlet-class>
+        <servlet-class>superduper.servlets.UsersListServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AreaServlet</servlet-name>
+        <servlet-class>superduper.servlets.AreaServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>LoginShortResponseServlet</servlet-name>
         <url-pattern>/pages/login/loginShortResponse</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AreaServlet</servlet-name>
+        <url-pattern>/area</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>UsersListServlet</servlet-name>

@@ -1,10 +1,9 @@
 package course.java.sdm.engine;
 
-import components.main.SuperController;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.concurrent.Task;
-
 import java.awt.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
@@ -29,11 +28,13 @@ public class Engine {
         return userManager;
     }
 
-    public void loadXML(String filePath , SuperController controller, Runnable onFinish){
-        this.superXML  = new SuperXML();
-        Task<Boolean> currentRunningTask = new LoadTask(filePath, superXML,this);
+    public void loadXML(String file, int userId) throws Exception {
+        this.superXML = new SuperXML(this);
+        superXML.load(file);
+        initMembers(userId);
+   /*     Task<Boolean> currentRunningTask = new LoadTask(file, superXML,this);
         controller.bindTaskToUIComponents(currentRunningTask,onFinish);
-        new Thread(currentRunningTask).start();
+        new Thread(currentRunningTask).start();*/
 
     }
 
@@ -45,10 +46,11 @@ public class Engine {
         return isXMLLoaded;
     }
 
-    public void initMembers(){
+    public void initMembers(int userId){
         isXMLLoaded = true;
         allProducts = superXML.getTempAllProducts();
         allStores = superXML.getTempAllStores();
+        userManager.getAllStoreOwners().get(userId).getZones().add(superXML.getSuperMarket().getSDMZone().getName());
     //    allCustomers = superXML.getTempAllCustomers();
         setProductAvgAndStoreCount();
     }
