@@ -39,7 +39,7 @@ public class SuperXML {
         return tempAllStores;
     }
 
-    public void load(String fileContent) throws Exception {
+    public void load(InputStream fileContent) throws Exception {
         try {
             superMarket = this.XMLToObject(fileContent);
             if( superMarket != null){
@@ -50,14 +50,14 @@ public class SuperXML {
         }
     }
 
-    private SuperDuperMarketDescriptor XMLToObject(String fileContent) throws Exception {
+    private SuperDuperMarketDescriptor XMLToObject(InputStream fileContent) throws Exception {
         SuperDuperMarketDescriptor superMarket = null;
         try {
-            File file = new File(fileContent);
+   //         File file = new File(fileContent);
             JAXBContext jaxbContext = JAXBContext.newInstance(JAXB_XML);
 
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            superMarket =  (SuperDuperMarketDescriptor) jaxbUnmarshaller.unmarshal(file);
+            superMarket =  (SuperDuperMarketDescriptor) jaxbUnmarshaller.unmarshal(fileContent);
         }catch (JAXBException e) {
             throw new Exception("couldn't load file");
         }
@@ -77,7 +77,7 @@ public class SuperXML {
 
     private void checkZone() throws Exception {
         for (StoreOwner owner : engine.getUserManager().getAllStoreOwners().values()) {
-            if (owner.getZones().contains(superMarket.getSDMZone().getName())) {
+            if (owner.getZones().containsKey(superMarket.getSDMZone().getName())) {
                 throw new Exception("The Zone already exists in the system\n");
             }
         }

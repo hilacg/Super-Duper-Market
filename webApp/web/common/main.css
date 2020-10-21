@@ -17,3 +17,9 @@ button:hover, .button:hover{
     background-color: #ddd;
     color: black;
 }
+
+.error{
+    background-color: #ffcccc;
+    color: red;
+    text-align: center;
+}

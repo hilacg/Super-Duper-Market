@@ -13,11 +13,9 @@ import java.util.stream.Collectors;
 
 public class Engine {
     private static int orderNum = 0;
-    private Map<Integer, Product> allProducts = new HashMap<>();
-    private Map<Integer, Store> allStores = new HashMap<>();
-    private UserManager userManager = new UserManager();
-    private boolean isXMLLoaded = false;
-    private SuperXML superXML;
+//    private Map<Integer, Product> allProducts = new HashMap<>();
+  //  private Map<Integer, Store> allStores = new HashMap<>();
+    private final UserManager userManager = new UserManager();
     private final List<Order> orders = new ArrayList<>();
 
     public Engine() {
@@ -28,13 +26,12 @@ public class Engine {
         return userManager;
     }
 
-    public void loadXML(String file, int userId) throws Exception {
-        this.superXML = new SuperXML(this);
+    public void loadXML(InputStream file, int userId) throws Exception {
+        SuperXML superXML = new SuperXML(this);
         superXML.load(file);
-        initMembers(userId);
-   /*     Task<Boolean> currentRunningTask = new LoadTask(file, superXML,this);
-        controller.bindTaskToUIComponents(currentRunningTask,onFinish);
-        new Thread(currentRunningTask).start();*/
+        Zone newZone = new Zone(superXML);
+        userManager.getAllStoreOwners().get(userId).getZones().put(newZone.getName(), newZone);
+ //       initMembers(userId);
 
     }
 
@@ -42,22 +39,18 @@ public class Engine {
         return userManager.getAllCustomers();
     }
 
-    public boolean getisXMLLoaded() {
-        return isXMLLoaded;
-    }
 
-    public void initMembers(int userId){
-        isXMLLoaded = true;
+ /*   public void initMembers(int userId){
         allProducts = superXML.getTempAllProducts();
         allStores = superXML.getTempAllStores();
-        userManager.getAllStoreOwners().get(userId).getZones().add(superXML.getSuperMarket().getSDMZone().getName());
+//        userManager.getAllStoreOwners().get(userId).getZones().add(superXML.getSuperMarket().getSDMZone().getName());
     //    allCustomers = superXML.getTempAllCustomers();
         setProductAvgAndStoreCount();
-    }
+    }*/
 
 
 
-    private void setProductAvgAndStoreCount() {
+ /*   private void setProductAvgAndStoreCount() {
         int price = 0;
         for(Product product : allProducts.values()){
             price = 0;
@@ -70,12 +63,12 @@ public class Engine {
             }
             product.setAvgPrice(price);
         }
-    }
+    }*/
 
     public void executeCommand() {
     }
 
-    public Map<Integer, Product> getProducts() {
+ /*   public Map<Integer, Product> getProducts() {
         return allProducts;
     }
     public Map<Integer, Store> getStores() {
@@ -84,9 +77,9 @@ public class Engine {
 
     public List<Order> getOrders() {
         return orders;
-    }
+    }*/
 
-    public Order setNewOrder(Customer selectedCustomer, Map<Integer, Map<Integer, Double>> storeProductsToOrder, LocalDate date) {
+  /*  public Order setNewOrder(Customer selectedCustomer, Map<Integer, Map<Integer, Double>> storeProductsToOrder, LocalDate date) {
         Order newOrder = new Order(++orderNum,date, storeProductsToOrder, selectedCustomer.getLocation(),selectedCustomer.getId());
         newOrder.calculateDistance(allStores);
         return newOrder;
@@ -198,5 +191,5 @@ public class Engine {
         int maxX = Math.max(maxCustomerX,maxStoreX);
         int maxY = Math.max(maxCustomerY,maxStoreY);
         return new Point(maxX,maxY);
-    }
+    }*/
 }

@@ -14,7 +14,26 @@
     <img src="../../common/images/logo.png" id="logo" alt="logo">
     <span id="hello">Hello </span>
     <span id="userType">connected as </span>
-    <button style="float: right; height: 100%;">Logout</button>
+    <button style="float: right; height: 100%;" onclick="openAccount">Account</button>
+</div>
+<div id="account-container" style="display: none">
+    <button>X</button>
+    <div id="balance">Balance: <span></span></div>
+    <div id="activities-container">
+        <table id="activitiesTable">
+            <thead>
+            <tr>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Sum</th>
+                <th>Previous Balance</th>
+                <th>Current Balance</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
 </div>
 <div class="container">
     <div class="onlineUsers">
@@ -27,7 +46,22 @@
             <img id="uploadImg" src="../../common/images/upload.png" style="width: 20px; margin-right: 15px;" alt="upload"> Upload XML File
             <input type="file" id="xmlFile" name="xmlFile" accept=".xml" onchange="loadXML(event)">
         </label>
-        <div id="errorMsg"></div>
+        <div id="message"></div>
+    </div>
+    <div id="zones-container">
+        <table id="zonesTable">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Owner</th>
+                <th>Products Types</th>
+                <th>Number Of Stores</th>
+                <th>Total Orders</th>
+                <th>Orders Average Price</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
     </div>
 </div>
 </body>

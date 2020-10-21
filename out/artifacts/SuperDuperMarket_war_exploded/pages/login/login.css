@@ -32,8 +32,3 @@ body{
     transform: translate(-50%);
     top: 10%;
 }
-
-#error-placeholder{
-    background-color: #ffcccc;
-    color: red;
-}

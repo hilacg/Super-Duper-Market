@@ -1,13 +1,15 @@
 package course.java.sdm.engine;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StoreOwner {
 
     private Integer id;
     private String name;
-    private List<String> zones = new ArrayList<>();
+    private Map<String, Zone> zones = new HashMap<>();
 
     public StoreOwner(Integer id, String name){
         this.id = id;
@@ -18,7 +20,7 @@ public class StoreOwner {
         return name;
     }
 
-    public List<String> getZones() {
+    public  Map<String, Zone> getZones() {
         return zones;
     }
 

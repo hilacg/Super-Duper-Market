@@ -8,20 +8,13 @@ Note that asking if a user exists (isUserExists) does not participate in the syn
 of the user of this class to handle the synchronization of isUserExists with other methods here on it's own
  */
 public class UserManager {
-    private final Map<String,String> usersMap;
+    private final List<String> usersList = new ArrayList<>();
     private Map<Integer, Customer> allCustomers = new HashMap<>();
     private Map<Integer, StoreOwner> allStoreOwners = new HashMap<>();
 
-    public UserManager() {
-        usersMap = new HashMap<>();
-    }
 
-    public synchronized void removeUser(String username) {
-        usersMap.remove(username);
-    }
-
-    public synchronized Map<String,String> getUsers() {
-        return Collections.unmodifiableMap(usersMap);
+    public synchronized List<String>getUsers() {
+        return Collections.unmodifiableList(usersList);
     }
 
     public synchronized Boolean isCustomer(Integer userId) {
@@ -31,10 +24,11 @@ public class UserManager {
     }
 
     public boolean isUserExists(String username) {
-        return usersMap.containsKey(username);
+        return usersList.contains(username);
     }
 
     public synchronized void addUser(int id, String userName, boolean isCustomer){
+        usersList.add(userName);
         if(isCustomer)
             allCustomers.put(id, new Customer(id,userName));
         else
