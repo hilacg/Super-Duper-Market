@@ -48,7 +48,6 @@ public class LightweightLoginServlet extends HttpServlet {
 
 
         Integer userIdFromSession = SessionUtils.getUserId(request);
-   //     UserManager userManager = ServletUtils.getUserManager(getServletContext());
 
         switch (userAction){
             case "login": {

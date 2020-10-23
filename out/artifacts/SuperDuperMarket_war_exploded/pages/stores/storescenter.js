@@ -9,8 +9,9 @@ let user={
     isCustomer:true,
 };
 
-function openAccount(){
-    $("#account-container").style.display = "block";
+function showAccount(){
+    document.getElementById("account-container").classList.toggle("show");
+    user.isCustomer ? document.getElementById("depositForm").style.display = "block" : null;
 
 }
 
@@ -41,10 +42,7 @@ function ajaxUsersList() {
 function showFileChooser(){
     if(!user.isCustomer){
         const uploadButton = document.getElementById("fileChooser");
-        const uploadImg = document.getElementById("uploadImg");
         uploadButton.style.display = "block";
-        uploadButton.addEventListener("mouseenter",()=>(uploadImg.style.filter = "invert(1)"));
-        uploadButton.addEventListener("mouseleave",()=>(uploadImg.style.filter = "invert(0)"));
     }
 }
 
@@ -72,7 +70,7 @@ function loadXML(event) {
     var formData = new FormData();
     formData.append("file", file);
     formData.append("id", user.id);
-    formData.append("action", "loadXML");
+ //   formData.append("action", "loadXML");
     const message =  $("#message");
 
     $.ajax({
@@ -101,22 +99,6 @@ function refreshZonesTable(zones) {
         var tr = $(document.createElement('tr'));
         for( var key of Object.keys(zone))
            tr.append($(document.createElement('td')).text(zone[key]));
-
-        /*
-                var tdName = $(document.createElement('td')).text(zone.zoneName);
-                var tdOwner = $(document.createElement('td')).text(zone.ownerName);
-                var tdProductsTypes = $(document.createElement('td')).text(zone.productsTypes);
-                var tdAmountOfStores = $(document.createElement('td')).text(zone.amountOfStores);
-                var tdAmountOfOrders = $(document.createElement('td')).text(zone.amountOfOrders);
-                var tdOrderAvg = $(document.createElement('td')).text(zone.orderAvg);
-
-                tdName.appendTo(tr);
-                tdOwner.appendTo(tr);
-                tdProductsTypes.appendTo(tr);
-                tdAmountOfStores.appendTo(tr);
-                tdAmountOfOrders.appendTo(tr);
-                tdOrderAvg.appendTo(tr);
-        */
         tr.appendTo(zonesTable);
     });
 
@@ -143,5 +125,6 @@ $(function() {
     //The users list is refreshed automatically every second
     setInterval(ajaxUsersList, refreshRate);
     setInterval(ajaxZone, refreshRate);
-
+    $("#datepicker").datepicker({minDate: -1});
+    $("#datepicker").datepicker("option", "dateFormat","dd/mm/yyyy");
 });

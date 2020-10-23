@@ -9,8 +9,9 @@ let user={
     isCustomer:true,
 };
 
-function openAccount(){
-    $("#account-container").style.display = "block";
+function showAccount(){
+    document.getElementById("account-container").classList.toggle("show");
+    user.isCustomer ? document.getElementById("depositForm").style.display = "block" : null;
 
 }
 
@@ -41,10 +42,7 @@ function ajaxUsersList() {
 function showFileChooser(){
     if(!user.isCustomer){
         const uploadButton = document.getElementById("fileChooser");
-        const uploadImg = document.getElementById("uploadImg");
         uploadButton.style.display = "block";
-        uploadButton.addEventListener("mouseenter",()=>(uploadImg.style.filter = "invert(1)"));
-        uploadButton.addEventListener("mouseleave",()=>(uploadImg.style.filter = "invert(0)"));
     }
 }
 
@@ -72,8 +70,8 @@ function loadXML(event) {
     var formData = new FormData();
     formData.append("file", file);
     formData.append("id", user.id);
-    formData.append("action", "loadXML");
-    const message =  $("#message");
+ //   formData.append("action", "loadXML");
+    const message =  $("#fileChooser .message");
 
     $.ajax({
         method:'POST',
@@ -127,5 +125,6 @@ $(function() {
     //The users list is refreshed automatically every second
     setInterval(ajaxUsersList, refreshRate);
     setInterval(ajaxZone, refreshRate);
-
+    $("#datepicker").datepicker({minDate: -1});
+    $("#datepicker").datepicker("option", "dateFormat","dd/mm/yy");
 });

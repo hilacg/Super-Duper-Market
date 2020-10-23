@@ -23,3 +23,44 @@ button:hover, .button:hover{
     color: red;
     text-align: center;
 }
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}
+tr:hover {background-color: #ffdcb7;}
+
+th {
+    background-color: #ffae51;
+    color: white;
+}
+
+
+.popup-window{
+    display: none;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+    overflow: hidden;
+    background-color: #bbbbbb8f;
+}
+.popup-window>div{
+    position: fixed;
+    background-color: #fff;
+    height: 50%;
+    width: 50%;
+    top: 25%;
+    left: 25%;
+}
+
+.show {display:block;}

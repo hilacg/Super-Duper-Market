@@ -9,6 +9,7 @@ import course.java.sdm.engine.Zone;
 import superduper.utils.ServletUtils;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -34,29 +35,17 @@ public class AreaServlet  extends HttpServlet {
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String userAction = request.getParameter("action");
+        ServletOutputStream out = response.getOutputStream();
         switch (userAction){
-            case "loadXML":{
-                response.setContentType("text/plain;charset=UTF-8");
-                try {
-  //                  InputStream xmlConnection = request.getPart("xmlFile").getInputStream();
-                    engine.loadXML(request.getPart("file").getInputStream(),(int)request.getSession(false).getAttribute("userId"));
-                    response.setStatus(200);
-                    response.getOutputStream().println("File loaded successfully!");
-                    break;
-                }catch(Exception e){
-                    response.setStatus(401);
-                    response.getOutputStream().println(e.getMessage());
-                }
-            }
             case "getZones":{
-                getZones(response);
+                getZones(response,out);
             }
         }
 
 
     }
 
-    private void getZones(HttpServletResponse response) throws IOException {
+    private void getZones(HttpServletResponse response,ServletOutputStream out) throws IOException {
         response.setContentType("application/json");
         Gson gson = new Gson();
         JsonArray zoneJson = new JsonArray();
@@ -74,8 +63,9 @@ public class AreaServlet  extends HttpServlet {
             });
         });
         mainObj.add("zones",zoneJson);
-        response.getOutputStream().println(gson.toJson(mainObj));
         response.setStatus(200);
+        out.println(gson.toJson(mainObj));
+        out.flush();
     }
 
 
@@ -107,7 +97,18 @@ public class AreaServlet  extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        ServletOutputStream out = response.getOutputStream();
+        response.setContentType("text/plain;charset=UTF-8");
+        try {
+            engine.loadXML(request.getPart("file").getInputStream(),(int)request.getSession(false).getAttribute("userId"));
+            response.setStatus(200);
+            out.println("File loaded successfully!");
+            out.flush();
+        }catch(Exception e){
+            response.setStatus(401);
+            out.println(e.getMessage());
+            out.flush();
+        }
     }
 
     /**

@@ -1,8 +1,15 @@
 #toolBar{
+    position: relative;
     background-color: #333;
-    display: flow-root;
     color: white;
     height: 50px;
+    line-height: 50px;
+    padding: 0 20px;
+    overflow: hidden;
+}
+
+#account:hover{
+    color: #ffae51;
 }
 
 #logo{
@@ -10,7 +17,7 @@
 }
 
 .container{
-    display: flex;
+    margin-top: 15px;
     padding: 10px;
     height: 90%;
     overflow: auto;
@@ -27,6 +34,8 @@
     padding: 10px;
     height: 90%;
     overflow: auto;
+    float: left;
+    margin-right: 10px;
 }
 
 input[type="file"] {
@@ -42,9 +51,10 @@ input[type="file"] {
 #fileChooser{
     display: none;
     height: fit-content;
-    width: 100%;
+    margin-bottom: 10px;
 }
 
-#message{
+.message{
     text-align: center;
 }
+
