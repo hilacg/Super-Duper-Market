@@ -1,0 +1,60 @@
+#toolBar{
+    position: relative;
+    background-color: #333;
+    color: white;
+    height: 50px;
+    line-height: 50px;
+    padding: 0 20px;
+    overflow: hidden;
+}
+
+#account:hover{
+    color: #ffae51;
+}
+
+#logo{
+    width: 100px;
+}
+
+.container{
+    margin-top: 15px;
+    padding: 10px;
+    height: 90%;
+    overflow: auto;
+}
+
+#userlist{
+    list-style: none;
+    padding: 0;
+}
+
+.onlineUsers{
+    border: 1px solid #ccc;
+    width: 10%;
+    padding: 10px;
+    height: 90%;
+    overflow: auto;
+    float: left;
+    margin-right: 10px;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload{
+    display: flex;
+    width: fit-content;
+    margin: auto;
+}
+
+#fileChooser{
+    display: none;
+    height: fit-content;
+    margin-bottom: 10px;
+}
+
+.message{
+    text-align: center;
+}
+
