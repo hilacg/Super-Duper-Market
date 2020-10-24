@@ -1,7 +1,8 @@
 const refreshRate = 5000; //milli seconds
-const USER_LIST_URL = buildUrlWithContextPath("userslist");
+const USER_LIST_URL = buildUrlWithContextPath("users");
 const LOGIN_URL = buildUrlWithContextPath("pages/login/loginShortResponse");
 const AREA_URL = buildUrlWithContextPath("area");
+const ZONE_URL = buildUrlWithContextPath("pages/zone/zone.html");
 
 let user={
     id:0,
@@ -9,10 +10,35 @@ let user={
     isCustomer:true,
 };
 
+
+
+function refreshAction(actions) {
+    const activitiesTable = $('#activitiesTable tbody');
+    activitiesTable.empty();
+    actions.forEach(function (action) {
+        var tr = $(document.createElement('tr'));
+        for( var key of Object.keys(action))
+            tr.append($(document.createElement('td')).text(action[key]));
+        tr.appendTo(activitiesTable);
+    });
+}
+
+function getActions() {
+    $.ajax({
+        url: Account_URL,
+        data:{
+            action: "getAccountAction"
+        },
+        success: function(json) {
+            refreshAction(json.actions);
+        }
+    });
+}
+
 function showAccount(){
     document.getElementById("account-container").classList.toggle("show");
     user.isCustomer ? document.getElementById("depositForm").style.display = "block" : null;
-
+    setInterval(getActions, refreshRate);
 }
 
 
@@ -32,6 +58,9 @@ function refreshUsersList(users) {
 function ajaxUsersList() {
     $.ajax({
         url: USER_LIST_URL,
+        data:{
+            action: "getUsersList"
+        },
         success: function(users) {
             refreshUsersList(users);
         }
@@ -71,7 +100,7 @@ function loadXML(event) {
     formData.append("file", file);
     formData.append("id", user.id);
  //   formData.append("action", "loadXML");
-    const message =  $("#message");
+    const message =  $("#fileChooser .message");
 
     $.ajax({
         method:'POST',
@@ -91,6 +120,11 @@ function loadXML(event) {
         }
     });
 }
+function enterZone(event){
+    var zoneName =  event.target.parentNode.children[0].innerText;
+    var url = ZONE_URL.concat("?zoneName="+zoneName);
+    window.location.replace(url);
+}
 
 function refreshZonesTable(zones) {
     const zonesTable = $('#zonesTable tbody');
@@ -99,9 +133,16 @@ function refreshZonesTable(zones) {
         var tr = $(document.createElement('tr'));
         for( var key of Object.keys(zone))
            tr.append($(document.createElement('td')).text(zone[key]));
-        tr.appendTo(zonesTable);
-    });
+        var btn = $(document.createElement('button'));
+        btn.addClass("enterZone");
+  //      button.append($(document.createElement('il')).addClass("fa fa-fw fa-sign-in-alt"));
 
+ //       btn.addEventListener('click', function(){ alert('blah');}, false);
+        tr.append(btn);
+        tr.appendTo(zonesTable);
+
+    });
+    $(".enterZone").on("click",enterZone);
    /* var tr = $('.tableBody tr');
     for (var i = 0; i < tr.length; i++) {
         tr[i].onclick = createGameDialog;
@@ -126,5 +167,16 @@ $(function() {
     setInterval(ajaxUsersList, refreshRate);
     setInterval(ajaxZone, refreshRate);
     $("#datepicker").datepicker({minDate: -1});
-    $("#datepicker").datepicker("option", "dateFormat","dd/mm/yyyy");
+    $("#datepicker").datepicker("option", "dateFormat","dd/mm/yy");
+    $("#depositForm").submit(function() {
+        $.ajax({
+            url:Account_URL,
+            method:'POST',
+            data:{
+                amount: document.getElementById("amount").value,
+                date: document.getElementById("datepicker").value,
+            }
+        });
+        return false;
+    })
 });

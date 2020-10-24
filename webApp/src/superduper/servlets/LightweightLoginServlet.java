@@ -30,7 +30,7 @@ public class LightweightLoginServlet extends HttpServlet {
     // you can use absolute paths, but then you need to build them from scratch, starting from the context path
     // ( can be fetched from request.getContextPath() ) and then the 'absolute' path from it.
     // Each method with it's pros and cons...
-    private final String STORE_CENTER_URL = "pages/stores/storesCenter.html";
+    private final String ZONES_CENTER_URL = "pages/zonesCenter/zonesCenter.html";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -128,14 +128,14 @@ public class LightweightLoginServlet extends HttpServlet {
                         //redirect the request to the chat room - in order to actually change the URL
                         System.out.println("On login, request URI is: " + request.getRequestURI());
                         response.setStatus(200);
-                        response.getOutputStream().println(STORE_CENTER_URL);
+                        response.getOutputStream().println(ZONES_CENTER_URL);
                     }
                 }
             }
         } else {
             //user is already logged in
             response.setStatus(200);
-            response.getOutputStream().println(STORE_CENTER_URL);
+            response.getOutputStream().println(ZONES_CENTER_URL);
         }
     }
 

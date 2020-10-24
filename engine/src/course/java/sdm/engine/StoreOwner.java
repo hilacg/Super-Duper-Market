@@ -10,6 +10,7 @@ public class StoreOwner {
     private Integer id;
     private String name;
     private Map<String, Zone> zones = new HashMap<>();
+    private Account account = new Account();
 
     public StoreOwner(Integer id, String name){
         this.id = id;
@@ -26,5 +27,9 @@ public class StoreOwner {
 
     public Integer getId() {
         return id;
+    }
+
+    public Account getAccount() {
+        return account;
     }
 }

@@ -21,6 +21,14 @@ public class Zone {
         setProductAvgAndStoreCount();
     }
 
+    public Map<Integer, Product> getAllProducts() {
+        return allProducts;
+    }
+
+    public Map<Integer, Store> getAllStores() {
+        return allStores;
+    }
+
     public String getName() {
         return name;
     }

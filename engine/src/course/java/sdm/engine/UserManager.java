@@ -46,4 +46,14 @@ public class UserManager {
     public String getUserName(Integer userId) {
         return allCustomers.containsKey(userId) ? allCustomers.get(userId).getName() : allStoreOwners.get(userId).getName();
     }
+
+    public void updateAccount(Integer userIdFromSession, String action, double amount, String date) {
+        Account account = isCustomer(userIdFromSession)? allCustomers.get(userIdFromSession).getAccount() :allStoreOwners.get(userIdFromSession).getAccount();
+            account.updateAccount(action, amount,date);
+
+    }
+
+    public List<Account.AccountAction> getUserActions(Integer userIdFromSession) {
+        return isCustomer(userIdFromSession)? allCustomers.get(userIdFromSession).getAccount().getActions() :  allStoreOwners.get(userIdFromSession).getAccount().getActions();
+    }
 }

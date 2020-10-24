@@ -18,6 +18,7 @@ public class Customer {
     private double avgOrdersPrice = 0; //without shipping
     private double avgShippingPrice = 0;
     private List<Order> orders = new ArrayList<>();
+    private Account account = new Account();
 
     public Customer(){
     }
@@ -30,6 +31,10 @@ public class Customer {
         name = customer.getName();
         location = new Point(customer.getLocation().getX(),customer.getLocation().getY());
 
+    }
+
+    public Account getAccount() {
+        return account;
     }
 
     public Integer getId() {

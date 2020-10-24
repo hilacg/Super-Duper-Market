@@ -95,6 +95,14 @@ public class Store {
         return productsSold;
     }
 
+    public double getTotalProductPrice() {
+        return productsSold.values().stream().mapToDouble(Double::doubleValue).sum();
+    }
+    public double getTotalDeliveryEarnings(){
+        return orders.stream().mapToDouble(order -> order.getDeliveryPrices().values().stream().mapToDouble(Double::doubleValue).sum()).sum();
+    }
+
+
     public void deleteProduct(int chosenProductSerial) {
         productPrices.remove(chosenProductSerial);
         productsSold.remove(chosenProductSerial);

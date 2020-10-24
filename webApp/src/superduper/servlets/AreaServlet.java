@@ -3,9 +3,7 @@ package superduper.servlets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import course.java.sdm.engine.Engine;
-import course.java.sdm.engine.UserManager;
-import course.java.sdm.engine.Zone;
+import course.java.sdm.engine.*;
 import superduper.utils.ServletUtils;
 
 import javax.servlet.ServletException;
@@ -34,19 +32,92 @@ public class AreaServlet  extends HttpServlet {
     }
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
         String userAction = request.getParameter("action");
         ServletOutputStream out = response.getOutputStream();
         switch (userAction){
             case "getZones":{
                 getZones(response,out);
+                break;
+            }
+            case "getProducts":{
+                getProducts(request,response,out);
+                break;
+            }
+            case "getStores":{
+                getStores(request,response,out);
+                break;
             }
         }
 
 
     }
 
+    private void getStores(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {
+        Gson gson = new Gson();
+        JsonArray storeJson = new JsonArray();
+        JsonObject mainObj = new JsonObject();
+        StoreOwner storeOwner = userManager.getAllStoreOwners().values().stream().filter(owner -> owner.getZones().containsKey(request.getParameter("zoneName"))).findFirst().get();
+        Zone zone = storeOwner.getZones().get(request.getParameter("zoneName"));
+        zone.getAllStores().values().forEach(store ->{
+            JsonObject obj = new JsonObject();
+            obj.addProperty("Serial Number", store.getSerialNumber());
+            obj.addProperty("Name", store.getName());
+            obj.addProperty("Owner", storeOwner.getName());
+            obj.addProperty("Location", store.getLocation().toString());
+            obj.addProperty("products", getStoreProducts(store,zone));
+            obj.addProperty("Orders", store.getTotalOrders());
+            obj.addProperty("Total Product Price", store.getTotalProductPrice());
+            obj.addProperty("PPK", store.getPPK());
+            obj.addProperty("Total Delivery Earnings", store.getTotalDeliveryEarnings());
+            storeJson.add(obj);
+        });
+        mainObj.add("stores",storeJson);
+        response.setStatus(200);
+        out.println(gson.toJson(mainObj));
+        out.flush();
+    }
+
+    private String getStoreProducts(Store store, Zone zone) {
+        Gson gson = new Gson();
+        JsonArray productJson = new JsonArray();
+        store.getProductPrices().forEach((key, value) -> {
+            Product product = zone.getAllProducts().get(key);
+            JsonObject obj = new JsonObject();
+            obj.addProperty("Serial Number", product.getSerialNumber());
+            obj.addProperty("Name", product.getName());
+            obj.addProperty("Selling Method", product.getMethod().toString());
+            obj.addProperty("Price", value);
+            obj.addProperty("sold", store.getProductsSold().get(key));
+            productJson.add(obj);
+        });
+        return gson.toJson(productJson);
+    }
+
+    private void getProducts(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {
+
+        Gson gson = new Gson();
+        JsonArray productJson = new JsonArray();
+        JsonObject mainObj = new JsonObject();
+       StoreOwner storeOwner = userManager.getAllStoreOwners().values().stream().filter(owner -> owner.getZones().containsKey(request.getParameter("zoneName"))).findFirst().get();
+       Zone zone = storeOwner.getZones().get(request.getParameter("zoneName"));
+       zone.getAllProducts().values().forEach(product ->{
+           JsonObject obj = new JsonObject();
+           obj.addProperty("Serial Number", product.getSerialNumber());
+           obj.addProperty("Name", product.getName());
+           obj.addProperty("Selling Method", product.getMethod().toString());
+           obj.addProperty("Sold In", product.getStoreCount());
+           obj.addProperty("Average Price", product.getAvgPrice());
+           obj.addProperty("Amount Sold", product.getSoldAmount());
+           productJson.add(obj);
+       });
+        mainObj.add("products",productJson);
+        response.setStatus(200);
+        out.println(gson.toJson(mainObj));
+        out.flush();
+    }
+
     private void getZones(HttpServletResponse response,ServletOutputStream out) throws IOException {
-        response.setContentType("application/json");
         Gson gson = new Gson();
         JsonArray zoneJson = new JsonArray();
         JsonObject mainObj = new JsonObject();

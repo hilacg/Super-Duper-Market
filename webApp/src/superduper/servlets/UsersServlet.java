@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import course.java.sdm.engine.Customer;
 import course.java.sdm.engine.StoreOwner;
 import course.java.sdm.engine.UserManager;
+import superduper.utils.SessionUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -16,24 +17,35 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class UsersListServlet extends HttpServlet {
+public class UsersServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //returning JSON objects, not HTML
         response.setContentType("application/json");
-        try (PrintWriter out = response.getWriter()) {
+        String userAction = request.getParameter("action");
+        Integer userIdFromSession = SessionUtils.getUserId(request);
+        PrintWriter out = response.getWriter();
+        switch (userAction){
+            case("getUsersList"):{
+                getUsersList(out);
+                break;
+            }
+        }
+
+    }
+
+    private void getUsersList(PrintWriter out ) {
+        //returning JSON objects, not HTML
             Gson gson = new Gson();
             UserManager userManager = ServletUtils.getEngine(getServletContext()).getUserManager();
-          //  Set<String> usersList = userManager.getUsers();
-          //  Map<String,String> usersList = userManager.getUsers();
+            //  Set<String> usersList = userManager.getUsers();
+            //  Map<String,String> usersList = userManager.getUsers();
             Map<String,String> usersList = new HashMap<>();
             usersList.putAll(userManager.getAllCustomers().values().stream().collect( Collectors.toMap(Customer::getName,(customer)->"customer")));
             usersList.putAll(userManager.getAllStoreOwners().values().stream().collect( Collectors.toMap(StoreOwner::getName,(owner)->"store owner")));
             String json = gson.toJson(usersList);
             out.println(json);
             out.flush();
-        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

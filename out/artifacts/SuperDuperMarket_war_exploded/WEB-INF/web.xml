@@ -7,8 +7,12 @@
         <servlet-class>superduper.servlets.LightweightLoginServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>UsersListServlet</servlet-name>
-        <servlet-class>superduper.servlets.UsersListServlet</servlet-class>
+        <servlet-name>UsersServlet</servlet-name>
+        <servlet-class>superduper.servlets.UsersServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AccountServlet</servlet-name>
+        <servlet-class>superduper.servlets.AccountServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>AreaServlet</servlet-name>
@@ -24,7 +28,11 @@
         <url-pattern>/area</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>UsersListServlet</servlet-name>
-        <url-pattern>/userslist</url-pattern>
+        <servlet-name>UsersServlet</servlet-name>
+        <url-pattern>/users</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AccountServlet</servlet-name>
+        <url-pattern>/users/account</url-pattern>
     </servlet-mapping>
 </web-app>
