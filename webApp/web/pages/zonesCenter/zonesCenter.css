@@ -1,12 +1,3 @@
-#toolBar{
-    position: relative;
-    background-color: #333;
-    color: white;
-    height: 50px;
-    line-height: 50px;
-    padding: 0 20px;
-    overflow: hidden;
-}
 
 #account:hover{
     color: #ffae51;
@@ -56,5 +47,15 @@ input[type="file"] {
 
 .message{
     text-align: center;
+}
+
+#activities-container{
+    height: inherit;
+    overflow: auto;
+}
+
+#balance{
+    margin: auto;
+    width: fit-content;
 }
 

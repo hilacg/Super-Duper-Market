@@ -7,10 +7,9 @@
     <script src="../../common/context-path-helper.js"></script>
     <link rel="stylesheet" href="../../common/main.css">
     <link rel="stylesheet" href="../zonesCenter/zonesCenter.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
     <script src="zonesCenter.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/resources/demos/style.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 </head>
@@ -24,11 +23,11 @@
 <div id="account-container" class="popup-window">
     <div>
         <button onclick="showAccount()"><i class="fa fa-lg fa-times"></i></button>
-        <div id="balance">Balance: <span></span></div>
-        <form id="depositForm" style="display:none" method="POST">
-            <input type="text" id="amount" name="amount" placeholder="Amount"/>
-            <p>Date: <input type="text" id="datepicker" name="date"></p>
-            <button type="submit">Deposit</button>
+        <div id="balance"><b>Current Balance:</b> <span></span></div>
+        <form id="depositForm" method="POST" style="display:none">
+            <input type="text" id="amount" name="amount" placeholder="Amount" required/>
+            <input type="text" id="datepicker" name="date" required placeholder="Date">
+            <button>Deposit</button>
             <div class="message"></div>
         </form>
         <div id="activities-container">
@@ -57,7 +56,7 @@
     <div style="width: 85%; float: left;">
         <div id="fileChooser">
             <label for="xmlFile" class="custom-file-upload button">
-                <i class="fa fa-fw fa-arrow-circle-up"></i>  Upload XML File
+                <i class="fa fa-fw fa-cloud-upload"></i>  Upload XML File
                 <input type="file" id="xmlFile" name="xmlFile" accept=".xml" onchange="loadXML(event)">
             </label>
             <div class="message"></div>

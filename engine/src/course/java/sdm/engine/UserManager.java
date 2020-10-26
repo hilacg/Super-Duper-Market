@@ -56,4 +56,8 @@ public class UserManager {
     public List<Account.AccountAction> getUserActions(Integer userIdFromSession) {
         return isCustomer(userIdFromSession)? allCustomers.get(userIdFromSession).getAccount().getActions() :  allStoreOwners.get(userIdFromSession).getAccount().getActions();
     }
+
+    public double getUserBalance(Integer userIdFromSession){
+        return isCustomer(userIdFromSession)? allCustomers.get(userIdFromSession).getAccount().getBalance() :  allStoreOwners.get(userIdFromSession).getAccount().getBalance();
+    }
 }

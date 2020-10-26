@@ -2,16 +2,56 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
     <script src="../../common/jquery-2.0.3.min.js"></script>
     <script src="../../common/context-path-helper.js"></script>
     <link rel="stylesheet" href="../../common/main.css">
+    <link rel="stylesheet" href="zone.css">
     <script src="zone.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <title>Zone</title>
 </head>
 <body>
-<button id="backbtn" onclick= "backButton()">Back</button>
+
+<div id="toolBar">
+    <button id="backbtn" onclick= "backButton()"><i class="fa fa-lg fa-backward"></i></button>
+    <button id="newOrder" onclick= "backButton()">New Order</button>
+    <button id="orderHistory" onclick= "backButton()">Order History</button>
+    <img style="float: right " src="../../common/images/logo.png" id="logo" alt="logo">
+</div>
+
+<h1 id="zoneName"></h1>
+<div id="order-container">
+        <input type="text" id="datepicker" name="date" placeholder="Date" required>
+        <div>
+            <input type="radio" id="static" name="type" value="static" checked>
+            <label for="static">Static</label>
+            <input type="radio" id="dynamic" name="type" value="dynamic" >
+            <label for="dynamic">Dynamic</label><br>
+        </div>
+    <div id="products">
+        <table class="productsTable">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Buying Method</th>
+                <th>Sold In</th>
+                <th>Average Price</th>
+                <th>Amount Sold</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div id="cart">
+
+    </div>
+</div>
 <div id="product-container">
-    <table id="productsTable">
+    <table class="productsTable">
         <thead>
         <tr>
             <th>Id</th>
@@ -26,7 +66,7 @@
     </table>
 </div>
 <div id="stores-container">
-    <table id="zonesTable">
+    <table id="storesTable">
         <thead>
         <tr>
             <th>Id</th>
@@ -34,8 +74,10 @@
             <th>Owner</th>
             <th>Location</th>
             <th>Prodcuts</th>
-            <th>Orders Average Price</th>
-            <th>Enter Zone</th>
+            <th>Orders</th>
+            <th>Total Product Earnings</th>
+            <th>PPK</th>
+            <th>Delivery Earnings</th>
         </tr>
         </thead>
         <tbody></tbody>

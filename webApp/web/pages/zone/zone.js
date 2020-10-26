@@ -6,8 +6,7 @@ function backButton(){
 }
 
 function showProducts(products) {
-
-    const table = $('#productsTable tbody');
+    const table = $('.productsTable tbody');
     table.empty();
     products.forEach(function (product) {
         var tr = $(document.createElement('tr'));
@@ -30,14 +29,34 @@ function getProducts(zoneName) {
         }
     });
 }
-function showStores(stores) {
 
+
+function showStoreProducts(products) {
+    var div = $(document.createElement('div'));
+    div.addClass("storeProducts");
+    var ol = $(document.createElement('ol'));
+    div.append(ol);
+    products.forEach(product=>{
+        var li = $(document.createElement('li'));
+        ol.append(li);
+        for( var key of Object.keys(product)) {
+            li.append(key + ": " + product[key]);
+            li.append($(document.createElement('br')))
+        }
+    })
+    return div
+}
+
+function showStores(stores) {
     const table = $('#storesTable tbody');
     table.empty();
     stores.forEach(function (store) {
         var tr = $(document.createElement('tr'));
         for( var key of Object.keys(store))
-            tr.append($(document.createElement('td')).text(store[key]));
+            if(key!== "products")
+                tr.append($(document.createElement('td')).text(store[key]));
+            else
+                tr.append(showStoreProducts(store[key]));
         tr.appendTo(table);
     });
 
@@ -51,11 +70,11 @@ function getStores(zoneName) {
             zoneName:zoneName
         },
         success: function(json) {
- //           showStores(json.stores);
+            showStores(json.stores);
         }
     });
 }
-$.urlParam = function(name){
+function urlParam(name){
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
     if (results==null) {
         return null;
@@ -64,7 +83,8 @@ $.urlParam = function(name){
 }
 
 $(function() {
-    var zoneName = $.urlParam('zoneName');
+    var zoneName = urlParam('zoneName');
+    document.getElementById("zoneName").innerText = zoneName;
     getProducts(zoneName);
     getStores(zoneName);
 })

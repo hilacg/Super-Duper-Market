@@ -30,15 +30,50 @@ public class AccountServlet  extends HttpServlet {
     private void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String userAction = request.getParameter("action");
         ServletOutputStream out = response.getOutputStream();
-        response.setContentType("application/json");
         Integer userIdFromSession = SessionUtils.getUserId(request);
-        switch(userAction){
-            case "getAccountAction":
-                showAccountActions(response,out,userIdFromSession);
+        switch (userAction) {
+            case "deposit": {
+                deposit(response, request, out, userIdFromSession);
+                break;
+            }
+            case "getAccountAction": {
+                showAccountActions(response, out, userIdFromSession);
+                break;
+            }
+            case "getAccountBalance": {
+                response.setContentType("text/plain;charset=UTF-8");
+                response.setStatus(200);
+                out.println(userManager.getUserBalance(userIdFromSession));
+                out.flush();
+                break;
+            }
         }
+    }
+
+    private void deposit(HttpServletResponse response, HttpServletRequest request, ServletOutputStream out, Integer userIdFromSession) throws IOException {
+        response.setContentType("text/plain;charset=UTF-8");
+        try{
+            double amount = Double.parseDouble(request.getParameter("amount"));
+            String date =  request.getParameter("date");
+            userManager.updateAccount(userIdFromSession,"deposit", amount, date);
+            response.setStatus(200);
+            out.flush();
+        }
+        catch (NumberFormatException e){
+            response.setStatus(401);
+            response.getOutputStream().println("Amount must be a number");
+            out.flush();
+        }
+        catch (NullPointerException e){
+            response.setStatus(402);
+            response.getOutputStream().println("All fields must be filled");
+            out.flush();
         }
 
+    }
+
     private void showAccountActions(HttpServletResponse response, ServletOutputStream out, Integer userIdFromSession) throws IOException {
+        response.setContentType("application/json");
         Gson gson = new Gson();
         JsonArray actionJason = new JsonArray();
         JsonObject mainObj = new JsonObject();
@@ -86,11 +121,7 @@ public class AccountServlet  extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        ServletOutputStream out = response.getOutputStream();
-        response.setContentType("application/json");
-        Integer userIdFromSession = SessionUtils.getUserId(request);
-        userManager.updateAccount(userIdFromSession,"deposit", Double.parseDouble(request.getParameter("amount")), request.getParameter("date"));
-
+        processRequest(request, response);
     }
 
     /**

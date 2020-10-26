@@ -6,6 +6,17 @@ body{
     font-family: "Trebuchet MS", Helvetica, sans-serif;
 }
 
+#toolBar{
+    position: relative;
+    background-color: #333;
+    color: white;
+    height: 50px;
+    line-height: 50px;
+    padding: 0 20px;
+    overflow: hidden;
+}
+
+
 button, .button{
     background-color: #333;
     border: none;
@@ -40,6 +51,8 @@ tr:hover {background-color: #ffdcb7;}
 th {
     background-color: #ffae51;
     color: white;
+    top: 0;
+    position: sticky;
 }
 
 
@@ -57,10 +70,26 @@ th {
 .popup-window>div{
     position: fixed;
     background-color: #fff;
-    height: 50%;
+    height: 70%;
     width: 50%;
-    top: 25%;
+    top: 15%;
     left: 25%;
+}
+
+form{
+    box-sizing: border-box;
+    text-align: center;
+    padding: 2%;
+    background-color: white;
+}
+
+input{
+    margin-bottom: 1rem;
+    text-align: left;
+    padding: 7px 20px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
 }
 
 .show {display:block;}

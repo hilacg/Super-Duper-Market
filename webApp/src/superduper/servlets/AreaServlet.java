@@ -65,7 +65,7 @@ public class AreaServlet  extends HttpServlet {
             obj.addProperty("Name", store.getName());
             obj.addProperty("Owner", storeOwner.getName());
             obj.addProperty("Location", store.getLocation().toString());
-            obj.addProperty("products", getStoreProducts(store,zone));
+            obj.add("products", getStoreProducts(store,zone));
             obj.addProperty("Orders", store.getTotalOrders());
             obj.addProperty("Total Product Price", store.getTotalProductPrice());
             obj.addProperty("PPK", store.getPPK());
@@ -78,8 +78,7 @@ public class AreaServlet  extends HttpServlet {
         out.flush();
     }
 
-    private String getStoreProducts(Store store, Zone zone) {
-        Gson gson = new Gson();
+    private JsonArray getStoreProducts(Store store, Zone zone) {
         JsonArray productJson = new JsonArray();
         store.getProductPrices().forEach((key, value) -> {
             Product product = zone.getAllProducts().get(key);
@@ -91,7 +90,7 @@ public class AreaServlet  extends HttpServlet {
             obj.addProperty("sold", store.getProductsSold().get(key));
             productJson.add(obj);
         });
-        return gson.toJson(productJson);
+        return productJson;
     }
 
     private void getProducts(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {
