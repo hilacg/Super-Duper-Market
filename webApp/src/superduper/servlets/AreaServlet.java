@@ -36,6 +36,14 @@ public class AreaServlet  extends HttpServlet {
         String userAction = request.getParameter("action");
         ServletOutputStream out = response.getOutputStream();
         switch (userAction){
+            case "getOwnerId":{
+                response.setContentType("text/plain;charset=UTF-8");
+                Integer id = userManager.getAllStoreOwners().values().stream().filter(owner -> owner.getZones().containsKey(request.getParameter("zoneName"))).findFirst().get().getId();
+                response.setStatus(200);
+                out.println(id);
+                out.flush();
+                break;
+            }
             case "getZones":{
                 getZones(response,out);
                 break;
@@ -48,6 +56,18 @@ public class AreaServlet  extends HttpServlet {
                 getStores(request,response,out);
                 break;
             }
+            case "getStoreProducts":{
+                Gson gson = new Gson();
+                JsonObject mainObj = new JsonObject();
+                Zone zone = userManager.getAllStoreOwners().get(Integer.parseInt(request.getParameter("owner"))).getZones().get(request.getParameter("zoneName"));
+                Store store = zone.getAllStores().get(Integer.parseInt(request.getParameter("store")));
+                JsonArray jsonArray = getStoreProducts(store,zone);
+                mainObj.add("storeProducts",jsonArray);
+                response.setStatus(200);
+                out.println(gson.toJson(mainObj));
+                out.flush();
+                break;
+            }
         }
 
 
@@ -57,7 +77,7 @@ public class AreaServlet  extends HttpServlet {
         Gson gson = new Gson();
         JsonArray storeJson = new JsonArray();
         JsonObject mainObj = new JsonObject();
-        StoreOwner storeOwner = userManager.getAllStoreOwners().values().stream().filter(owner -> owner.getZones().containsKey(request.getParameter("zoneName"))).findFirst().get();
+        StoreOwner storeOwner = userManager.getAllStoreOwners().get(Integer.parseInt(request.getParameter("owner")));
         Zone zone = storeOwner.getZones().get(request.getParameter("zoneName"));
         zone.getAllStores().values().forEach(store ->{
             JsonObject obj = new JsonObject();
@@ -98,7 +118,7 @@ public class AreaServlet  extends HttpServlet {
         Gson gson = new Gson();
         JsonArray productJson = new JsonArray();
         JsonObject mainObj = new JsonObject();
-       StoreOwner storeOwner = userManager.getAllStoreOwners().values().stream().filter(owner -> owner.getZones().containsKey(request.getParameter("zoneName"))).findFirst().get();
+       StoreOwner storeOwner = userManager.getAllStoreOwners().get(Integer.parseInt(request.getParameter("owner")));
        Zone zone = storeOwner.getZones().get(request.getParameter("zoneName"));
        zone.getAllProducts().values().forEach(product ->{
            JsonObject obj = new JsonObject();

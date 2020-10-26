@@ -26,11 +26,34 @@
 <div id="order-container">
         <input type="text" id="datepicker" name="date" placeholder="Date" required>
         <div>
-            <input type="radio" id="static" name="type" value="static" checked>
+            <input type="radio" id="static" name="type" value="static" onclick="staticOrder()">
             <label for="static">Static</label>
-            <input type="radio" id="dynamic" name="type" value="dynamic" >
+            <input type="radio" id="dynamic" name="type" value="dynamic">
             <label for="dynamic">Dynamic</label><br>
         </div>
+    <div id="staticOrder-container" style="display: none">
+        <table id="storeSelect">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Location</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <table id="storeProductSelect">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Buying Method</th>
+                <th>Price</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+</div>
     <div id="products">
         <table class="productsTable">
             <thead>
@@ -50,6 +73,8 @@
 
     </div>
 </div>
+
+
 <div id="product-container">
     <table class="productsTable">
         <thead>
