@@ -1,0 +1,17 @@
+.storeProducts{
+    height: 400px;
+    overflow: auto;
+}
+
+.storeProducts li {
+    border-bottom: 1px solid #ccc;
+}
+
+#logo{
+    width: 100px;
+}
+
+#zoneName{
+    margin: auto;
+    width: fit-content;
+}
