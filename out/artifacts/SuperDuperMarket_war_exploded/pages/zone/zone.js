@@ -1,12 +1,52 @@
 const ZONE_CENTER_URL = buildUrlWithContextPath("pages/zonesCenter/zonesCenter.html");
 const AREA_URL = buildUrlWithContextPath("area");
 
+let storesJson = {}
+let zoneName;
+let ownerId;
+
 function backButton(){
     window.location.replace(ZONE_CENTER_URL);
 }
 
-function showProducts(products) {
-    const table = $('.productsTable tbody');
+
+function getStoreProducts(storeId) {
+    $.ajax({
+        url:AREA_URL,
+        data: {
+            action: "getStoreProducts",
+            zoneName:zoneName,
+            owner:ownerId,
+            store:storeId,
+        },
+        success: function(json) {
+            showProducts(json.storeProducts,'#storeProductSelect tbody');
+        }
+    });
+}
+
+function selectStore(event) {
+    $('#storeSelect tr').removeClass("selected");
+    const storeNode = event.target.closest("tr");
+    getStoreProducts(storeNode.children[0].innerHTML)
+}
+
+function staticOrder() {
+    $('#staticOrder-container').css("display","block");
+    const table = $('#storeSelect tbody');
+    table.empty();
+    storesJson.forEach(store => {
+        var tr = $(document.createElement('tr'));
+        tr.append($(document.createElement('td')).text(store["Serial Number"]));
+        tr.append($(document.createElement('td')).text(store["Name"]));
+        tr.append($(document.createElement('td')).text(store["Location"]));
+        tr.appendTo(table);
+    })
+    $('#storeSelect tr').on("click",selectStore);
+}
+
+function showProducts(products,selectors) {
+    const table = $(selectors);
     table.empty();
     products.forEach(function (product) {
         var tr = $(document.createElement('tr'));
@@ -17,15 +57,16 @@ function showProducts(products) {
 
 }
 
-function getProducts(zoneName) {
+function getProducts() {
     $.ajax({
         url:AREA_URL,
         data: {
             action: "getProducts",
-            zoneName:zoneName
+            zoneName:zoneName,
+            owner: ownerId,
         },
         success: function(json) {
-            showProducts(json.products);
+            showProducts(json.products,".productsTable tbody");
         }
     });
 }
@@ -62,14 +103,16 @@ function showStores(stores) {
 
 }
 
-function getStores(zoneName) {
+function getStores() {
     $.ajax({
         url:AREA_URL,
         data: {
             action: "getStores",
-            zoneName:zoneName
+            zoneName:zoneName,
+            owner: ownerId,
         },
         success: function(json) {
+            storesJson = json.stores;
             showStores(json.stores);
         }
     });
@@ -82,9 +125,24 @@ function urlParam(name){
     return decodeURI(results[1]) || 0;
 }
 
+function getOwnerId(zoneName) {
+    $.ajax({
+        url:AREA_URL,
+        data: {
+            action: "getOwnerId",
+            zoneName:zoneName
+        },
+        success: function(response) {
+            ownerId = parseInt(response);
+            getProducts();
+            getStores();
+        }
+    });
+}
+
 $(function() {
-    var zoneName = urlParam('zoneName');
+    zoneName = urlParam('zoneName');
     document.getElementById("zoneName").innerText = zoneName;
-    getProducts(zoneName);
-    getStores(zoneName);
+    getOwnerId(zoneName)
+
 })

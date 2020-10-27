@@ -45,8 +45,13 @@ th, td {
     padding: 8px;
 }
 
+.selected{
+    background-color: #ffdcb7 !important;
+}
+
 tr:nth-child(even){background-color: #f2f2f2}
 tr:hover {background-color: #ffdcb7;}
+
 
 th {
     background-color: #ffae51;
