@@ -1,6 +1,8 @@
 package superduper.servlets;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import course.java.sdm.engine.*;
 import superduper.utils.ServletUtils;
@@ -39,6 +41,14 @@ public class OrderServlet extends HttpServlet {
         String userAction = request.getParameter("action");
         ServletOutputStream out = response.getOutputStream();
         switch (userAction) {
+            case "initOrder":{
+                response.setContentType("text/plain;charset=UTF-8");
+                productsToOrder = new HashMap<>();
+                storeProductsToOrder = new HashMap<>();
+                discounts = new ArrayList<>();
+                response.setStatus(200);
+                out.flush();
+            }
             case "addToCart": {
                 response.setContentType("text/plain;charset=UTF-8");
                 try {
@@ -91,13 +101,59 @@ public class OrderServlet extends HttpServlet {
                 }
             });
         }
+        buildOrderResponse(response,out);
+
+    }
+
+    private void buildOrderResponse(HttpServletResponse response, ServletOutputStream out) throws IOException {
         Gson gson = new Gson();
+
         JsonObject mainObj = new JsonObject();
         response.setStatus(200);
-        mainObj.add("discounts", gson.toJsonTree(discounts));
-        mainObj.add("orderSum", gson.toJsonTree(storeProductsToOrder));
+        mainObj.add("discounts",buildDiscounts());
+        mainObj.add("orderSum", buildOrder());
         out.println( gson.toJson(mainObj));
         out.flush();
+    }
+
+    private JsonElement buildDiscounts() {
+        JsonArray jsonArray = new JsonArray();
+        discounts.forEach(discount->{
+            JsonObject obj = new JsonObject();
+            JsonArray offers = new JsonArray();
+            discount.getOffers().forEach((offer)->{
+                JsonObject offerObj = new JsonObject();
+                offerObj.addProperty("quantity", offer.getQuantity());
+                offerObj.addProperty("productId",offer.getItemId());
+                offerObj.addProperty("product", zone.getAllProducts().get(offer.getItemId()).getName());
+                offerObj.addProperty("forAdditional", offer.getForAdditional());
+
+                offers.add(offerObj);
+            });
+            obj.addProperty("name",discount.getName());
+            obj.addProperty("quantity",discount.getQuantity());
+            obj.addProperty("product",zone.getAllProducts().get(discount.getItemId()).getName());
+            obj.addProperty("operator",discount.getOperator().toString());
+            obj.add("offers", offers);
+            jsonArray.add(obj);
+        });
+        return jsonArray;
+    }
+
+    private JsonElement buildOrder() {
+        JsonArray jsonArray = new JsonArray();
+        storeProductsToOrder.forEach((storeId,productsAndAmount)->{
+            JsonObject obj = new JsonObject();
+            JsonArray products = new JsonArray();
+            productsAndAmount.forEach((productId,amount)->{
+                JsonObject productsObj = new JsonObject();
+                productsObj.addProperty(zone.getAllProducts().get(productId).getName(), amount);
+                products.add(productsObj);
+            });
+            obj.add(zone.getAllStores().get(storeId).getName(), products);
+            jsonArray.add(obj);
+        });
+        return jsonArray;
     }
 
 

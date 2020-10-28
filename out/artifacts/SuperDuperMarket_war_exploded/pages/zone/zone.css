@@ -19,3 +19,15 @@
 #toolBar button{
     display: none;
 }
+
+.orderSum{
+    z-index: 2;
+    position: fixed;
+    overflow: auto;
+    background-color: #fff;
+    height: 70%;
+    width: 50%;
+    top: 15%;
+    left: 25%;
+    box-shadow: 2px 2px 9px 0px #a0a0a0;
+}

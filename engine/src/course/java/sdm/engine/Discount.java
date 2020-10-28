@@ -57,7 +57,7 @@ public class Discount {
 
     public enum Operator {
         IRRELEVANT{public String toString(){return "";}},
-        ONE_OF{public String toString(){return "on of";}},
+        ONE_OF{public String toString(){return "one of";}},
         ALL_OR_NOTHING{public String toString(){return "all or nothing of";}};
 
         public abstract String toString();
