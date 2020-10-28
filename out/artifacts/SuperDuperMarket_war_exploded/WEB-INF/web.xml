@@ -18,6 +18,10 @@
         <servlet-name>AreaServlet</servlet-name>
         <servlet-class>superduper.servlets.AreaServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>OrderServlet</servlet-name>
+        <servlet-class>superduper.servlets.OrderServlet</servlet-class>
+    </servlet>
 
     <servlet-mapping>
         <servlet-name>LoginShortResponseServlet</servlet-name>
@@ -26,6 +30,10 @@
     <servlet-mapping>
         <servlet-name>AreaServlet</servlet-name>
         <url-pattern>/area</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>OrderServlet</servlet-name>
+        <url-pattern>/area/order</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>UsersServlet</servlet-name>
