@@ -60,4 +60,8 @@ public class UserManager {
     public double getUserBalance(Integer userIdFromSession){
         return isCustomer(userIdFromSession)? allCustomers.get(userIdFromSession).getAccount().getBalance() :  allStoreOwners.get(userIdFromSession).getAccount().getBalance();
     }
+
+    public Zone getZone(Integer ownerId, String zoneName){
+        return allStoreOwners.get(ownerId).getZones().get(zoneName);
+    }
 }

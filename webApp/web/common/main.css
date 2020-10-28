@@ -71,9 +71,11 @@ th {
     z-index: 5;
     overflow: hidden;
     background-color: #bbbbbb8f;
+    transition: background-color .15s linear;
 }
 .popup-window>div{
     position: fixed;
+    overflow: auto;
     background-color: #fff;
     height: 70%;
     width: 50%;
@@ -97,4 +99,4 @@ input{
     box-sizing: border-box;
 }
 
-.show {display:block;}
+.show {display:initial !important;}

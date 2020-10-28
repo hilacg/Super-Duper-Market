@@ -79,30 +79,7 @@ public class Engine {
         return orders;
     }*/
 
-  /*  public Order setNewOrder(Customer selectedCustomer, Map<Integer, Map<Integer, Double>> storeProductsToOrder, LocalDate date) {
-        Order newOrder = new Order(++orderNum,date, storeProductsToOrder, selectedCustomer.getLocation(),selectedCustomer.getId());
-        newOrder.calculateDistance(allStores);
-        return newOrder;
-    }
-
-    public void addOrder(Order newOrder) {
-        newOrder.calculatePrice(allStores);
-        newOrder.calculateTotalPrice();
-        updateProductSoldAmount(newOrder);
-        Customer c = userManager.getAllCustomers().get(newOrder.getCustomerId());
-        c.addOrder(newOrder);
-        orders.add(newOrder);
-    }
-
-    private void updateProductSoldAmount(Order newOrder) {
-        for (Map.Entry<Integer, Map<Integer, Double>> storeSoldProduct : newOrder.getStoreProducts().entrySet()) {
-            for (Map.Entry<Integer, Double> productSold : storeSoldProduct.getValue().entrySet()) {
-                allProducts.get(productSold.getKey()).setSoldAmount(productSold.getValue());
-                allStores.get(storeSoldProduct.getKey()).setProductsSold(productSold);
-            }
-        }
-    }
-
+/*
     public Product getChosenProduct(Store chosenStore, int chosenSerial) throws Exception {
         if (chosenStore.getProductPrices().containsKey(chosenSerial))
             return allProducts.get(chosenSerial);
@@ -164,25 +141,9 @@ public class Engine {
         }
         return res;
     }
+*/
 
-    public  Map<Integer,  Map<Integer, Double>> findOptimalOrder(Map<Integer, Double> productsToOrder) {
-        Map<Integer,  Map<Integer, Double>> storeProducts = new HashMap<>();
-        for(Map.Entry<Integer, Double> productToBuy : productsToOrder.entrySet()){
-            Map<Integer, Double> newProductAndPrice = new HashMap<>();
-            Optional<Store> cheapestStore = allStores.values().stream()
-                    .filter(store -> store.getProductPrices().get(productToBuy.getKey())!=null).min(Comparator.comparing(store -> store.getProductPrices().get(productToBuy.getKey())));
-
-            newProductAndPrice.put(productToBuy.getKey(),productToBuy.getValue());
-            Map<Integer, Double> productAndPrice = storeProducts.get(cheapestStore.get().getSerialNumber());
-            if(productAndPrice!=null){
-                productAndPrice.putAll(newProductAndPrice);
-            }
-            else
-                storeProducts.put(cheapestStore.get().getSerialNumber(),newProductAndPrice);
-        }
-        return storeProducts;
-    }
-
+/*
     public Point findMapLimits() {
         int maxCustomerX = userManager.getAllCustomers().values().stream().max(Comparator.comparing(customer -> customer.getLocation().y)).get().getLocation().x;
         int maxStoreX = allStores.values().stream().max(Comparator.comparing(store -> store.getLocation().x)).get().getLocation().x;

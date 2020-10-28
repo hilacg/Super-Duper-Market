@@ -1,10 +1,9 @@
 package course.java.sdm.engine;
 
+import java.awt.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Zone {
@@ -62,11 +61,11 @@ public class Zone {
         }
     }
 
-    public Order setNewOrder(Customer selectedCustomer, Map<Integer, Map<Integer, Double>> storeProductsToOrder, LocalDate date) {
-        Order newOrder = new Order(++orderNum,date, storeProductsToOrder, selectedCustomer.getLocation(),selectedCustomer.getId());
+   /* public Order setNewOrder(Customer selectedCustomer, Map<Integer, Map<Integer, Double>> storeProductsToOrder, String date, int x, int y) {
+        Order newOrder = new Order(++orderNum,date, storeProductsToOrder, new Point(x,y),selectedCustomer.getId());
         newOrder.calculateDistance(allStores);
         return newOrder;
-    }
+    }*/
 
    /* public void addOrder(Order newOrder) {
         newOrder.calculatePrice(allStores);
@@ -110,6 +109,24 @@ public class Zone {
             throw new Exception("Can't delete product, The chosen product is sold only in the chosen store.\n");
     }
 
+    public  Map<Integer,  Map<Integer, Double>> findOptimalOrder(Map<Integer, Double> productsToOrder) {
+        Map<Integer,  Map<Integer, Double>> storeProducts = new HashMap<>();
+        for(Map.Entry<Integer, Double> productToBuy : productsToOrder.entrySet()){
+            Map<Integer, Double> newProductAndPrice = new HashMap<>();
+            Optional<Store> cheapestStore = allStores.values().stream()
+                    .filter(store -> store.getProductPrices().get(productToBuy.getKey())!=null).min(Comparator.comparing(store -> store.getProductPrices().get(productToBuy.getKey())));
+
+            newProductAndPrice.put(productToBuy.getKey(),productToBuy.getValue());
+            Map<Integer, Double> productAndPrice = storeProducts.get(cheapestStore.get().getSerialNumber());
+            if(productAndPrice!=null){
+                productAndPrice.putAll(newProductAndPrice);
+            }
+            else
+                storeProducts.put(cheapestStore.get().getSerialNumber(),newProductAndPrice);
+        }
+        return storeProducts;
+    }
+
     private void checkDiscounts(Store chosenStore, Product chosenProduct) {
         for(Discount discount: chosenStore.getDiscounts()){
             discount.setOffers(discount.getOffers().stream().filter(offer->offer.getItemId()!= chosenProduct.getSerialNumber()).collect(Collectors.toList()));
@@ -124,4 +141,20 @@ public class Zone {
         setProductAvgAndStoreCount();
 
     }
+
+    public Order setNewOrder(Customer customer, Map<Integer, Map<Integer, Double>> storeProductsToOrder, String date, int x, int y) {
+        Order newOrder = new Order(++orderNum,date, storeProductsToOrder, new Point(x,y),customer.getId());
+        newOrder.calculateDistance(allStores);
+        return newOrder;
+    }
+
+  /*  public void addOrder(Order newOrder) {
+        newOrder.calculatePrice(allStores);
+        newOrder.calculateTotalPrice();
+        updateProductSoldAmount(newOrder);
+        Customer c = userManager.getAllCustomers().get(newOrder.getCustomerId());
+        c.addOrder(newOrder);
+        orders.add(newOrder);
+    }*/
+
 }

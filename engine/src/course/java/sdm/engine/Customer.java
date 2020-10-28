@@ -26,12 +26,6 @@ public class Customer {
         this.id = id;
         this.name = name;
     }
-    public Customer(SDMCustomer customer){
-        id = customer.getId();
-        name = customer.getName();
-        location = new Point(customer.getLocation().getX(),customer.getLocation().getY());
-
-    }
 
     public Account getAccount() {
         return account;
@@ -66,7 +60,7 @@ public class Customer {
         this.avgShippingPrice = deliverySum/orders.size();
     }
 
-    @Override
+  /*  @Override
     public String toString() {
         return
                 "id:" + id +
@@ -74,5 +68,5 @@ public class Customer {
                 "\ntotal orders:" + totalOrders +
                 String.format("\naverage orders price: %.2f", avgOrdersPrice) +
                         String.format("\naverage shipping price: %.2f" , avgShippingPrice) ;
-    }
+    }*/
 }

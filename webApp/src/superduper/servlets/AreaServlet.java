@@ -59,7 +59,7 @@ public class AreaServlet  extends HttpServlet {
             case "getStoreProducts":{
                 Gson gson = new Gson();
                 JsonObject mainObj = new JsonObject();
-                Zone zone = userManager.getAllStoreOwners().get(Integer.parseInt(request.getParameter("owner"))).getZones().get(request.getParameter("zoneName"));
+                Zone zone = userManager.getZone(Integer.parseInt(request.getParameter("owner")),request.getParameter("zoneName"));
                 Store store = zone.getAllStores().get(Integer.parseInt(request.getParameter("store")));
                 JsonArray jsonArray = getStoreProducts(store,zone);
                 mainObj.add("storeProducts",jsonArray);
@@ -118,8 +118,7 @@ public class AreaServlet  extends HttpServlet {
         Gson gson = new Gson();
         JsonArray productJson = new JsonArray();
         JsonObject mainObj = new JsonObject();
-       StoreOwner storeOwner = userManager.getAllStoreOwners().get(Integer.parseInt(request.getParameter("owner")));
-       Zone zone = storeOwner.getZones().get(request.getParameter("zoneName"));
+       Zone zone = userManager.getZone(Integer.parseInt(request.getParameter("owner")),request.getParameter("zoneName"));
        zone.getAllProducts().values().forEach(product ->{
            JsonObject obj = new JsonObject();
            obj.addProperty("Serial Number", product.getSerialNumber());

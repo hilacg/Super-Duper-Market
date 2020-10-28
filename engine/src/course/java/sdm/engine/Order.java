@@ -7,7 +7,7 @@ import java.util.*;
 
 public class Order {
     private int serial;
-    private LocalDate date;
+    private String date;
     private Map<Integer, Double> products;
     private Map<Integer,  Map<Integer, Double>> storeProducts = new HashMap<>(); //store serial, and list of products serials to buy and amounts for each
     private double price = 0;
@@ -19,7 +19,7 @@ public class Order {
     private Point customerLocation;
     private Map<Integer,  Map<Integer, Double>> discountsProducts = new HashMap<>();
 
-    public Order(int serial, LocalDate date, Map<Integer, Map<Integer, Double>> storeProductsToOrder, Point location,int customerId){
+    public Order(int serial, String date, Map<Integer, Map<Integer, Double>> storeProductsToOrder, Point location,int customerId){
         this.serial = serial;
         this.date = date;
         this.storeProducts = storeProductsToOrder;
@@ -31,7 +31,7 @@ public class Order {
         return storeProducts;
     }
 
-    public LocalDate getDate() {
+    public String getDate() {
         return date;
     }
 

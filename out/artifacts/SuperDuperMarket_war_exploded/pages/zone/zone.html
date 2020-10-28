@@ -5,8 +5,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
     <script src="../../common/jquery-2.0.3.min.js"></script>
     <script src="../../common/context-path-helper.js"></script>
-    <link rel="stylesheet" href="../../common/main.css">
     <link rel="stylesheet" href="zone.css">
+    <link rel="stylesheet" href="../../common/main.css">
     <script src="zone.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
@@ -16,64 +16,79 @@
 <body>
 
 <div id="toolBar">
-    <button id="backbtn" onclick= "backButton()"><i class="fa fa-lg fa-backward"></i></button>
-    <button id="newOrder" onclick= "backButton()">New Order</button>
-    <button id="orderHistory" onclick= "backButton()">Order History</button>
+    <button id="backbtn" class="customerOption ownerOption" onclick= "backButton()"><i class="fa fa-lg fa-backward"></i></button>
+    <button id="newOrder" class="customerOption" onclick= "showWindow('order-container')"><i class="fa fa-plus"></i> New Order</button>
+    <button id="orderHistory" class="customerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-history"></i> Order History</button>
+    <button id="ordersBtn" class="ownerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-history"></i> Orders</button>
+    <button id="feedbacksBtn" class="ownerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-commenting"></i> Feedbacks</button>
+    <button id="newStoreBtn" class="ownerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-plus"></i> New Store</button>
+
     <img style="float: right " src="../../common/images/logo.png" id="logo" alt="logo">
 </div>
 
 <h1 id="zoneName"></h1>
-<div id="order-container">
-        <input type="text" id="datepicker" name="date" placeholder="Date" required>
-        <div>
-            <input type="radio" id="static" name="type" value="static" onclick="staticOrder()">
-            <label for="static">Static</label>
-            <input type="radio" id="dynamic" name="type" value="dynamic">
-            <label for="dynamic">Dynamic</label><br>
+
+<div id="order-container" class="popup-window">
+    <div>
+        <button onclick="showWindow('order-container')" class="fa fa-lg fa-times"></button>
+        <form id="orderForm" method="POST">
+            <input type="text" id="datepicker" name="date" required placeholder="Date">
+            <p>Location:  <input type="number" id="x" min="1" max="50" name="x" required placeholder="X"> <input type="number" id="y" min="1" max="50" name="y" required placeholder="Y"></p>
+            <div>
+                <input type="radio" id="static" name="type" value="static" onclick="staticOrder()">
+                <label for="static">Static</label>
+                <input type="radio" id="dynamic" name="type" value="dynamic" onclick="dynamicOrder()">
+                <label for="dynamic">Dynamic</label><br>
+            </div>
+            <button>Finish Order</button>
+        </form>
+
+        <div id="staticOrder-container" style="display: none">
+            <table id="storeSelect">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Location</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <table id="storeProductSelect">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Buying Method</th>
+                    <th>Price</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
-    <div id="staticOrder-container" style="display: none">
-        <table id="storeSelect">
-            <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Location</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <table id="storeProductSelect">
-            <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Buying Method</th>
-                <th>Price</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-</div>
-    <div id="products">
-        <table class="productsTable">
-            <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Buying Method</th>
-                <th>Sold In</th>
-                <th>Average Price</th>
-                <th>Amount Sold</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+
+        <div id="dynamicOrder-container" style="display: none">
+            <div id="products">
+                <table class="productsTable">
+                    <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Buying Method</th>
+                        <th>Sold In</th>
+                        <th>Average Price</th>
+                        <th>Amount Sold</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
     <div id="cart">
 
     </div>
+    </div>
 </div>
-
 
 <div id="product-container">
     <table class="productsTable">
@@ -98,7 +113,7 @@
             <th>Name</th>
             <th>Owner</th>
             <th>Location</th>
-            <th>Prodcuts</th>
+            <th>Products</th>
             <th>Orders</th>
             <th>Total Product Earnings</th>
             <th>PPK</th>

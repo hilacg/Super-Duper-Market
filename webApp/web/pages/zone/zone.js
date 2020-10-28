@@ -1,38 +1,46 @@
 const ZONE_CENTER_URL = buildUrlWithContextPath("pages/zonesCenter/zonesCenter.html");
+const LOGIN_URL = buildUrlWithContextPath("pages/login/loginShortResponse");
 const AREA_URL = buildUrlWithContextPath("area");
+const ORDER_URL = buildUrlWithContextPath("area/order");
 
 let storesJson = {}
 let zoneName;
 let ownerId;
+let user;
+let order={};
 
+function showWindow(winId){
+    document.getElementById(winId).classList.toggle("show");
+}
 function backButton(){
     window.location.replace(ZONE_CENTER_URL);
 }
 
 
-function validateAmount(amount) {
+function addToCart(productId,amount) {
     $.ajax({
-        url:AREA_URL,
+        url:ORDER_URL,
         data: {
-            action: "validateAmount",
+            action: "addToCart",
             zoneName:zoneName,
             owner:ownerId,
-            store:storeId,
+            store:order.storeId,
+            product:productId,
+            amount:amount,
         },
-        success: function(json) {
-            showProducts(json.storeProducts,'#storeProductSelect tbody');
-            $("#storeProductSelect tr").on("click",chooseAmount);
-
+        success: function(response) {
+            alert(response);
+        },
+        error:error=>{
+            alert(error.responseText);
         }
     });
 }
 
-function chooseAmount() {
+function chooseAmount(productId) {
     var amount = prompt("Please enter amount to buy:");
-    if (!(amount == null) || amount !== "") {
-        try{
-            validateAmount(amount);
-        }
+    if (!(amount == null)) {
+        addToCart(productId,amount);
     }
 }
 
@@ -46,8 +54,9 @@ function getStoreProducts(storeId) {
             store:storeId,
         },
         success: function(json) {
+            json.storeProducts.forEach(product => delete product.sold);
             showProducts(json.storeProducts,'#storeProductSelect tbody');
-            $("#storeProductSelect tr").on("click",chooseAmount);
+            $("#storeProductSelect tr").on("click",(event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML));
 
         }
     });
@@ -57,12 +66,15 @@ function selectStore(event) {
     $('#storeSelect tr').removeClass("selected");
     const storeNode = event.target.closest("tr");
     storeNode.classList.add("selected");
-    getStoreProducts(storeNode.children[0].innerHTML);
+    order.storeId =storeNode.children[0].innerHTML;
+    getStoreProducts(order.storeId);
 
 }
 
 function staticOrder() {
+    order.type="static";
     $('#staticOrder-container').css("display","block");
+    $('#dynamicOrder-container').css("display","none");
     const table = $('#storeSelect tbody');
     table.empty();
     storesJson.forEach(store => {
@@ -75,6 +87,12 @@ function staticOrder() {
     $('#storeSelect tr').on("click",selectStore);
 }
 
+function dynamicOrder() {
+    order.type="dynamic";
+    $('#dynamicOrder-container').css("display","block");
+    $('#staticOrder-container').css("display","none");
+}
+
 function showProducts(products,selectors) {
     const table = $(selectors);
     table.empty();
@@ -84,7 +102,7 @@ function showProducts(products,selectors) {
             tr.append($(document.createElement('td')).text(product[key]));
         tr.appendTo(table);
     });
-
+    $("#products .productsTable tr").on("click",(event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML));
 }
 
 function getProducts() {
@@ -170,9 +188,54 @@ function getOwnerId(zoneName) {
     });
 }
 
+function getUser(){
+    $.ajax({
+        async: false,
+        url: LOGIN_URL,
+        data: {
+            action: "getUser"
+        },
+        type: 'GET',
+        success: function (json) {
+            user =json;
+            showUserOptions();
+        }
+    });
+}
+
+function showUserOptions(){
+    user.isCustomer ? $(".customerOption").toggleClass("show") : $(".ownerOption").toggleClass("show");
+}
+
+
+function finishOrder() {
+    $.ajax({
+        url: ORDER_URL,
+        method: 'GET',
+        data: {
+            action: "finishOrder",
+            type: order.type,
+            store: order.storeId,
+            x: document.getElementById("x").value,
+            y: document.getElementById("y").value,
+            date: document.getElementById("datepicker").value
+        },
+        success: function (json) {
+            alert(json);
+        },
+        error: ()=>{
+         alert("error")
+        }
+    });
+}
+
 $(function() {
+    getUser();
     zoneName = urlParam('zoneName');
     document.getElementById("zoneName").innerText = zoneName;
-    getOwnerId(zoneName)
-
+    getOwnerId(zoneName);
+    $("#orderForm").submit(()=>{
+        finishOrder();
+        return false;
+    })
 })
