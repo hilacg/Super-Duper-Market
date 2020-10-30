@@ -1,10 +1,9 @@
 package superduper.servlets;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import course.java.sdm.engine.*;
+import jdk.nashorn.internal.parser.JSONParser;
 import superduper.utils.ServletUtils;
 import superduper.utils.SessionUtils;
 
@@ -14,10 +13,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class OrderServlet extends HttpServlet {
 
@@ -70,8 +71,37 @@ public class OrderServlet extends HttpServlet {
                 finishOrder(request,response,out);
                 break;
             }
+            case "saveDiscounts":{
+                saveDiscounts(request,response,out);
+                break;
+            }
+            case "getOrderSum":{
+                getOrderSum(request,response,out);
+                break;
+            }
         }
 
+    }
+
+    private void getOrderSum(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {
+        Gson gson = new Gson();
+        JsonObject mainObj = new JsonObject();
+        mainObj.add("orderSum", buildTotalOrderSum());
+        out.println( gson.toJson(mainObj));
+        response.setStatus(200);
+        out.flush();
+    }
+
+    private void saveDiscounts(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {
+        response.setContentType("text/plain;charset=UTF-8");
+        JsonArray j = new JsonParser().parse(request.getParameter("discounts")).getAsJsonArray();
+        j.forEach(discount ->{
+            JsonObject discountObj = (JsonObject)discount;
+            Discount selectedDiscount = zone
+                    .getAllStores().get(discountObj.get("storeId").getAsInt()).getDiscounts().stream().filter(storeDiscount -> storeDiscount.getName().equals(discountObj.get("discountName").getAsString())).collect(Collectors.toList()).get(0);
+            newOrder.saveDiscounts(selectedDiscount, discountObj.get("chosenRadio").getAsString(), discountObj.get("productId").getAsInt());
+        });
+        response.setStatus(200);
     }
 
     private void finishOrder(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {
@@ -107,7 +137,6 @@ public class OrderServlet extends HttpServlet {
 
     private void buildOrderResponse(HttpServletResponse response, ServletOutputStream out) throws IOException {
         Gson gson = new Gson();
-
         JsonObject mainObj = new JsonObject();
         response.setStatus(200);
         mainObj.add("discounts",buildDiscounts());
@@ -130,6 +159,7 @@ public class OrderServlet extends HttpServlet {
 
                 offers.add(offerObj);
             });
+            obj.addProperty("storeId",discount.getStoreSerial());
             obj.addProperty("name",discount.getName());
             obj.addProperty("quantity",discount.getQuantity());
             obj.addProperty("product",zone.getAllProducts().get(discount.getItemId()).getName());
@@ -139,6 +169,7 @@ public class OrderServlet extends HttpServlet {
         });
         return jsonArray;
     }
+
 
     private JsonElement buildOrder() {
         JsonArray jsonArray = new JsonArray();
@@ -154,6 +185,44 @@ public class OrderServlet extends HttpServlet {
             jsonArray.add(obj);
         });
         return jsonArray;
+    }
+    private JsonElement buildTotalOrderSum() {
+
+        JsonArray jsonArray = new JsonArray();
+        newOrder.getStoreProducts().forEach((storeId,productAndAmount)->{
+            JsonObject storeObj = new JsonObject();
+            JsonArray storeP = new JsonArray();
+            JsonArray storeD = new JsonArray();
+            storeObj.addProperty("storeName",zone.getAllStores().get(storeId).getName());
+
+            productAndAmount.forEach((productId,amount)->{
+                storeP.add(buildStoreSum(productId,amount,storeId, false));
+            });
+            if( newOrder.getDiscountsProducts().size() >0 ) {
+                newOrder.getDiscountsProducts().get(storeId).forEach((productId, amount) -> {
+                    storeD.add(buildStoreSum(productId, amount, storeId, true));
+
+                });
+            }
+            storeObj.add("product",storeP);
+            storeObj.add("discount",storeD);
+            jsonArray.add(storeObj);
+        });
+
+        return jsonArray;
+    }
+
+    private JsonElement buildStoreSum(Integer productId, Double amount,Integer storeId, boolean fromDiscount) {
+        Product product = zone.getAllProducts().get(productId);
+        JsonObject productObj = new JsonObject();
+        productObj.addProperty("productName",product.getName());
+        productObj.addProperty("productId",productId);
+        productObj.addProperty("buyingMethod",product.getMethod().toString());
+        productObj.addProperty("amount",amount);
+        productObj.addProperty("price",zone.getAllStores().get(storeId).getProductPrices().get(productId));
+        productObj.addProperty("totalPrice",zone.getAllStores().get(storeId).getProductPrices().get(productId) * amount);
+        productObj.addProperty("fromDiscount",fromDiscount);
+        return productObj;
     }
 
 

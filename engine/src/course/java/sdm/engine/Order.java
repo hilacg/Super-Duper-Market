@@ -101,22 +101,22 @@ public class Order {
         }
     }
 
-    public void saveDiscounts(Discount selectedDiscount, RadioButton radio) {
+    public void saveDiscounts(Discount selectedDiscount, String radio, Integer productId) {
         Map<Integer, Double> productsFromStore = discountsProducts.get(selectedDiscount.getStoreSerial());
         if(productsFromStore == null) {
             productsFromStore = new HashMap<>();
             discountsProducts.put(selectedDiscount.getStoreSerial(),productsFromStore);
         }
-        if(radio == null){
+        if(selectedDiscount.getOperator() != Discount.Operator.ONE_OF){
             for(Offer offer : selectedDiscount.getOffers()) {
                 productsFromStore.put(offer.itemId, productsFromStore.getOrDefault(offer.itemId, 0.0) + offer.quantity);
                 discountsPrice += offer.quantity* offer.forAdditional;
             }
         }
         else{
-            String[] parts = radio.getText().split(" ");
+            String[] parts = radio.split(" ");
             Double quantity = Double.parseDouble(parts[0]);
-            productsFromStore.put(Integer.parseInt(radio.getId()),productsFromStore.getOrDefault(Integer.parseInt(radio.getId()), 0.0 ) + quantity);
+            productsFromStore.put(productId,productsFromStore.getOrDefault(productId, 0.0 ) + quantity);
             discountsPrice += quantity* Double.parseDouble(parts[parts.length - 2]);
         }
     }
@@ -130,5 +130,4 @@ public class Order {
         }
         price += discountsPrice;
     }
-
 }

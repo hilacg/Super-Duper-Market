@@ -120,12 +120,63 @@ function showOptimalOrder(orderSum) {
     $("#order-container").append(sum);
 }
 
-function addOderDiscounts() {
-    return undefined;
+function showOrderSum(json) {
+    console.log("hi")
+ /*   var sum = $(document.createElement('div'));
+    sum.addClass("orderSum");
+    var button = $(document.createElement('button')).text("X");
+    button.on("click",()=>{$(".orderSum").remove()});
+    sum.append(button);
+    sum.append($(document.createElement('h1')).text("Optimal Order"));
+    orderSum.forEach(storOrder=>{
+        var div = $(document.createElement('div'));
+        div.addClass("storeSum");
+        div.append($(document.createElement('h2')).text(Object.keys(storOrder)[0]));
+        for( var productkey of storOrder[Object.keys(storOrder)]){
+            var divP = $(document.createElement('div'));
+            divP.append($(document.createElement('span')).text(Object.keys(productkey)[0] + ": "));
+            divP.append($(document.createElement('span')).text(productkey[Object.keys(productkey)]));
+            divP.append($(document.createElement('br')));
+            div.append(divP);
+        }
+        sum.append(div);
+    })
+    $("#order-container").append(sum);*/
+}
+
+function getOrderSum() {
+    $.ajax({
+        url: ORDER_URL,
+        data: {
+            action: "getOrderSum",
+        },
+        success: (json)=>{showOrderSum(json)}
+    })
+}
+
+function addOrderDiscounts() {
+    var requestData = [];
+    var selectedDiscount = $(".discount.selected");
+    selectedDiscount.each( (index,discount) => {
+        requestData.push({
+            storeId: discount.classList[1],
+            discountName: discount.children[0].textContent,
+            chosenRadio: $(discount).find("input:radio:checked").next().text(),
+            productId: $(discount).find("input:radio:checked").attr('class')
+        });
+    });
+    $.ajax({
+        url: ORDER_URL,
+        contentType: 'application/json; charset=utf-8',
+        data: {
+            action: "saveDiscounts",
+            discounts:JSON.stringify(requestData),
+        },
+        success: ()=>getOrderSum()
+    })
 }
 
 function showDiscounts(discounts) {
-    $("#order-container div:first-child").css("display","none");
     const win =   $(document.createElement('div'));
     win.addClass("discountsWin");
     var button = $(document.createElement('button')).text("X");
@@ -138,15 +189,29 @@ function showDiscounts(discounts) {
     discounts.forEach((discount,index)=>{
         var div = $(document.createElement('div'));
         div.addClass("discount");
+        div.addClass(discount.storeId.toString());
         div.append($(document.createElement('h2')).text(discount.name));
         div.append($(document.createElement('p')).text("Because you bought: " + discount.quantity+" "+discount.product));
         div.append($(document.createElement('span')).text(" You can get " + discount.operator + ":"));
         discount.offers.forEach(offer=>{
             var offerDiv =  $(document.createElement('div'));
+            offerDiv.click(event=>{
+                e = window.event;
+
+                //IE9 & Other Browsers
+                if (e.stopPropagation) {
+                    e.stopPropagation();
+                }
+                //IE8 and Lower
+                else {
+                    e.cancelBubble = true;
+                }
+            })
             var of = offer.quantity+" "+ offer.product+ " for additional "+ offer.forAdditional+" Nis";
             switch (discount.operator) {
                 case "one of": {
-                    var radio = $('<input type="radio" name="' +index+'" id="'+offer.productId+'" value="'+offer.productId+'" checked>');
+                    var radio = $('<input type="radio" name="' +index+'" value="'+offer.productId+'" checked>');
+                    radio.addClass(offer.productId.toString())
                     offerDiv.append(radio);
                     var label = $(document.createElement('label')).text(of);
                     label.prop("for", offer.productId);
@@ -167,7 +232,7 @@ function showDiscounts(discounts) {
         win.append(div);
     })
     button = $(document.createElement('button')).text("Confirm");
-    button.on("click",addOderDiscounts());
+    button.on("click",()=>addOrderDiscounts());
     win.append(button);
     $("#order-container").append(win);
 }
@@ -185,11 +250,12 @@ function finishOrder() {
             date: document.getElementById("datepicker").value
         },
         success: function (json) {
+            $("#order-container div:first-child").css("display","none");
             order.type === "dynamic" && showOptimalOrder(json.orderSum);
             if(json.discounts.length > 0)
                 showDiscounts(json.discounts);
             else
-                showOrderSum();
+                getOrderSum();
         },
         error: ()=>{
             alert("error")
