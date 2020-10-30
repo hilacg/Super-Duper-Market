@@ -59,8 +59,7 @@ function getStoreProducts(storeId) {
         success: function(json) {
             json.storeProducts.forEach(product => delete product.sold);
             showProducts(json.storeProducts,'#storeProductSelect tbody');
-            $("#storeProductSelect tr").on("click",(event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML));
-
+            $("#storeProductSelect tr").click((event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML));
         }
     });
 }
@@ -98,7 +97,7 @@ function dynamicOrder() {
     $('#staticOrder-container').css("display","none");
 }
 
-function showOrderSum(orderSum) {
+function showOptimalOrder(orderSum) {
     var sum = $(document.createElement('div'));
     sum.addClass("orderSum");
     var button = $(document.createElement('button')).text("X");
@@ -186,10 +185,11 @@ function finishOrder() {
             date: document.getElementById("datepicker").value
         },
         success: function (json) {
-            showOrderSum(json.orderSum);
+            order.type === "dynamic" && showOptimalOrder(json.orderSum);
             if(json.discounts.length > 0)
                 showDiscounts(json.discounts);
-
+            else
+                showOrderSum();
         },
         error: ()=>{
             alert("error")

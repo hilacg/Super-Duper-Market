@@ -59,8 +59,7 @@ function getStoreProducts(storeId) {
         success: function(json) {
             json.storeProducts.forEach(product => delete product.sold);
             showProducts(json.storeProducts,'#storeProductSelect tbody');
-            $("#storeProductSelect tr").on("click",(event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML));
-
+            $("#storeProductSelect tr").click((event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML));
         }
     });
 }
@@ -141,7 +140,7 @@ function showDiscounts(discounts) {
         div.addClass("discount");
         div.append($(document.createElement('h2')).text(discount.name));
         div.append($(document.createElement('p')).text("Because you bought: " + discount.quantity+" "+discount.product));
-        div.append($(document.createElement('span')).text(" You can get: " + discount.operator));
+        div.append($(document.createElement('span')).text(" You can get " + discount.operator + ":"));
         discount.offers.forEach(offer=>{
             var offerDiv =  $(document.createElement('div'));
             var of = offer.quantity+" "+ offer.product+ " for additional "+ offer.forAdditional+" Nis";

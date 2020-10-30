@@ -26,7 +26,8 @@ function showProducts(products,selectors) {
             tr.append($(document.createElement('td')).text(product[key]));
         tr.appendTo(table);
     });
-    $("#products .productsTable tr").on("click",(event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML));
+    $("#products .productsTable tbody tr").unbind();
+    $("#products .productsTable tbody tr").click((event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML));
 }
 
 function showStoreProducts(products) {
