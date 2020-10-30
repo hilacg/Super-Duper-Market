@@ -87,8 +87,8 @@ public class OrderServlet extends HttpServlet {
         Gson gson = new Gson();
         JsonObject mainObj = new JsonObject();
         mainObj.add("orderSum", buildTotalOrderSum());
-        out.println( gson.toJson(mainObj));
         response.setStatus(200);
+        out.println( gson.toJson(mainObj));
         out.flush();
     }
 
@@ -198,7 +198,7 @@ public class OrderServlet extends HttpServlet {
             productAndAmount.forEach((productId,amount)->{
                 storeP.add(buildStoreSum(productId,amount,storeId, false));
             });
-            if( newOrder.getDiscountsProducts().size() >0 ) {
+            if( newOrder.getDiscountsProducts().get(storeId) !=null ) {
                 newOrder.getDiscountsProducts().get(storeId).forEach((productId, amount) -> {
                     storeD.add(buildStoreSum(productId, amount, storeId, true));
 
@@ -215,13 +215,12 @@ public class OrderServlet extends HttpServlet {
     private JsonElement buildStoreSum(Integer productId, Double amount,Integer storeId, boolean fromDiscount) {
         Product product = zone.getAllProducts().get(productId);
         JsonObject productObj = new JsonObject();
-        productObj.addProperty("productName",product.getName());
-        productObj.addProperty("productId",productId);
-        productObj.addProperty("buyingMethod",product.getMethod().toString());
-        productObj.addProperty("amount",amount);
-        productObj.addProperty("price",zone.getAllStores().get(storeId).getProductPrices().get(productId));
-        productObj.addProperty("totalPrice",zone.getAllStores().get(storeId).getProductPrices().get(productId) * amount);
-        productObj.addProperty("fromDiscount",fromDiscount);
+        productObj.addProperty("Product",product.getName());
+        productObj.addProperty("Id",productId);
+        productObj.addProperty("Buying Method",product.getMethod().toString());
+        productObj.addProperty("Amount",amount);
+        productObj.addProperty("Price",zone.getAllStores().get(storeId).getProductPrices().get(productId));
+        productObj.addProperty("Total Price",zone.getAllStores().get(storeId).getProductPrices().get(productId) * amount);
         return productObj;
     }
 

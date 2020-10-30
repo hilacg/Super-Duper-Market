@@ -101,6 +101,11 @@ input{
 
 .show {display:initial !important;}
 
-h1, h2{
+h1{
     color: #ffae51;
+    margin: auto;
+    width: fit-content;
+}
+h2{
+    color: #de943f;
 }

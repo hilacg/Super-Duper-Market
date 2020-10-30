@@ -20,6 +20,10 @@
     display: none;
 }
 
+.optimalOrder{
+    z-index: 3;
+}
+
 .orderSum{
     z-index: 2;
     position: fixed;
@@ -30,4 +34,14 @@
     top: 15%;
     left: 25%;
     box-shadow: 2px 2px 9px 0px #a0a0a0;
+}
+
+.summary-container{
+    width: fit-content;
+    margin: auto;
+    font-size: 13px;
+    font-family: "Courier New", Courier, monospace;
+}
+.storeSum{
+    border-bottom: 1px solid #ccc;
 }

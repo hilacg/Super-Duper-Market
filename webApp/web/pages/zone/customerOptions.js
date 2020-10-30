@@ -99,9 +99,9 @@ function dynamicOrder() {
 
 function showOptimalOrder(orderSum) {
     var sum = $(document.createElement('div'));
-    sum.addClass("orderSum");
+    sum.addClass("optimalOrder");
     var button = $(document.createElement('button')).text("X");
-    button.on("click",()=>{$(".orderSum").remove()});
+    button.on("click",()=>{$(".optimalOrder").remove()});
     sum.append(button);
     sum.append($(document.createElement('h1')).text("Optimal Order"));
     orderSum.forEach(storOrder=>{
@@ -120,29 +120,46 @@ function showOptimalOrder(orderSum) {
     $("#order-container").append(sum);
 }
 
-function showOrderSum(json) {
-    console.log("hi")
- /*   var sum = $(document.createElement('div'));
+function showOrderSum(orderSum) {
+    $("#order-container>div:gt(0)").remove();
+    var sum = $(document.createElement('div'));
     sum.addClass("orderSum");
     var button = $(document.createElement('button')).text("X");
-    button.on("click",()=>{$(".orderSum").remove()});
+    button.on("click",()=>{$("#order-container>div:gt(0)").remove(); showWindow("order-container")});
     sum.append(button);
-    sum.append($(document.createElement('h1')).text("Optimal Order"));
-    orderSum.forEach(storOrder=>{
-        var div = $(document.createElement('div'));
-        div.addClass("storeSum");
-        div.append($(document.createElement('h2')).text(Object.keys(storOrder)[0]));
-        for( var productkey of storOrder[Object.keys(storOrder)]){
-            var divP = $(document.createElement('div'));
-            divP.append($(document.createElement('span')).text(Object.keys(productkey)[0] + ": "));
-            divP.append($(document.createElement('span')).text(productkey[Object.keys(productkey)]));
-            divP.append($(document.createElement('br')));
-            div.append(divP);
+    sum.append($(document.createElement('h1')).text("Order Summary"));
+    var divOrder = $(document.createElement('div'));
+    divOrder.addClass("summary-container");
+    orderSum.forEach(storeOrder=> {
+        var divStore = $(document.createElement('div'));
+        var sumList = $(document.createElement('ul'))
+        divStore.append(sumList);
+        sumList.addClass("storeSum");
+        sumList.append($(document.createElement('h2')).text(storeOrder.storeName));
+        sumList.append($(document.createElement('h3')).text("Product bought:"));
+        showProductsSum(storeOrder.product, sumList);
+        if (storeOrder.discount.length > 0) {
+            sumList.append($(document.createElement('h3')).text("Product from discounts:"));
+            showProductsSum(storeOrder.discount, sumList);
         }
-        sum.append(div);
-    })
-    $("#order-container").append(sum);*/
+        divOrder.append(divStore);
+        });
+    sum.append(divOrder);
+    $("#order-container").append(sum);
 }
+
+function showProductsSum(products,sumList){
+    products.forEach(product=>{
+        var divProduct = $(document.createElement('li'));
+        for( var productkey of Object.keys(product)) {
+            divProduct.append($(document.createElement('span')).text(productkey + ": " + product[productkey]));
+            divProduct.append($(document.createElement('br')));
+        }
+        divProduct.append($(document.createElement('br')));
+        sumList.append(divProduct);
+    });
+}
+
 
 function getOrderSum() {
     $.ajax({
@@ -150,7 +167,7 @@ function getOrderSum() {
         data: {
             action: "getOrderSum",
         },
-        success: (json)=>{showOrderSum(json)}
+        success: (json)=>{showOrderSum(json.orderSum)}
     })
 }
 
@@ -158,11 +175,12 @@ function addOrderDiscounts() {
     var requestData = [];
     var selectedDiscount = $(".discount.selected");
     selectedDiscount.each( (index,discount) => {
+        var productId = $(discount).find("input:radio:checked").attr('class');
         requestData.push({
             storeId: discount.classList[1],
             discountName: discount.children[0].textContent,
             chosenRadio: $(discount).find("input:radio:checked").next().text(),
-            productId: $(discount).find("input:radio:checked").attr('class')
+            productId: typeof productId !== 'undefined' ? productId : 0
         });
     });
     $.ajax({
@@ -193,29 +211,30 @@ function showDiscounts(discounts) {
         div.append($(document.createElement('h2')).text(discount.name));
         div.append($(document.createElement('p')).text("Because you bought: " + discount.quantity+" "+discount.product));
         div.append($(document.createElement('span')).text(" You can get " + discount.operator + ":"));
-        discount.offers.forEach(offer=>{
-            var offerDiv =  $(document.createElement('div'));
-            offerDiv.click(event=>{
-                e = window.event;
+        var offerDiv =  $(document.createElement('div'));
+        offerDiv.click(event=>{
+            e = window.event;
 
-                //IE9 & Other Browsers
-                if (e.stopPropagation) {
-                    e.stopPropagation();
-                }
-                //IE8 and Lower
-                else {
-                    e.cancelBubble = true;
-                }
-            })
+            //IE9 & Other Browsers
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            //IE8 and Lower
+            else {
+                e.cancelBubble = true;
+            }
+        })
+        discount.offers.forEach((offer,indx2)=>{
             var of = offer.quantity+" "+ offer.product+ " for additional "+ offer.forAdditional+" Nis";
             switch (discount.operator) {
                 case "one of": {
-                    var radio = $('<input type="radio" name="' +index+'" value="'+offer.productId+'" checked>');
+                    var radio = $('<input type="radio" name="' +index+'" id="'+ index + "_" +indx2 +'" value="'+offer.productId+'" checked>');
                     radio.addClass(offer.productId.toString())
                     offerDiv.append(radio);
                     var label = $(document.createElement('label')).text(of);
-                    label.prop("for", offer.productId);
+                    label.prop("for", `${index}_${indx2}`);
                     offerDiv.append(label);
+                    offerDiv.append($(document.createElement('br')));
                     break;
                 }
                 default: {
