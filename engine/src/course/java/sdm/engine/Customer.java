@@ -27,6 +27,10 @@ public class Customer {
         this.name = name;
     }
 
+    public List<Order> getOrders() {
+        return orders;
+    }
+
     public Account getAccount() {
         return account;
     }

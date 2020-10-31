@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import course.java.sdm.engine.Engine;
+import course.java.sdm.engine.Order;
 import course.java.sdm.engine.UserManager;
+import course.java.sdm.engine.Zone;
 import superduper.utils.ServletUtils;
 import superduper.utils.SessionUtils;
 
@@ -19,6 +21,7 @@ public class AccountServlet  extends HttpServlet {
 
     private UserManager userManager;
     private Engine engine;
+
 
     @Override
     public void init() throws ServletException {
@@ -47,7 +50,29 @@ public class AccountServlet  extends HttpServlet {
                 out.flush();
                 break;
             }
+            case "charge": {
+                chargeOrder(response,request,out, userIdFromSession);
+                break;
+            }
+
         }
+    }
+
+    private void chargeOrder(HttpServletResponse response, HttpServletRequest request, ServletOutputStream out, Integer userIdFromSession) throws IOException {
+        response.setContentType("text/plain;charset=UTF-8");
+        Order order = userManager.getAllCustomers().get(userIdFromSession).getOrders().get(userManager.getAllCustomers().get(userIdFromSession).getOrders().size()-1);
+        Zone zone = userManager.getZone(Integer.parseInt(request.getParameter("owner")),request.getParameter("zoneName"));
+        userManager.updateAccount(userIdFromSession,"withdraw", order.getTotalPrice(), order.getDate());
+        order.getStoreProducts().forEach((storeId,prouductAndAmount)->{
+            Double amountToPay = 0.0;
+            amountToPay+= order.calculateStorePrice(zone.getAllStores().get(storeId));
+            amountToPay+= order.getDeliveryPrices().get(storeId);
+            amountToPay+=order.calculateStoreDiscount(storeId);
+            userManager.updateAccount(zone.getAllStores().get(storeId).getOwnerId(),"deposit", amountToPay, order.getDate());
+        });
+        response.setStatus(200);
+        out.println(order.getTotalPrice());
+        out.flush();
     }
 
     private void deposit(HttpServletResponse response, HttpServletRequest request, ServletOutputStream out, Integer userIdFromSession) throws IOException {

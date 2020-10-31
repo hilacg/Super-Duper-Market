@@ -2,6 +2,7 @@ const ZONE_CENTER_URL = buildUrlWithContextPath("pages/zonesCenter/zonesCenter.h
 const LOGIN_URL = buildUrlWithContextPath("pages/login/loginShortResponse");
 const AREA_URL = buildUrlWithContextPath("area");
 const ORDER_URL = buildUrlWithContextPath("area/order");
+const ACCOUNT_URL = buildUrlWithContextPath("users/account");
 
 let storesJson = {}
 let zoneName;

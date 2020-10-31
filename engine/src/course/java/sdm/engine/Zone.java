@@ -148,13 +148,11 @@ public class Zone {
         return newOrder;
     }
 
-  /*  public void addOrder(Order newOrder) {
-        newOrder.calculatePrice(allStores);
-        newOrder.calculateTotalPrice();
+    public void addOrder(Order newOrder,Customer customer) {
         updateProductSoldAmount(newOrder);
-        Customer c = userManager.getAllCustomers().get(newOrder.getCustomerId());
+        Customer c = customer;
         c.addOrder(newOrder);
         orders.add(newOrder);
-    }*/
+    }
 
 }

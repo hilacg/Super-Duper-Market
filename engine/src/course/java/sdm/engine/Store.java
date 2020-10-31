@@ -12,6 +12,7 @@ import java.util.List;
 @XmlRootElement(name = "SDM-store")
 public class Store {
     private int serialNumber;
+    private int ownerId;
     private String name;
     private Map<Integer,Integer> productPrices = new HashMap<>();//serial price
     private Map<Integer,Double> productsSold = new HashMap<>(); //serial total earnings
@@ -23,8 +24,9 @@ public class Store {
 
     public Store(){}
 
-    public Store(SDMStore store){
+    public Store(SDMStore store,int ownerId){
         serialNumber = store.getId();
+        this.ownerId = ownerId;
         name = store.getName();
         for(SDMSell sell : store.getSDMPrices().getSDMSell()){
             productPrices.put(sell.getItemId(), sell.getPrice());
@@ -37,6 +39,10 @@ public class Store {
         PPK = store.getDeliveryPpk();
         location = new Point(store.getLocation().getX(),store.getLocation().getY());
 
+    }
+
+    public int getOwnerId() {
+        return ownerId;
     }
 
     public Integer getTotalOrders(){
@@ -62,7 +68,9 @@ public class Store {
     public Point getLocation() {
         return location;
     }
-
+    public String getStringLocation() {
+        return "("+location.x+", "+location.y+")";
+    }
     public void setSerialNumber(int serialNumber) {
         this.serialNumber = serialNumber;
     }
@@ -140,4 +148,5 @@ public class Store {
                 "\ndeliveryEarnings: " + deliveryEarnings +
                 "\nlocation: (" + location.x + ", " + location.y + ")" ;
     }
+
 }

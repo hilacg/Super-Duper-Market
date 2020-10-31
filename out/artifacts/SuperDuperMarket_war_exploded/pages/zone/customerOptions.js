@@ -107,11 +107,11 @@ function showOptimalOrder(orderSum) {
     orderSum.forEach(storOrder=>{
         var div = $(document.createElement('div'));
         div.addClass("storeSum");
-        div.append($(document.createElement('h2')).text(Object.keys(storOrder)[0]));
-        for( var productkey of storOrder[Object.keys(storOrder)]){
+        div.append($(document.createElement('h2')).text(storOrder.storeName));
+        for( var storeDetail of Object.keys(storOrder.storeDetails)){
             var divP = $(document.createElement('div'));
-            divP.append($(document.createElement('span')).text(Object.keys(productkey)[0] + ": "));
-            divP.append($(document.createElement('span')).text(productkey[Object.keys(productkey)]));
+            divP.append($(document.createElement('span')).text((storeDetail) + ": "));
+            divP.append($(document.createElement('span')).text(storOrder.storeDetails[storeDetail]));
             divP.append($(document.createElement('br')));
             div.append(divP);
         }
@@ -120,12 +120,41 @@ function showOptimalOrder(orderSum) {
     $("#order-container").append(sum);
 }
 
-function showOrderSum(orderSum) {
-    $("#order-container>div:gt(0)").remove();
+function chargeCustomer() {
+    $.ajax({
+        url: ACCOUNT_URL,
+        data: {
+            action: "charge",
+            owner: ownerId,
+            zoneName: zoneName
+        },
+        success:(amount)=> {
+            alert("You were charged a total of "+ amount+ " Nis");
+
+        }
+    })
+}
+
+function confirmOrder() {
+    $.ajax({
+        url: ORDER_URL,
+        data: {
+            action: "confirmOrder",
+        },
+        success:()=> {
+            alert("Order Added Successfully!");
+            chargeCustomer();
+        }
+    })
+}
+
+function showOrderSum(json,winId) {
+    var orderSum = json.orderSum;
+    $("#"+winId+">div:gt(0)").remove();
     var sum = $(document.createElement('div'));
     sum.addClass("orderSum");
     var button = $(document.createElement('button')).text("X");
-    button.on("click",()=>{$("#order-container>div:gt(0)").remove(); showWindow("order-container")});
+    button.on("click",()=>{$("#"+winId+">div:gt(0)").remove(); showWindow(winId)});
     sum.append(button);
     sum.append($(document.createElement('h1')).text("Order Summary"));
     var divOrder = $(document.createElement('div'));
@@ -135,7 +164,8 @@ function showOrderSum(orderSum) {
         var sumList = $(document.createElement('ul'))
         divStore.append(sumList);
         sumList.addClass("storeSum");
-        sumList.append($(document.createElement('h2')).text(storeOrder.storeName));
+        sumList.append($(document.createElement('h2')).text(storeOrder["store Name"]));
+        showProductsSum([storeOrder.details], sumList)
         sumList.append($(document.createElement('h3')).text("Product bought:"));
         showProductsSum(storeOrder.product, sumList);
         if (storeOrder.discount.length > 0) {
@@ -145,7 +175,19 @@ function showOrderSum(orderSum) {
         divOrder.append(divStore);
         });
     sum.append(divOrder);
-    $("#order-container").append(sum);
+    divOrder = $(document.createElement('div'));
+    showProductsSum([json.orderFinalSum],divOrder)
+    sum.append(divOrder);
+    var divButtons = $(document.createElement('div'));
+    divButtons.addClass("summaryButtons")
+    var confirm = $(document.createElement('button')).text("confirm");
+    confirm.on("click",()=> {confirmOrder(); button.click();});
+    divButtons.append(confirm);
+    var cancel = $(document.createElement('button')).text("cancel");
+    cancel.on("click",()=>button.click());
+    divButtons.append(cancel);
+    sum.append(divButtons);
+    $("#"+winId).append(sum);
 }
 
 function showProductsSum(products,sumList){
@@ -167,7 +209,8 @@ function getOrderSum() {
         data: {
             action: "getOrderSum",
         },
-        success: (json)=>{showOrderSum(json.orderSum)}
+        success: (json)=>{showOrderSum(json,"order-container")
+        }
     })
 }
 
@@ -212,6 +255,7 @@ function showDiscounts(discounts) {
         div.append($(document.createElement('p')).text("Because you bought: " + discount.quantity+" "+discount.product));
         div.append($(document.createElement('span')).text(" You can get " + discount.operator + ":"));
         var offerDiv =  $(document.createElement('div'));
+        offerDiv.css("width","fit-content");
         offerDiv.click(event=>{
             e = window.event;
 
@@ -234,7 +278,7 @@ function showDiscounts(discounts) {
                     var label = $(document.createElement('label')).text(of);
                     label.prop("for", `${index}_${indx2}`);
                     offerDiv.append(label);
-                    offerDiv.append($(document.createElement('br')));
+
                     break;
                 }
                 default: {
@@ -242,6 +286,7 @@ function showDiscounts(discounts) {
                     break;
                 }
             }
+            offerDiv.append($(document.createElement('br')));
             div.append(offerDiv);
         })
         div.on("click",event=>{
@@ -280,6 +325,29 @@ function finishOrder() {
             alert("error")
         }
     });
+}
+
+function showCustomerOrders(json) {
+    var div = $(document.createElement('div'))
+    div.attr('id', 'order-history');
+    div.attr('class', 'pop-popup-window show');
+    div.append($(document.createElement('div')));
+    $("body").append(div);
+    json.forEach(order=>{
+        showOrderSum(order,"order-history");
+    })
+}
+
+function orderHistory(){
+    $.ajax({
+        url: ORDER_URL,
+        data: {
+            action: "getCustomerOrders",
+        },
+        success: (json)=>{showCustomerOrders(json);
+        $(".summaryButtons").remove();
+        }
+    })
 }
 
 

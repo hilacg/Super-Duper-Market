@@ -39,11 +39,11 @@ public class SuperXML {
         return tempAllStores;
     }
 
-    public void load(InputStream fileContent) throws Exception {
+    public void load(InputStream fileContent, int userId) throws Exception {
         try {
             superMarket = this.XMLToObject(fileContent);
             if( superMarket != null){
-                validateXML();
+                validateXML(userId);
             }
         }catch (Exception e){
             throw e;
@@ -64,13 +64,12 @@ public class SuperXML {
         return  superMarket;
     }
 
-    public void validateXML() throws Exception {
+    public void validateXML( int userId) throws Exception {
         checkZone();
-        checkStores();
+        checkStores(userId);
         checkProducts();
         storeProductCheck();
         productSoldTwice(); //in a single store
-    //    checkCustomers();
         checkSales();
 
     }
@@ -95,10 +94,10 @@ public class SuperXML {
         }
     }
 
-    private void checkStores() throws Exception {
+    private void checkStores(int userId) throws Exception {
        tempAllStores = new HashMap<>();
         for(SDMStore store : superMarket.getSDMStores().getSDMStore()){
-            Store s = tempAllStores.putIfAbsent(store.getId(),new Store(store));
+            Store s = tempAllStores.putIfAbsent(store.getId(),new Store(store,userId));
            if(checkLocationRange(store.getLocation().getX(), store.getLocation().getY()))
             {
                 throw new Exception("location exception\n");

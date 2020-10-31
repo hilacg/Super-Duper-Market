@@ -181,7 +181,8 @@ function deposit(){
         success: function(){
             getActions();
             $("#depositForm .message").removeClass("error");
-            $("#depositForm .message").text("Deposit successed")
+            $("#depositForm .message").text("Deposit succeeded");
+            getAccountBalance();
         },
         error:(response)=> {
             $("#depositForm .message").text(response.responseText);
