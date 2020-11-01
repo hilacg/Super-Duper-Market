@@ -152,6 +152,31 @@ function rateStore(event,storeId) {
     }
 }
 
+function saveReview() {
+    var feedbacks=[];
+
+    $(".storeReview.selected").each(function(){
+        var feedback={};
+        var stars = $(this).find(".stars");
+        feedback.storeId = stars.prop("classList")[1];
+        feedback.stars = $(stars).data("stars");
+        feedback.message = $(this).find("input").val();
+        feedbacks.push(feedback);
+    })
+  /*  $.ajax({
+        url: ORDER_URL,
+        data: {
+            action: "feedback",
+
+        },
+        success:(amount)=> {
+            alert("You were charged a total of "+ amount+ " Nis");
+
+        }
+    })*/
+    $("#exit").click()
+}
+
 function reviewWin() {
     var mainDiv = $(document.createElement('div'));
     var button = $(document.createElement('button')).text("X");
@@ -167,7 +192,7 @@ function reviewWin() {
             const store = event.target.closest(".storeReview ");
             store.classList.toggle("selected")});
         storeReview.append($(document.createElement('h2')).text(store.name));
-        var starsDiv = $(`<div class="stars ${store.id}"> 
+        var starsDiv = $(`<div class="stars ${store.id}" data-stars="1"> 
                                 <i class='fa fa-star star checked' data-stars="1"></i>
                                 <i class='fa fa-star star' data-stars="2"></i>
                                 <i class='fa fa-star star' data-stars="3"></i>
@@ -207,7 +232,7 @@ function reviewWin() {
     var divButtons = $(document.createElement('div'));
     divButtons.addClass("summaryButtons")
     var confirm = $(document.createElement('button')).text("confirm");
-    confirm.on("click",()=> {alert("!");$("#exit").click()});
+    confirm.on("click",()=> {saveReview()});
     divButtons.append(confirm);
     var cancel = $(document.createElement('button')).text("cancel");
     cancel.on("click",()=>$("#exit").click());
