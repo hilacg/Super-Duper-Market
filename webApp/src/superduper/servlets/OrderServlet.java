@@ -101,33 +101,27 @@ public class OrderServlet extends HttpServlet {
                 getOwnerOrders(response, SessionUtils.getUserId(request),out);
                 break;
             }
+            case "feedback":{
+                addFeedbackToStore(request,response,SessionUtils.getUserId(request),out);
+                break;
+            }
         }
 
     }
 
+    private void addFeedbackToStore(HttpServletRequest request, HttpServletResponse response, Integer userId, ServletOutputStream out) {
+        response.setContentType("text/plain;charset=UTF-8");
+        JsonArray feedbacks = new JsonParser().parse(request.getParameter("feedbacks")).getAsJsonArray();
+        feedbacks.forEach(feedback -> {
+            JsonObject feedbackObj = (JsonObject) feedback;
+            Store chosenStore = zone.getAllStores().get((feedbackObj.get("storeId").getAsInt()));
+            chosenStore.addFeedback(feedbackObj.get("stars").getAsInt(),feedbackObj.get("message").toString(),userManager.getAllCustomers().get(userId));
+            response.setStatus(200);
+        });
+    }
+
     private void getOwnerOrders(HttpServletResponse response, Integer userId, ServletOutputStream out) throws IOException {
-    /*    Gson gson = new Gson();
-        JsonArray orderArray = new JsonArray();
-        StoreOwner owner = userManager.getAllStoreOwners().get(userId);
-  //      zone.getOrders().stream().map(Order::getStoreProducts).filter((storeId,products)->storeId.)
-        zone.getOrders().forEach(order->{
-            order.getStoreProducts().forEach((storeId,products)->{
-                if(zone.getAllStores().get(storeId).getOwnerId()==userId) {
-                    try {
-                        orderArray.add(getOrderSum(response,out,order));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        });
-            try {
-                orderArray.add(getOrderSum(response,out,order));
-            } catch (IOException e){}
-        });
-        response.setStatus(200);
-        out.println(gson.toJson(orderArray));
-        out.flush();*/
+
     }
 
     private void getCustomerOrders(HttpServletResponse response, Integer userId, ServletOutputStream out) throws IOException {
