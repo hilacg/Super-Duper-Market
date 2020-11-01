@@ -12,6 +12,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -90,6 +91,7 @@ public class OrderServlet extends HttpServlet {
             case "confirmOrder":{
                 response.setContentType("text/plain;charset=UTF-8");
                 zone.addOrder(newOrder,userManager.getAllCustomers().get(newOrder.getCustomerId()));
+                setOwnerOrders();
                 response.setStatus(200);
                 out.flush();
             }
@@ -97,8 +99,8 @@ public class OrderServlet extends HttpServlet {
                 getCustomerOrders(response, SessionUtils.getUserId(request),out);
                 break;
             }
-            case "getOwnerOrders":{
-                getOwnerOrders(response, SessionUtils.getUserId(request),out);
+            case "getStoreOrders":{
+                getStoreOrders(request,response,out);
                 break;
             }
             case "feedback":{
@@ -106,6 +108,22 @@ public class OrderServlet extends HttpServlet {
                 break;
             }
         }
+
+    }
+
+    private void getStoreOrders(HttpServletRequest request,HttpServletResponse response,ServletOutputStream out) throws IOException {
+        JsonObject mainObj = new JsonObject();
+        Gson gson = new Gson();
+        Store store = zone.getAllStores().get(request.getParameter("storeId"));
+        store.getOrders().forEach(order -> {
+                    try {
+                        mainObj.add("order",getOrderSum(response, out,order ));
+                    } catch (IOException e) {}
+                }
+        );
+        response.setStatus(200);
+        out.println(gson.toJson(mainObj));
+        out.flush();
 
     }
 
@@ -120,8 +138,8 @@ public class OrderServlet extends HttpServlet {
         });
     }
 
-    private void getOwnerOrders(HttpServletResponse response, Integer userId, ServletOutputStream out) throws IOException {
-
+    private void setOwnerOrders() throws IOException {
+        newOrder.addOrdersToStores(zone);
     }
 
     private void getCustomerOrders(HttpServletResponse response, Integer userId, ServletOutputStream out) throws IOException {

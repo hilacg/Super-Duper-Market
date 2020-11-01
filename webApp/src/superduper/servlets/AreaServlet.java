@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import course.java.sdm.engine.*;
 import superduper.utils.ServletUtils;
+import superduper.utils.SessionUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -68,9 +69,22 @@ public class AreaServlet  extends HttpServlet {
                 out.flush();
                 break;
             }
+            case "storeFeedbacks":{
+                storeFeedback(request,response,out);
+                break;
+            }
         }
 
 
+    }
+
+    private void storeFeedback(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {
+        Gson gson = new Gson();
+        Integer storeId = Integer.parseInt(request.getParameter("storeId"));
+        Zone zone = userManager.getZone(SessionUtils.getUserId(request),request.getParameter("zoneName"));
+        response.setStatus(200);
+        out.println(gson.toJson(gson.toJson(zone.getAllStores().get(storeId).getStoreFeedback())));
+        out.flush();
     }
 
     private void getStores(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {
