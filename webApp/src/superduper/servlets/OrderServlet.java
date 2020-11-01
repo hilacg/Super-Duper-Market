@@ -115,7 +115,7 @@ public class OrderServlet extends HttpServlet {
         feedbacks.forEach(feedback -> {
             JsonObject feedbackObj = (JsonObject) feedback;
             Store chosenStore = zone.getAllStores().get((feedbackObj.get("storeId").getAsInt()));
-            chosenStore.addFeedback(feedbackObj.get("stars").getAsInt(),feedbackObj.get("message").toString(),userManager.getAllCustomers().get(userId));
+            chosenStore.addFeedback(feedbackObj.get("stars").getAsInt(),feedbackObj.get("message").getAsString(),userManager.getAllCustomers().get(userId));
             response.setStatus(200);
         });
     }

@@ -163,17 +163,18 @@ function saveReview() {
         feedback.message = $(this).find("input").val();
         feedbacks.push(feedback);
     })
-  /*  $.ajax({
+    $.ajax({
         url: ORDER_URL,
+        contentType: 'application/json; charset=utf-8',
         data: {
             action: "feedback",
-
+            feedbacks:JSON.stringify(feedbacks)
         },
         success:(amount)=> {
-            alert("You were charged a total of "+ amount+ " Nis");
+            alert("Your reviews were saved");
 
         }
-    })*/
+    })
     $("#exit").click()
 }
 

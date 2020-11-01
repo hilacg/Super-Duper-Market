@@ -165,9 +165,10 @@ function saveReview() {
     })
     $.ajax({
         url: ORDER_URL,
+        contentType: 'application/json; charset=utf-8',
         data: {
             action: "feedback",
-            feedbacks:feedbacks
+            feedbacks:JSON.stringify(feedbacks)
         },
         success:(amount)=> {
             alert("Your reviews were saved");
