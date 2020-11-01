@@ -1,4 +1,4 @@
-const refreshRate = 2000; //milli seconds
+const refreshRate = 8000; //milli seconds
 const USER_LIST_URL = buildUrlWithContextPath("users");
 const LOGIN_URL = buildUrlWithContextPath("pages/login/loginShortResponse");
 const AREA_URL = buildUrlWithContextPath("area");
@@ -169,6 +169,29 @@ function ajaxZone() {
     });
 }
 
+function showNotification(response) {
+    const newNote = $('<div class="notification"></div>')
+    const exit = $(document.createElement('button'));
+    exit.click(event=>event.target.closest("div").remove());
+    exit.addClass("fa fa-xs fa-times")
+    newNote.append(exit)
+    newNote.append($(document.createElement('div')).text(response));
+    setTimeout(()=>{ newNote.remove() }, 10000)
+    $("#notifications").append(newNote);
+}
+
+function ajaxNotification() {
+    $.ajax({
+        url:ACCOUNT_URL,
+        data: {
+            action: "getNotifications"
+        },
+        success: function(response) {
+            response!=="" && showNotification(response);
+        }
+    });
+}
+
 function deposit(){
     $.ajax({
         url:ACCOUNT_URL,
@@ -196,6 +219,7 @@ $(function() {
     //The users list is refreshed automatically every second
     setInterval(ajaxUsersList, refreshRate);
     setInterval(ajaxZone, refreshRate);
+    setInterval(ajaxNotification, refreshRate);
     $("#datepicker").datepicker({minDate: 0});
     $("#datepicker").datepicker("option", "dateFormat","dd/mm/yy");
     $("#depositForm").submit(()=>{

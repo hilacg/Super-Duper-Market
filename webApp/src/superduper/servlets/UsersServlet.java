@@ -38,8 +38,6 @@ public class UsersServlet extends HttpServlet {
         //returning JSON objects, not HTML
             Gson gson = new Gson();
             UserManager userManager = ServletUtils.getEngine(getServletContext()).getUserManager();
-            //  Set<String> usersList = userManager.getUsers();
-            //  Map<String,String> usersList = userManager.getUsers();
             Map<String,String> usersList = new HashMap<>();
             usersList.putAll(userManager.getAllCustomers().values().stream().collect( Collectors.toMap(Customer::getName,(customer)->"customer")));
             usersList.putAll(userManager.getAllStoreOwners().values().stream().collect( Collectors.toMap(StoreOwner::getName,(owner)->"store owner")));

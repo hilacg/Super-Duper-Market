@@ -91,6 +91,7 @@ public class OrderServlet extends HttpServlet {
             case "confirmOrder":{
                 response.setContentType("text/plain;charset=UTF-8");
                 zone.addOrder(newOrder,userManager.getAllCustomers().get(newOrder.getCustomerId()));
+                notifyOrder();
                 setOwnerOrders();
                 response.setStatus(200);
                 out.flush();
@@ -111,18 +112,35 @@ public class OrderServlet extends HttpServlet {
 
     }
 
+    private void notifyOrder() {
+        newOrder.getStoreProducts().keySet().forEach(storeId->{
+            int ownerId = zone.getAllStores().get(storeId).getOwnerId();
+            Notification note = userManager.getAllStoreOwners().get(ownerId).getNotification();
+            note.setMessage("sold!");
+            note.setSent(false);
+        });
+    }
+
+    private void notifyfeedback(int ownerId) {
+            Notification note = userManager.getAllStoreOwners().get(ownerId).getNotification();
+            note.setMessage("got feedback!");
+            note.setSent(false);
+    }
+
+
     private void getStoreOrders(HttpServletRequest request,HttpServletResponse response,ServletOutputStream out) throws IOException {
         JsonObject mainObj = new JsonObject();
         Gson gson = new Gson();
-        Store store = zone.getAllStores().get(request.getParameter("storeId"));
+        JsonArray ordersArray = new JsonArray();
+        Store store = zone.getAllStores().get(Integer.parseInt(request.getParameter("storeId")));
         store.getOrders().forEach(order -> {
                     try {
-                        mainObj.add("order",getOrderSum(response, out,order ));
+                        ordersArray.add(getOrderSum(response, out,order ));
                     } catch (IOException e) {}
                 }
         );
         response.setStatus(200);
-        out.println(gson.toJson(mainObj));
+        out.println(gson.toJson(ordersArray));
         out.flush();
 
     }
@@ -134,8 +152,9 @@ public class OrderServlet extends HttpServlet {
             JsonObject feedbackObj = (JsonObject) feedback;
             Store chosenStore = zone.getAllStores().get((feedbackObj.get("storeId").getAsInt()));
             chosenStore.addFeedback(feedbackObj.get("stars").getAsInt(),feedbackObj.get("message").getAsString(),userManager.getAllCustomers().get(userId));
-            response.setStatus(200);
+            notifyfeedback(chosenStore.getOwnerId());
         });
+        response.setStatus(200);
     }
 
     private void setOwnerOrders() throws IOException {

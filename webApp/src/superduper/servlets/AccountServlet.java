@@ -3,10 +3,7 @@ package superduper.servlets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import course.java.sdm.engine.Engine;
-import course.java.sdm.engine.Order;
-import course.java.sdm.engine.UserManager;
-import course.java.sdm.engine.Zone;
+import course.java.sdm.engine.*;
 import superduper.utils.ServletUtils;
 import superduper.utils.SessionUtils;
 
@@ -54,8 +51,22 @@ public class AccountServlet  extends HttpServlet {
                 chargeOrder(response,request,out, userIdFromSession);
                 break;
             }
+            case "getNotifications":{
+                getNotifications(response,out,userIdFromSession);
+            }
 
         }
+    }
+
+    private void getNotifications(HttpServletResponse response, ServletOutputStream out, Integer userIdFromSession) throws IOException {
+        response.setContentType("text/plain;charset=UTF-8");
+        StoreOwner owner = userManager.getAllStoreOwners().get(userIdFromSession);
+        if(!owner.getNotification().isSent())
+        {
+            owner.getNotification().setSent(true);
+            out.println(owner.getNotification().getMessage());
+        }
+        out.flush();
     }
 
     private void chargeOrder(HttpServletResponse response, HttpServletRequest request, ServletOutputStream out, Integer userIdFromSession) throws IOException {

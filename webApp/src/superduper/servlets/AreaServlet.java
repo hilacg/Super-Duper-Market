@@ -83,7 +83,7 @@ public class AreaServlet  extends HttpServlet {
         Integer storeId = Integer.parseInt(request.getParameter("storeId"));
         Zone zone = userManager.getZone(SessionUtils.getUserId(request),request.getParameter("zoneName"));
         response.setStatus(200);
-        out.println(gson.toJson(gson.toJson(zone.getAllStores().get(storeId).getStoreFeedback())));
+        out.println(gson.toJson(zone.getAllStores().get(storeId).getStoreFeedback()));
         out.flush();
     }
 
