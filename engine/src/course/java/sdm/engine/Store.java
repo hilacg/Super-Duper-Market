@@ -45,6 +45,10 @@ public class Store {
         return ownerId;
     }
 
+    public List<Order> getOrders() {
+        return orders;
+    }
+
     public Integer getTotalOrders(){
         return orders.size();
     }
@@ -68,11 +72,16 @@ public class Store {
     public Point getLocation() {
         return location;
     }
+
     public String getStringLocation() {
         return "("+location.x+", "+location.y+")";
     }
     public void setSerialNumber(int serialNumber) {
         this.serialNumber = serialNumber;
+    }
+
+    public List<Feedback> getStoreFeedback() {
+        return storeFeedback;
     }
 
     public void setName(String name) {

@@ -27,13 +27,24 @@ public class Order {
         this.customerId = customerId;
         this.zoneName = zoneName;
     }
-
     public String getZoneName() {
         return zoneName;
     }
 
+    public Point getCustomerLocation() {
+        return customerLocation;
+    }
+
     public double getDiscountsPrice() {
         return discountsPrice;
+    }
+
+    public int getSerial() {
+        return serial;
+    }
+
+    public void setDiscountsProducts(Integer storeId,Map<Integer, DiscountProduct> Products) {
+        this.discountsProducts.put(storeId,Products);
     }
 
     public Map<Integer, Map<Integer, Double>> getStoreProducts() {
@@ -153,6 +164,22 @@ public class Order {
             }
         }
         price += discountsPrice;
+    }
+
+    public void addOrdersToStores(Zone zone) {
+        for (Map.Entry<Integer, Map<Integer, Double>> storeAndProduct : this.getStoreProducts().entrySet()) {
+            Map<Integer, Map<Integer, Double>> storeP = new HashMap<>();
+            storeP.put(storeAndProduct.getKey(), storeAndProduct.getValue());
+            Store store = zone.getAllStores().get(storeAndProduct.getKey());
+            Order storeOrder = new Order(this.getSerial(), this.getDate(), storeP, this.getCustomerLocation(), this.getCustomerId(), zone.getName());
+            if(this.getDiscountsProducts().get(store.getSerialNumber())!= null) {
+                storeOrder.setDiscountsProducts(store.getSerialNumber(), this.getDiscountsProducts().get(storeAndProduct.getKey()));
+            }
+            storeOrder.calculateDistance(zone.getAllStores());
+            storeOrder.calculatePrice(zone.getAllStores());
+            storeOrder.calculateTotalPrice();
+            store.getOrders().add(storeOrder);
+        }
     }
 
     public class DiscountProduct{
