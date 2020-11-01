@@ -20,6 +20,10 @@ public class Zone {
         setProductAvgAndStoreCount();
     }
 
+    public List<Order> getOrders() {
+        return orders;
+    }
+
     public Map<Integer, Product> getAllProducts() {
         return allProducts;
     }
@@ -43,7 +47,7 @@ public class Zone {
         return orders.size();
     }
     public double getOrdersAvg(){
-        return  orders.size() >0? (orders.stream().mapToDouble(Order::getPrice).sum())/orders.size():0;
+        return  orders.size() >0? (orders.stream().mapToDouble(Order::getTotalPrice).sum())/orders.size():0;
     }
 
     private void setProductAvgAndStoreCount() {
@@ -143,7 +147,7 @@ public class Zone {
     }
 
     public Order setNewOrder(Customer customer, Map<Integer, Map<Integer, Double>> storeProductsToOrder, String date, int x, int y) {
-        Order newOrder = new Order(++orderNum,date, storeProductsToOrder, new Point(x,y),customer.getId());
+        Order newOrder = new Order(++orderNum,date, storeProductsToOrder, new Point(x,y),customer.getId(),this.name);
         newOrder.calculateDistance(allStores);
         return newOrder;
     }

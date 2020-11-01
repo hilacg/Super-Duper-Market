@@ -8,7 +8,9 @@ let storesJson = {}
 let zoneName;
 let ownerId;
 let user;
-let order={};
+let order={
+        stores:[]
+};
 
 function showWindow(winId){
     document.getElementById(winId).classList.toggle("show");
@@ -109,6 +111,7 @@ function getOwnerId(zoneName) {
         },
         success: function(response) {
             ownerId = parseInt(response);
+            switchZone();
             getProducts();
             getStores();
         }
@@ -134,6 +137,19 @@ function showUserOptions(){
     user.isCustomer ? $(".customerOption").toggleClass("show") : $(".ownerOption").toggleClass("show");
 }
 
+
+function switchZone() {
+    $.ajax({
+        url: ORDER_URL,
+        data: {
+            action: "switchZone",
+            zoneName: zoneName,
+            ownerId: ownerId
+
+        },
+        type: 'GET',
+    });
+}
 
 $(function() {
     getUser();

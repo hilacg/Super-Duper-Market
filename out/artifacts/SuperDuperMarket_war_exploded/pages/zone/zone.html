@@ -19,7 +19,7 @@
 <div id="toolBar">
     <button id="backbtn" class="customerOption ownerOption" onclick= "backButton()"><i class="fa fa-lg fa-backward"></i></button>
     <button id="newOrder" class="customerOption" onclick= "openOrder()"><i class="fa fa-plus"></i> New Order</button>
-    <button id="orderHistory" class="customerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-history"></i> Order History</button>
+    <button id="orderHistory" class="customerOption" onclick= "orderHistory()"><i class="fa fa-history"></i> Order History</button>
     <button id="ordersBtn" class="ownerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-history"></i> Orders</button>
     <button id="feedbacksBtn" class="ownerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-commenting"></i> Feedbacks</button>
     <button id="newStoreBtn" class="ownerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-plus"></i> New Store</button>
@@ -89,13 +89,10 @@
                 </table>
             </div>
         </div>
-    <div id="cart">
-
-    </div>
     </div>
 </div>
-
 <div id="product-container">
+    <h2>Product Available</h2>
     <table class="productsTable">
         <thead>
         <tr>
@@ -111,6 +108,7 @@
     </table>
 </div>
 <div id="stores-container">
+    <h2>Stores Available</h2>
     <table id="storesTable">
         <thead>
         <tr>

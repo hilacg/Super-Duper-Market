@@ -14,6 +14,7 @@
 #zoneName{
     margin: auto;
     width: fit-content;
+    margin-top: 30px;
 }
 
 #toolBar button{
@@ -24,18 +25,6 @@
     z-index: 3;
 }
 
-.orderSum{
-    z-index: 2;
-    position: fixed;
-    overflow: auto;
-    background-color: #fff;
-    height: 70%;
-    width: 50%;
-    top: 15%;
-    left: 25%;
-    box-shadow: 2px 2px 9px 0px #a0a0a0;
-}
-
 .summary-container{
     width: fit-content;
     margin: auto;
@@ -44,4 +33,30 @@
 }
 .storeSum{
     border-bottom: 1px solid #ccc;
+}
+
+.summaryButtons {
+    text-align: center;
+}
+
+.summaryButtons>button {
+    margin: 10px;
+    width: 100px;
+}
+
+.orderSum {
+    border-bottom: 1px dashed #ccc;
+}
+
+body>div>h2{
+    width: fit-content;
+    margin: 10px auto;
+}
+
+.checked
+{
+    color:#ffae51;
+}
+.stars{
+    width: fit-content;
 }

@@ -84,7 +84,7 @@ public class AreaServlet  extends HttpServlet {
             obj.addProperty("Serial Number", store.getSerialNumber());
             obj.addProperty("Name", store.getName());
             obj.addProperty("Owner", storeOwner.getName());
-            obj.addProperty("Location", store.getLocation().toString());
+            obj.addProperty("Location", store.getStringLocation());
             obj.add("products", getStoreProducts(store,zone));
             obj.addProperty("Orders", store.getTotalOrders());
             obj.addProperty("Total Product Price", store.getTotalProductPrice());

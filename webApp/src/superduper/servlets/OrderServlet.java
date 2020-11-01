@@ -50,10 +50,14 @@ public class OrderServlet extends HttpServlet {
                 response.setStatus(200);
                 out.flush();
             }
+            case "switchZone":{
+                zone = userManager.getZone(Integer.parseInt(request.getParameter("ownerId")),request.getParameter("zoneName"));
+                response.setStatus(200);
+                out.flush();
+            }
             case "addToCart": {
                 response.setContentType("text/plain;charset=UTF-8");
                 try {
-                    zone = userManager.getZone(Integer.parseInt(request.getParameter("owner")),request.getParameter("zoneName"));
                     Product productToAdd = zone.getAllProducts().get(Integer.parseInt(request.getParameter("product")));
                     productToAdd.getMethod().validateAmount(request.getParameter("amount"));
                     productsToOrder.put(productToAdd.getSerialNumber(), productsToOrder.getOrDefault(productToAdd.getSerialNumber(), 0.0) + Double.parseDouble(request.getParameter("amount")));
@@ -86,7 +90,6 @@ public class OrderServlet extends HttpServlet {
             case "confirmOrder":{
                 response.setContentType("text/plain;charset=UTF-8");
                 zone.addOrder(newOrder,userManager.getAllCustomers().get(newOrder.getCustomerId()));
-                saveOrderOwners();
                 response.setStatus(200);
                 out.flush();
             }
@@ -94,15 +97,44 @@ public class OrderServlet extends HttpServlet {
                 getCustomerOrders(response, SessionUtils.getUserId(request),out);
                 break;
             }
+            case "getOwnerOrders":{
+                getOwnerOrders(response, SessionUtils.getUserId(request),out);
+                break;
+            }
         }
 
+    }
+
+    private void getOwnerOrders(HttpServletResponse response, Integer userId, ServletOutputStream out) throws IOException {
+    /*    Gson gson = new Gson();
+        JsonArray orderArray = new JsonArray();
+        StoreOwner owner = userManager.getAllStoreOwners().get(userId);
+  //      zone.getOrders().stream().map(Order::getStoreProducts).filter((storeId,products)->storeId.)
+        zone.getOrders().forEach(order->{
+            order.getStoreProducts().forEach((storeId,products)->{
+                if(zone.getAllStores().get(storeId).getOwnerId()==userId) {
+                    try {
+                        orderArray.add(getOrderSum(response,out,order));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        });
+            try {
+                orderArray.add(getOrderSum(response,out,order));
+            } catch (IOException e){}
+        });
+        response.setStatus(200);
+        out.println(gson.toJson(orderArray));
+        out.flush();*/
     }
 
     private void getCustomerOrders(HttpServletResponse response, Integer userId, ServletOutputStream out) throws IOException {
         Gson gson = new Gson();
         JsonArray orderArray = new JsonArray();
         Customer customer = userManager.getAllCustomers().get(userId);
-        customer.getOrders().forEach(order-> {
+        customer.getOrders().stream().filter(order->order.getZoneName().equals(zone.getName())).forEach(order-> {
             try {
                 orderArray.add(getOrderSum(response,out,order));
             } catch (IOException e){}
@@ -110,10 +142,6 @@ public class OrderServlet extends HttpServlet {
         response.setStatus(200);
         out.println(gson.toJson(orderArray));
         out.flush();
-    }
-
-    private void saveOrderOwners() {
-
     }
 
     private JsonObject getOrderSum(HttpServletResponse response, ServletOutputStream out,Order newOrder) throws IOException {
@@ -145,6 +173,13 @@ public class OrderServlet extends HttpServlet {
         storeProductsToOrder = new HashMap<>();
         Integer userIdFromSession = SessionUtils.getUserId(request);
         Customer customer = userManager.getAllCustomers().get(userIdFromSession);
+        if(productsToOrder.size() == 0 ){
+            String errorMessage = "The cart is empty. Please add products first.";
+
+            // stands for unauthorized as there is already such user with this name
+            response.setStatus(401);
+            response.getOutputStream().println(errorMessage);
+        }
         if(request.getParameter("type").equals("dynamic")){
             storeProductsToOrder = zone.findOptimalOrder(productsToOrder);
             newOrder = zone.setNewOrder(customer,storeProductsToOrder,request.getParameter("date"),Integer.parseInt(request.getParameter("x")),Integer.parseInt(request.getParameter("y")));
