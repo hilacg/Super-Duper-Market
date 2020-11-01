@@ -3,7 +3,6 @@ import generatedClasses.SDMDiscount;
 import generatedClasses.SDMSell;
 import generatedClasses.SDMStore;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.awt.*;
 import java.util.*;
@@ -21,6 +20,7 @@ public class Store {
     private int PPK;
     private float deliveryEarnings;
     private Point location;
+    private List<Feedback> storeFeedback = new ArrayList<>();;
 
     public Store(){}
 
@@ -95,6 +95,11 @@ public class Store {
         this.productsSold.put(productsSold.getKey(), this.productsSold.get(productsSold.getKey()) + productsSold.getValue());
     }
 
+    public void addFeedback(int stars, String message, Customer customer) {
+        String Date = customer.getOrders().get(customer.getOrders().size()-1).getDate();
+        Feedback newFeedback = new Feedback(this.serialNumber,customer.getName(), stars,message,Date);
+        this.storeFeedback.add(newFeedback);
+    }
     public Map<Integer, Integer> getProductPrices() {
         return productPrices;
     }

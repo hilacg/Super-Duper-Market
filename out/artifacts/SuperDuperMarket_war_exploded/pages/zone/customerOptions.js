@@ -152,6 +152,22 @@ function rateStore(event,storeId) {
     }
 }
 
+function saveReview() {
+    $.ajax({
+        url: ORDER_URL,
+        data: {
+            action: "review",
+            owner: ownerId,
+            zoneName: zoneName
+        },
+        success:(amount)=> {
+            alert("You were charged a total of "+ amount+ " Nis");
+
+        }
+    })
+    $("#exit").click()
+}
+
 function reviewWin() {
     var mainDiv = $(document.createElement('div'));
     var button = $(document.createElement('button')).text("X");
@@ -207,7 +223,7 @@ function reviewWin() {
     var divButtons = $(document.createElement('div'));
     divButtons.addClass("summaryButtons")
     var confirm = $(document.createElement('button')).text("confirm");
-    confirm.on("click",()=> {alert("!");$("#exit").click()});
+    confirm.on("click",()=> {saveReview()});
     divButtons.append(confirm);
     var cancel = $(document.createElement('button')).text("cancel");
     cancel.on("click",()=>$("#exit").click());
