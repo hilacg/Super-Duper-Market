@@ -130,22 +130,24 @@ public class OrderServlet extends HttpServlet {
 
 
     private void getStoreOrders(HttpServletRequest request,HttpServletResponse response,ServletOutputStream out) throws IOException {
-        JsonObject mainObj = new JsonObject();
-
+        Gson gson = new Gson();
         JsonArray ordersArray = new JsonArray();
         Store store = zone.getAllStores().get(Integer.parseInt(request.getParameter("storeId")));
         store.getOrders().forEach(order -> {
-                        storeOrderProducts(response, out,order );
+              ordersArray.add(storeOrderProducts(response, out,order ));
                 }
         );
+
+        response.setStatus(200);
+        out.println(gson.toJson(ordersArray));
+        out.flush();
     }
 
-    private void storeOrderProducts(HttpServletResponse response, ServletOutputStream out, Order order) {
+    private JsonElement storeOrderProducts(HttpServletResponse response, ServletOutputStream out, Order order) {
         Gson gson = new Gson();
         JsonObject storeObj = new JsonObject();
         JsonArray storeP = new JsonArray();
         JsonArray storeD = new JsonArray();
-        JsonArray ordersArray = new JsonArray();
         order.getStoreProducts().forEach((storeId,productAndAmount)->{
             productAndAmount.forEach((productId,amount)->{
                 storeP.add(buildStoreSum(productId,amount,storeId, zone.getAllStores().get(storeId).getProductPrices().get(productId)));
@@ -158,14 +160,8 @@ public class OrderServlet extends HttpServlet {
     }
             storeObj.add("product",storeP);
             storeObj.add("discount",storeD);
-            ordersArray.add(storeObj);
-            response.setStatus(200);
-            try {
-                out.println(gson.toJson(ordersArray));
-                out.flush();
-            }
-            catch (IOException e) {}
     });
+        return storeObj;
     }
     private void addFeedbackToStore(HttpServletRequest request, HttpServletResponse response, Integer userId, ServletOutputStream out) {
         response.setContentType("text/plain;charset=UTF-8");
