@@ -63,8 +63,6 @@ function getProducts() {
     });
 }
 
-
-
 function showStores(stores) {
     const table = $('#storesTable tbody');
     table.empty();
@@ -77,7 +75,22 @@ function showStores(stores) {
                 tr.append(showStoreProducts(store[key]));
         tr.appendTo(table);
     });
+    if(!user.isCustomer){
+        addOwnerButtons()
+    }
 
+}
+
+function addOwnerButtons(){
+    $("#storesTable thead>tr").append($(document.createElement('th')));
+    $('#storesTable tbody>tr').append($(document.createElement('td')))
+    $('#storesTable tbody').find("tr").each(function (){
+        if($(this).children().eq(2).text() === user.name ){
+            var feebeacks = $('<button class="feedbacks" onclick="openFeedbacks(event)"><i class="fa fa-commenting"></i> Feedbacks</button>');
+            var orderHistory = $('<button class="feedbacks" onclick="openOrderHistory(event)"><i class="fa fa-history"></i> Orders</button>');
+            $(this).children().eq(9).append(feebeacks,orderHistory);
+        }
+    })
 }
 
 function getStores() {

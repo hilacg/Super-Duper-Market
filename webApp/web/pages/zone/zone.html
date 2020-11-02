@@ -9,9 +9,12 @@
     <link rel="stylesheet" href="../../common/main.css">
     <script src="zone.js"></script>
     <script src="customerOptions.js"></script>
+    <script src="ownerOptions.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script type="text/javascript" src="../../common/notifications.js"></script>
+    <link rel="stylesheet" href="../../common/notifications.css">
     <title>Zone</title>
 </head>
 <body>
@@ -20,8 +23,8 @@
     <button id="backbtn" class="customerOption ownerOption" onclick= "backButton()"><i class="fa fa-lg fa-backward"></i></button>
     <button id="newOrder" class="customerOption" onclick= "openOrder()"><i class="fa fa-plus"></i> New Order</button>
     <button id="orderHistory" class="customerOption" onclick= "orderHistory()"><i class="fa fa-history"></i> Order History</button>
-    <button id="ordersBtn" class="ownerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-history"></i> Orders</button>
-    <button id="feedbacksBtn" class="ownerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-commenting"></i> Feedbacks</button>
+    <button id="ordersBtn" class="ownerOption" ><i class="fa fa-history"></i> Orders</button>
+    <button id="feedbacksBtn" class="ownerOption"><i class="fa fa-commenting"></i> Feedbacks</button>
     <button id="newStoreBtn" class="ownerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-plus"></i> New Store</button>
 
     <img style="float: right " src="../../common/images/logo.png" id="logo" alt="logo">
@@ -31,7 +34,7 @@
 
 <div id="order-container" class="popup-window">
     <div>
-        <button onclick="showWindow('order-container')" class="fa fa-lg fa-times"></button>
+        <button onclick="showWindow('order-container')" class="fa fa-lg fa-times exit"></button>
         <form id="orderForm" method="POST">
             <h1>New Order</h1>
             <input type="text" id="datepicker" name="date" required placeholder="Date">

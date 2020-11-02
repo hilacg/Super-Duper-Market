@@ -81,6 +81,7 @@ th {
     width: 70%;
     top: 15%;
     left: 15%;
+    padding: 10px;
 }
 
 form{
@@ -109,3 +110,5 @@ h1{
 h2{
     color: #de943f;
 }
+
+

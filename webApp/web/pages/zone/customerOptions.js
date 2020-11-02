@@ -104,7 +104,9 @@ function dynamicOrder() {
 function showOptimalOrder(orderSum) {
     var sum = $(document.createElement('div'));
     sum.addClass("optimalOrder");
-    var button = $(document.createElement('button')).text("X");
+    var button = $(document.createElement('button'));
+    button.addClass("exit");
+    button.addClass("fa fa-lg fa-times");
     button.on("click",()=>{$(".optimalOrder").remove()});
     sum.append(button);
     sum.append($(document.createElement('h1')).text("Optimal Order"));
@@ -153,25 +155,37 @@ function rateStore(event,storeId) {
 }
 
 function saveReview() {
+    var feedbacks=[];
+
+    $(".storeReview.selected").each(function(){
+        var feedback={};
+        var stars = $(this).find(".stars");
+        feedback.storeId = stars.prop("classList")[1];
+        feedback.stars = $(stars).data("stars");
+        feedback.message = $(this).find("input").val();
+        feedbacks.push(feedback);
+    })
     $.ajax({
         url: ORDER_URL,
+        contentType: 'application/json; charset=utf-8',
         data: {
-            action: "review",
-            owner: ownerId,
-            zoneName: zoneName
+            action: "feedback",
+            feedbacks:JSON.stringify(feedbacks)
         },
         success:(amount)=> {
-            alert("You were charged a total of "+ amount+ " Nis");
+            alert("Your reviews were saved");
 
         }
     })
-    $("#exit").click()
+    $(".reviewWindow .exit").click()
 }
 
 function reviewWin() {
     var mainDiv = $(document.createElement('div'));
-    var button = $(document.createElement('button')).text("X");
-    button.attr("id","exit");
+    mainDiv.addClass("reviewWindow")
+    var button = $(document.createElement('button'));
+    button.addClass("exit");
+    button.addClass("fa fa-lg fa-times");
     button.on("click",()=>{$("#order-container>div:gt(0)").remove(); showWindow("order-container")});
     mainDiv.append(button);
     mainDiv.append($(document.createElement('h1')).text("Review Stores"));
@@ -183,7 +197,7 @@ function reviewWin() {
             const store = event.target.closest(".storeReview ");
             store.classList.toggle("selected")});
         storeReview.append($(document.createElement('h2')).text(store.name));
-        var starsDiv = $(`<div class="stars ${store.id}"> 
+        var starsDiv = $(`<div class="stars ${store.id}" data-stars="1"> 
                                 <i class='fa fa-star star checked' data-stars="1"></i>
                                 <i class='fa fa-star star' data-stars="2"></i>
                                 <i class='fa fa-star star' data-stars="3"></i>
@@ -226,10 +240,11 @@ function reviewWin() {
     confirm.on("click",()=> {saveReview()});
     divButtons.append(confirm);
     var cancel = $(document.createElement('button')).text("cancel");
-    cancel.on("click",()=>$("#exit").click());
+    cancel.on("click",()=>$(".discountsWin .exit").click());
     divButtons.append(cancel);
     mainDiv.append(divButtons);
 
+    showWindow("order-container");
     $("#order-container").append(mainDiv);
 }
 
@@ -284,10 +299,10 @@ function showOrderSum(json) {
     var divButtons = $(document.createElement('div'));
     divButtons.addClass("summaryButtons")
     var confirm = $(document.createElement('button')).text("confirm");
-    confirm.on("click",()=> {confirmOrder();$("#exit").click()});
+    confirm.on("click",()=> {$("#orderSummary .exit").click(); confirmOrder()});
     divButtons.append(confirm);
     var cancel = $(document.createElement('button')).text("cancel");
-    cancel.on("click",()=>$("#exit").click());
+    cancel.on("click",()=>$("#orderSummary .exit").click());
     divButtons.append(cancel);
     sum.append(divButtons);
     return sum;
@@ -314,9 +329,11 @@ function getOrderSum() {
         },
         success: (json)=>{
             var mainDiv = $(document.createElement('div'));
-            var button = $(document.createElement('button')).text("X");
-            button.attr("id","exit");
-            button.on("click",()=>{$("#order-container>div:gt(0)").remove();});
+            mainDiv.attr("id","orderSummary")
+            var button = $(document.createElement('button'));
+            button.addClass("exit");
+            button.addClass("fa fa-lg fa-times");
+            button.on("click",()=>{$("#order-container>div:gt(0)").remove(); showWindow("order-container")});
             mainDiv.append(button);
             mainDiv.append($(document.createElement('h1')).text("Order Summary"));
             mainDiv.append(showOrderSum(json));
@@ -351,7 +368,9 @@ function addOrderDiscounts() {
 function showDiscounts(discounts) {
     const win =   $(document.createElement('div'));
     win.addClass("discountsWin");
-    var button = $(document.createElement('button')).text("X");
+    var button = $(document.createElement('button'));
+    button.addClass("exit");
+    button.addClass("fa fa-lg fa-times");
     button.on("click",()=>{
         document.getElementById("order-container").classList.toggle("show");
         win.remove();
@@ -444,8 +463,9 @@ function showCustomerOrders(json) {
     div.attr('class', 'popup-window show');
     var mainDiv = $(document.createElement('div'));
     $("body").append(div);
-    var button = $(document.createElement('button')).text("X");
-    button.attr("#exit");
+    var button = $(document.createElement('button'));;
+    button.addClass("exit");
+    button.addClass("fa fa-lg fa-times");
     button.on("click",()=>{$("#order-history").remove();});
     mainDiv.append(button);
     mainDiv.append($(document.createElement('h1')).text("Order History"));

@@ -11,10 +11,15 @@ public class StoreOwner {
     private String name;
     private Map<String, Zone> zones = new HashMap<>();
     private Account account = new Account();
+    private Notification notification = new Notification();
 
     public StoreOwner(Integer id, String name){
         this.id = id;
         this.name = name;
+    }
+
+    public Notification getNotification() {
+        return notification;
     }
 
     public String getName() {

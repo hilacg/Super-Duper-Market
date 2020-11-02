@@ -60,3 +60,19 @@ body>div>h2{
 .stars{
     width: fit-content;
 }
+
+.exit{
+    position: fixed;
+}
+
+.feedback{
+    background: white;
+    padding: 10px;
+}
+
+.feedback:nth-child(2) {
+    background: #f2f2f2;
+}
+.feedback:hover{
+    background: #ffdcb7;
+}

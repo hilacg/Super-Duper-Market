@@ -1,4 +1,4 @@
-const refreshRate = 2000; //milli seconds
+const refreshRate = 5000; //milli seconds
 const USER_LIST_URL = buildUrlWithContextPath("users");
 const LOGIN_URL = buildUrlWithContextPath("pages/login/loginShortResponse");
 const AREA_URL = buildUrlWithContextPath("area");
