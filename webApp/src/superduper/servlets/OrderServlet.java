@@ -52,6 +52,7 @@ public class OrderServlet extends HttpServlet {
                 break;
             }
             case "switchZone":{
+                getServletContext().setAttribute("zone", zone);
                 zone = userManager.getZone(Integer.parseInt(request.getParameter("ownerId")),request.getParameter("zoneName"));
                 getServletContext().setAttribute("zone", zone);
                 response.setStatus(200);
@@ -149,6 +150,7 @@ public class OrderServlet extends HttpServlet {
         JsonObject storeObj = new JsonObject();
         JsonArray storeP = new JsonArray();
         JsonArray storeD = new JsonArray();
+        storeOrderSum(order);
         order.getStoreProducts().forEach((storeId,productAndAmount)->{
             productAndAmount.forEach((productId,amount)->{
                 storeP.add(buildStoreSum(productId,amount,storeId, zone.getAllStores().get(storeId).getProductPrices().get(productId)));
@@ -159,11 +161,26 @@ public class OrderServlet extends HttpServlet {
 
                 });
     }
+            storeObj.add("ordersum",storeOrderSum(order));
             storeObj.add("product",storeP);
             storeObj.add("discount",storeD);
     });
         return storeObj;
     }
+
+    private JsonElement storeOrderSum(Order order) {
+        JsonObject orderSum = new JsonObject();
+        orderSum.addProperty("order number", order.getSerial());
+        orderSum.addProperty("date", order.getDate());
+        orderSum.addProperty("customer name", userManager.getAllCustomers().get(order.getCustomerId()).getName());
+        orderSum.addProperty("customer location", "("+order.getCustomerLocation().x+", "+order.getCustomerLocation().y+")");
+        orderSum.addProperty("number of item bought", order.getStoreProducts().values().size());
+        orderSum.addProperty("total products price", order.getPrice());
+        orderSum.addProperty("delivery price", order.getDeliveryPrice());
+        orderSum.addProperty("total order price", order.getTotalPrice());
+        return orderSum;
+    }
+
     private void addFeedbackToStore(HttpServletRequest request, HttpServletResponse response, Integer userId, ServletOutputStream out) {
         response.setContentType("text/plain;charset=UTF-8");
         JsonArray feedbacks = new JsonParser().parse(request.getParameter("feedbacks")).getAsJsonArray();
