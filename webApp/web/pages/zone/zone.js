@@ -131,6 +131,9 @@ function getOwnerId(zoneName) {
             switchZone();
             getProducts();
             setInterval(getStores, refreshRate);
+            if(!user.isCustomer)
+                $('#storesTable thead').append($(document.createElement('th')));
+
         }
     });
 }

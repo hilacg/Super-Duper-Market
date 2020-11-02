@@ -99,9 +99,10 @@ public class AreaServlet  extends HttpServlet {
             response.setStatus(200);
             out.println("new store added successfully!");
             out.flush();
-            synchronized (notificationLock) {
-                notifyNewStore(newStore);
-            }
+            if(newStore.getOwnerId() != zone.getOwnerId())
+                synchronized (notificationLock) {
+                    notifyNewStore(newStore);
+                }
         }catch (Exception e) {
             response.setStatus(401);
             response.getOutputStream().println(e.getMessage());
