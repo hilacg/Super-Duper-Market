@@ -53,6 +53,7 @@ public class OrderServlet extends HttpServlet {
             }
             case "switchZone":{
                 zone = userManager.getZone(Integer.parseInt(request.getParameter("ownerId")),request.getParameter("zoneName"));
+                getServletContext().setAttribute("zone", zone);
                 response.setStatus(200);
                 out.flush();
             }

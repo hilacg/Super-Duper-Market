@@ -137,7 +137,8 @@
         <button onclick="showWindow('store-container')" class="fa fa-lg fa-times exit"></button>
         <form id="storeForm" method="POST">
             <h1>New Store</h1>
-            <input id="storeName" type="text" name="storeName" placeholder="Store Name"/>
+            <input id="storeId" type="number" name="storeId" placeholder="Store ID" required/>
+            <input id="storeName" type="text" name="storeName" placeholder="Store Name" required/>
             <br>
             <p>Location:  <input type="number" class="x" min="1" max="50" name="x" required placeholder="X"> <input type="number" class="y" min="1" max="50" name="y" required placeholder="Y"></p>
             <input type="number" class="ppk" name="ppk" required placeholder="PPK">

@@ -106,6 +106,7 @@ function saveNewStore(){
             method: 'GET',
             data: {
                 action: "addNewStore",
+                soreId:$("#storeForm #storeId").val(),
                 storeName: $("#storeForm #storeName").val(),
                 x: $("#storeForm .x").val(),
                 y: $("#storeForm .y").val(),
