@@ -3,6 +3,7 @@ const LOGIN_URL = buildUrlWithContextPath("pages/login/loginShortResponse");
 const AREA_URL = buildUrlWithContextPath("area");
 const ORDER_URL = buildUrlWithContextPath("area/order");
 const ACCOUNT_URL = buildUrlWithContextPath("users/account");
+const refreshRate = 2000; //milli seconds
 
 let storesJson = {}
 let zoneName;
@@ -86,7 +87,6 @@ function showStores(stores) {
 }
 
 function addOwnerButtons(){
-    $("#storesTable thead>tr").append($(document.createElement('th')));
     $('#storesTable tbody>tr').append($(document.createElement('td')))
     $('#storesTable tbody').find("tr").each(function (){
         if($(this).children().eq(2).text() === user.name ){
@@ -130,7 +130,7 @@ function getOwnerId(zoneName) {
             ownerId = parseInt(response);
             switchZone();
             getProducts();
-            getStores();
+            setInterval(getStores, refreshRate);
         }
     });
 }

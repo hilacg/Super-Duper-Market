@@ -1,27 +1,31 @@
 let newStore={};
 
 function showFeedbacks(json) {
-    json.forEach(feedback=>{
-        var i;
-        var feed = $(document.createElement('div'));
-        feed.addClass("feedback");
-        var stars = $(document.createElement('div'));
-        stars.addClass("stars");
-        for(i=0; i < feedback.stars;i++)
-            stars.append($('<i class="fa fa-star star checked" ></i>'));
-        for(i=0;i<5-feedback.stars;i++)
-            stars.append($('<i class="fa fa-star star" ></i>'));
-        feed.append(stars);
-        var details = $(document.createElement('div'));
-        for( var key of Object.keys(feedback)) {
-            if(key!=="storeId") {
-                details.append($(document.createElement('span')).text(key + ": " + feedback[key]));
-                details.append($(document.createElement('br')));
+    if(json.length === 0)
+        $("#feedbacks").append($(document.createElement('span')).text("No feedbacks yet"));
+    else {
+        json.forEach(feedback => {
+            var i;
+            var feed = $(document.createElement('div'));
+            feed.addClass("feedback");
+            var stars = $(document.createElement('div'));
+            stars.addClass("stars");
+            for (i = 0; i < feedback.stars; i++)
+                stars.append($('<i class="fa fa-star star checked" ></i>'));
+            for (i = 0; i < 5 - feedback.stars; i++)
+                stars.append($('<i class="fa fa-star star" ></i>'));
+            feed.append(stars);
+            var details = $(document.createElement('div'));
+            for (var key of Object.keys(feedback)) {
+                if (key !== "storeId") {
+                    details.append($(document.createElement('span')).text(key + ": " + feedback[key]));
+                    details.append($(document.createElement('br')));
+                }
             }
-        }
-        feed.append(details);
-        $("#feedbacks").append(feed);
-    });
+            feed.append(details);
+            $("#feedbacks").append(feed);
+        });
+    }
 }
 
 function getFeedbacks(storeId) {
@@ -77,7 +81,7 @@ function openOrderHistory(event){
 
 function openStore(){
     showWindow('store-container');
-    $(".productsToAdd>span").remove();
+    $(".productsToAdd>span,.productsToAdd>br").remove();
     $("#storeForm").trigger('reset');
     newStore = {
         products:[],
@@ -88,11 +92,21 @@ function choosePrice(productId,productName) {
     var price = prompt("Please enter price:");
     if (!(price === null || price === "")) {
         if(/^\d+$/.test(price)) {
-            newStore.products.push({
-                productId: productId,
-                price: price
+            const index = newStore.products.findIndex(product=>product.productId === productId);
+            if(index === -1) {
+                newStore.products.push({
+                    productId: productId,
+                    price: price,
+                    productName: productName
+                })
+            }
+            else
+                newStore.products[index].price = price;
+            $(".productsToAdd>span,.productsToAdd>br").remove();
+            newStore.products.forEach(product=>{
+                $(".productsToAdd").append($(`<span>${product.productName}: </span><span>${product.price}₪</span><br>`))
             })
-            $(".productsToAdd").append($(`<span>${productName}: </span><span>${price}</span><br>`))
+
         }
         else
             alert("Price must be an integer");
@@ -104,14 +118,15 @@ function saveNewStore(){
         $.ajax({
             url: AREA_URL,
             method: 'GET',
+            contentType: 'application/json; charset=utf-8',
             data: {
                 action: "addNewStore",
-                soreId:$("#storeForm #storeId").val(),
+                storeId:$("#storeForm #storeId").val(),
                 storeName: $("#storeForm #storeName").val(),
                 x: $("#storeForm .x").val(),
                 y: $("#storeForm .y").val(),
                 ppk: $("#storeForm .ppk").val(),
-                products: newStore.products
+                products: JSON.stringify(newStore.products)
             },
             success: function (json) {
                 alert("new store opened")

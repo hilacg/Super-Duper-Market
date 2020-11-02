@@ -10,18 +10,24 @@ import java.util.stream.Collectors;
 
 public class Zone {
     private static int orderNum = 0;
+    private int ownerId;
     private String name;
     private Map<Integer, Product> allProducts = new HashMap<>();
     private Map<Integer, Store> allStores = new HashMap<>();
     private final List<Order> orders = new ArrayList<>();
     private Map<Point,Integer> AllLocations = new HashMap<>();
 
-    public Zone(SuperXML superXML) {
+    public Zone(SuperXML superXML,int userId) {
         this.name = superXML.getSuperMarket().getSDMZone().getName();
+        this.ownerId = userId;
         allProducts = superXML.getTempAllProducts();
         allStores = superXML.getTempAllStores();
         AllLocations = superXML.getTempAllLocations();
         setProductAvgAndStoreCount();
+    }
+
+    public int getOwnerId() {
+        return ownerId;
     }
 
     public List<Order> getOrders() {

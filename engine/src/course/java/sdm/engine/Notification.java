@@ -1,7 +1,7 @@
 package course.java.sdm.engine;
 
 public class Notification {
-    private boolean sent = false;
+    private boolean sent = true;
     private String message = "";
     private Notification.Type type;
 

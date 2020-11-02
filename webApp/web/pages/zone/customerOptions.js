@@ -18,7 +18,7 @@ function initOrder() {
             action: "initOrder",
         },
     })
-    $(".cart>span").remove();
+    $(".cart>span,.cart>br").remove();
     order={
         stores:[]
     };
@@ -460,21 +460,28 @@ function finishOrder() {
 }
 
 function showCustomerOrders(json) {
+
     var div = $(document.createElement('div'))
     div.attr('id', 'order-history');
     div.attr('class', 'popup-window show');
     var mainDiv = $(document.createElement('div'));
     $("body").append(div);
-    var button = $(document.createElement('button'));;
+    var button = $(document.createElement('button'));
     button.addClass("exit");
     button.addClass("fa fa-lg fa-times");
-    button.on("click",()=>{$("#order-history").remove();});
+    button.on("click", () => {
+        $("#order-history").remove();
+    });
     mainDiv.append(button);
     mainDiv.append($(document.createElement('h1')).text("Order History"));
-    json.forEach(order=>{
-        mainDiv.append(showOrderSum(order));
-    })
-    div.append(mainDiv);
+    if (json.length === 0)
+        mainDiv.append($(document.createElement('span')).text("No orders yet"));
+    else {
+        json.forEach(order => {
+            mainDiv.append(showOrderSum(order));
+        })
+    }
+        div.append(mainDiv);
 }
 
 function orderHistory(){

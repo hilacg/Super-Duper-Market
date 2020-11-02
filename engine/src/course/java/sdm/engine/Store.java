@@ -41,11 +41,12 @@ public class Store {
 
     }
 
-    public Store(Point location, int storeId, String name,int ownerId){
+    public Store(Point location, int storeId, String name,int ownerId,int ppk){
         this.location = location;
         this.serialNumber = storeId;
         this.name = name;
         this.ownerId = ownerId;
+        this.PPK = ppk;
     }
 
     public int getOwnerId() {
@@ -159,6 +160,13 @@ public class Store {
                 "\ndeliveryEarnings: " + deliveryEarnings;
 
         return res;
+    }
+
+    public String storeNotify(String owner, String zoneName, int zoneProducts){
+        return  owner + " has opened a new store in " + zoneName +
+                "\nstore name: " + name +
+                        "\nlocation: (" + location.x + ", " + location.y + ")" +
+                        "\nsells: " + productsSold.size() + "/" + zoneProducts + " products";
     }
 
     @Override

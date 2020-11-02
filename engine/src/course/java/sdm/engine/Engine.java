@@ -29,7 +29,7 @@ public class Engine {
     public void loadXML(InputStream file, int userId) throws Exception {
         SuperXML superXML = new SuperXML(this);
         superXML.load(file,userId);
-        Zone newZone = new Zone(superXML);
+        Zone newZone = new Zone(superXML,userId);
         userManager.getAllStoreOwners().get(userId).getZones().put(newZone.getName(), newZone);
  //       initMembers(userId);
 

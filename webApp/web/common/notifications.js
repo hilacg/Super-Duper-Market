@@ -34,6 +34,7 @@ function showNotification(notification) {
 
 function ajaxNotification() {
     $.ajax({
+        async: false,
         url:ACCOUNT_URL,
         data: {
             action: "getNotifications"

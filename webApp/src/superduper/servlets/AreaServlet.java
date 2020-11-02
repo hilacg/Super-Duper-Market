@@ -2,6 +2,7 @@ package superduper.servlets;
 
 import com.google.gson.*;
 import course.java.sdm.engine.*;
+import generatedClasses.SDMSell;
 import superduper.utils.ServletUtils;
 import superduper.utils.SessionUtils;
 
@@ -23,6 +24,8 @@ import java.util.List;
 public class AreaServlet  extends HttpServlet {
     private Engine engine;
     private UserManager userManager;
+
+    private static final Object notificationLock = new Object();
 
     @Override
     public void init() throws ServletException {
@@ -59,7 +62,7 @@ public class AreaServlet  extends HttpServlet {
             case "getStoreProducts":{
                 Gson gson = new Gson();
                 JsonObject mainObj = new JsonObject();
-                Zone zone = userManager.getZone(Integer.parseInt(request.getParameter("owner")),request.getParameter("zoneName"));
+                Zone zone = (Zone) getServletContext().getAttribute("zone");
                 Store store = zone.getAllStores().get(Integer.parseInt(request.getParameter("store")));
                 JsonArray jsonArray = getStoreProducts(store,zone);
                 mainObj.add("storeProducts",jsonArray);
@@ -84,17 +87,21 @@ public class AreaServlet  extends HttpServlet {
     private void addNewStore(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out, Integer ownerId) throws IOException {
         Zone zone = (Zone)getServletContext().getAttribute("zone");
         Point storeLocation = new Point(Integer.parseInt(request.getParameter("x")),Integer.parseInt(request.getParameter("y")));
-        Store newStore = new Store(storeLocation,Integer.parseInt(request.getParameter("ppk")),request.getParameter("storeName"),ownerId);
+        Store newStore = new Store(storeLocation,Integer.parseInt(request.getParameter("storeId")),request.getParameter("storeName"),ownerId,Integer.parseInt(request.getParameter("ppk")));
         JsonArray products = new JsonParser().parse(request.getParameter("products")).getAsJsonArray();
         for (JsonElement product : products) {
             JsonObject productsObj = (JsonObject) product;
             newStore.getProductPrices().putIfAbsent(productsObj.get("productId").getAsInt(),productsObj.get("price").getAsInt());
+            newStore.getProductsSold().put(productsObj.get("productId").getAsInt(), 0.0);
         }
         try {
             zone.addNewStore(newStore);
             response.setStatus(200);
             out.println("new store added successfully!");
             out.flush();
+            synchronized (notificationLock) {
+                notifyNewStore(newStore);
+            }
         }catch (Exception e) {
             response.setStatus(401);
             response.getOutputStream().println(e.getMessage());
@@ -102,10 +109,20 @@ public class AreaServlet  extends HttpServlet {
         }
     }
 
+    private void notifyNewStore(Store newStore) {
+        Zone zone = (Zone) getServletContext().getAttribute("zone");
+        Notification note = userManager.getAllStoreOwners().get(zone.getOwnerId()).getNotification();
+        String newOwner = userManager.getAllStoreOwners().get(newStore.getOwnerId()).getName();
+        int zoneProducts = zone.getProductTypes();
+        note.setMessage(newStore.storeNotify(newOwner,zone.getName(),zoneProducts));
+        note.setType(Notification.Type.STORE);
+        note.setSent(false);
+    }
+
     private void storeFeedback(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {
         Gson gson = new Gson();
         Integer storeId = Integer.parseInt(request.getParameter("storeId"));
-        Zone zone = userManager.getZone(SessionUtils.getUserId(request),request.getParameter("zoneName"));
+        Zone zone = (Zone) getServletContext().getAttribute("zone");
         response.setStatus(200);
         out.println(gson.toJson(zone.getAllStores().get(storeId).getStoreFeedback()));
         out.flush();
@@ -115,13 +132,12 @@ public class AreaServlet  extends HttpServlet {
         Gson gson = new Gson();
         JsonArray storeJson = new JsonArray();
         JsonObject mainObj = new JsonObject();
-        StoreOwner storeOwner = userManager.getAllStoreOwners().get(Integer.parseInt(request.getParameter("owner")));
-        Zone zone = storeOwner.getZones().get(request.getParameter("zoneName"));
+        Zone zone = (Zone) getServletContext().getAttribute("zone");
         zone.getAllStores().values().forEach(store ->{
             JsonObject obj = new JsonObject();
             obj.addProperty("Serial Number", store.getSerialNumber());
             obj.addProperty("Name", store.getName());
-            obj.addProperty("Owner", storeOwner.getName());
+            obj.addProperty("Owner", userManager.getAllStoreOwners().get(store.getOwnerId()).getName());
             obj.addProperty("Location", store.getStringLocation());
             obj.add("products", getStoreProducts(store,zone));
             obj.addProperty("Orders", store.getTotalOrders());
@@ -156,7 +172,7 @@ public class AreaServlet  extends HttpServlet {
         Gson gson = new Gson();
         JsonArray productJson = new JsonArray();
         JsonObject mainObj = new JsonObject();
-       Zone zone = userManager.getZone(Integer.parseInt(request.getParameter("owner")),request.getParameter("zoneName"));
+        Zone zone = (Zone) getServletContext().getAttribute("zone");
        zone.getAllProducts().values().forEach(product ->{
            JsonObject obj = new JsonObject();
            obj.addProperty("Serial Number", product.getSerialNumber());

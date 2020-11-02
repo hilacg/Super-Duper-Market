@@ -31,6 +31,9 @@ public class OrderServlet extends HttpServlet {
     private Order newOrder;
     private List<Discount> discounts = new ArrayList<>();
 
+    private static final Object orderLock = new Object();
+    private static final Object feedbackLock = new Object();
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -93,7 +96,9 @@ public class OrderServlet extends HttpServlet {
             case "confirmOrder":{
                 response.setContentType("text/plain;charset=UTF-8");
                 zone.addOrder(newOrder,userManager.getAllCustomers().get(newOrder.getCustomerId()));
-                notifyOrder();
+                synchronized (orderLock) {
+                    notifyOrder();
+                }
                 setOwnerOrders();
                 response.setStatus(200);
                 out.flush();
@@ -188,7 +193,9 @@ public class OrderServlet extends HttpServlet {
             JsonObject feedbackObj = (JsonObject) feedback;
             Store chosenStore = zone.getAllStores().get((feedbackObj.get("storeId").getAsInt()));
             chosenStore.addFeedback(feedbackObj.get("stars").getAsInt(),feedbackObj.get("message").getAsString(),userManager.getAllCustomers().get(userId));
-            notifyfeedback(chosenStore.getOwnerId(),chosenStore.getStoreFeedback().get(chosenStore.getStoreFeedback().size() - 1));
+            synchronized (feedbackLock) {
+                notifyfeedback(chosenStore.getOwnerId(), chosenStore.getStoreFeedback().get(chosenStore.getStoreFeedback().size() - 1));
+            }
         });
         response.setStatus(200);
     }

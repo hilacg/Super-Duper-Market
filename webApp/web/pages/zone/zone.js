@@ -87,7 +87,6 @@ function showStores(stores) {
 }
 
 function addOwnerButtons(){
-    $("#storesTable thead>tr").append($(document.createElement('th')));
     $('#storesTable tbody>tr').append($(document.createElement('td')))
     $('#storesTable tbody').find("tr").each(function (){
         if($(this).children().eq(2).text() === user.name ){
