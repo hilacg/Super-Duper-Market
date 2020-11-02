@@ -1,9 +1,6 @@
 package superduper.servlets;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import course.java.sdm.engine.*;
 import superduper.utils.ServletUtils;
 import superduper.utils.SessionUtils;
@@ -15,6 +12,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -83,9 +81,25 @@ public class AreaServlet  extends HttpServlet {
 
     }
 
-    private void addNewStore(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out, Integer ownerId) {
+    private void addNewStore(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out, Integer ownerId) throws IOException {
+        Zone zone = (Zone)getServletContext().getAttribute("zone");
+        Point storeLocation = new Point(Integer.parseInt(request.getParameter("x")),Integer.parseInt(request.getParameter("y")));
+        Store newStore = new Store(storeLocation,Integer.parseInt(request.getParameter("ppk")),request.getParameter("storeName"),ownerId);
         JsonArray products = new JsonParser().parse(request.getParameter("products")).getAsJsonArray();
-
+        for (JsonElement product : products) {
+            JsonObject productsObj = (JsonObject) product;
+            newStore.getProductPrices().putIfAbsent(productsObj.get("productId").getAsInt(),productsObj.get("price").getAsInt());
+        }
+        try {
+            zone.addNewStore(newStore);
+            response.setStatus(200);
+            out.println("new store added successfully!");
+            out.flush();
+        }catch (Exception e) {
+            response.setStatus(401);
+            response.getOutputStream().println(e.getMessage());
+            out.flush();
+        }
     }
 
     private void storeFeedback(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {

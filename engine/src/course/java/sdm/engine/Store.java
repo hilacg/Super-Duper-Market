@@ -24,21 +24,28 @@ public class Store {
 
     public Store(){}
 
-    public Store(SDMStore store,int ownerId){
+    public Store(SDMStore store,int ownerId) {
         serialNumber = store.getId();
         this.ownerId = ownerId;
         name = store.getName();
-        for(SDMSell sell : store.getSDMPrices().getSDMSell()){
+        for (SDMSell sell : store.getSDMPrices().getSDMSell()) {
             productPrices.put(sell.getItemId(), sell.getPrice());
-            productsSold.put(sell.getItemId(),0.0);
+            productsSold.put(sell.getItemId(), 0.0);
         }
-        if(store.getSDMDiscounts() !=null)
-            for(SDMDiscount discount: store.getSDMDiscounts().getSDMDiscount()) {
-               discounts.add(new Discount(discount,serialNumber));
+        if (store.getSDMDiscounts() != null)
+            for (SDMDiscount discount : store.getSDMDiscounts().getSDMDiscount()) {
+                discounts.add(new Discount(discount, serialNumber));
             }
         PPK = store.getDeliveryPpk();
-        location = new Point(store.getLocation().getX(),store.getLocation().getY());
+        location = new Point(store.getLocation().getX(), store.getLocation().getY());
 
+    }
+
+    public Store(Point location, int storeId, String name,int ownerId){
+        this.location = location;
+        this.serialNumber = storeId;
+        this.name = name;
+        this.ownerId = ownerId;
     }
 
     public int getOwnerId() {

@@ -14,13 +14,13 @@ public class Zone {
     private Map<Integer, Product> allProducts = new HashMap<>();
     private Map<Integer, Store> allStores = new HashMap<>();
     private final List<Order> orders = new ArrayList<>();
-    private Map<Point,Integer> tempAllLocations = new HashMap<>();
+    private Map<Point,Integer> AllLocations = new HashMap<>();
 
     public Zone(SuperXML superXML) {
         this.name = superXML.getSuperMarket().getSDMZone().getName();
         allProducts = superXML.getTempAllProducts();
         allStores = superXML.getTempAllStores();
-        tempAllLocations = superXML.getTempAllLocations();
+        AllLocations = superXML.getTempAllLocations();
         setProductAvgAndStoreCount();
     }
 
@@ -68,16 +68,18 @@ public class Zone {
             product.setAvgPrice(price);
         }
     }
+    public void addNewStore(Store newStore) throws Exception {
+        checkStores(newStore);
+        this.allStores.put(newStore.getSerialNumber(), newStore);
+    }
 
-    private void checkStores(int userId) throws Exception {
-   /*     for(SDMStore store : superMarket.getSDMStores().getSDMStore()){
-            Store s = tempAllStores.putIfAbsent(store.getId(),new Store(store,userId));
-            if(checkLocationRange(store.getLocation().getX(), store.getLocation().getY()))
-            {
+    public void checkStores(Store store) throws Exception {
+            Store s = allStores.get(store.getSerialNumber());
+            if(checkLocationRange(store.getLocation().x, store.getLocation().y)){
                 throw new Exception("location exception\n");
             }
             else{
-                Integer p = tempAllLocations.putIfAbsent(new Point(store.getLocation().getX(),store.getLocation().getY()),store.getId());
+                Integer p = AllLocations.putIfAbsent(new Point(store.getLocation().x, store.getLocation().y),store.getSerialNumber());
                 if(p!=null){
                     throw new Exception("duplicated location error\n");
                 }
@@ -86,9 +88,12 @@ public class Zone {
             {
                 throw new Exception("store duplicated id error\n");
             }
-        }*/
-    }
+        }
 
+    public static boolean checkLocationRange(int x, int y) {
+        return (x > 50 || x< 1 ||  y > 50 || y < 1);
+
+    }
     private void updateProductSoldAmount(Order newOrder) {
         for (Map.Entry<Integer, Map<Integer, Double>> storeSoldProduct : newOrder.getStoreProducts().entrySet()) {
             for (Map.Entry<Integer, Double> productSold : storeSoldProduct.getValue().entrySet()) {
@@ -167,5 +172,4 @@ public class Zone {
         c.addOrder(newOrder);
         orders.add(newOrder);
     }
-
 }
