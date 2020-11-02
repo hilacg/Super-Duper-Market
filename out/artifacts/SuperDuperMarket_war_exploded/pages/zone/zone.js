@@ -87,7 +87,7 @@ function addOwnerButtons(){
     $('#storesTable tbody').find("tr").each(function (){
         if($(this).children().eq(2).text() === user.name ){
             var feebeacks = $('<button class="feedbacks" onclick="openFeedbacks(event)"><i class="fa fa-commenting"></i> Feedbacks</button>');
-            var orderHistory = $('<button class="feedbacks" onclick="openOrderHistory(event)"><i class="fa fa-plus"></i> New Store</button>');
+            var orderHistory = $('<button class="feedbacks" onclick="openOrderHistory(event)"><i class="fa fa-history"></i> Orders</button>');
             $(this).children().eq(9).append(feebeacks,orderHistory);
         }
     })
