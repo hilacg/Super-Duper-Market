@@ -117,7 +117,7 @@ public class OrderServlet extends HttpServlet {
         Store store = zone.getAllStores().get(request.getParameter("storeId"));
         store.getOrders().forEach(order -> {
                     try {
-                        mainObj.add("order",getOrderSum(response, out,order ));
+                        mainObj.add("order",getOrderSum(response, out,order));
                     } catch (IOException e) {}
                 }
         );
