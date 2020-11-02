@@ -106,7 +106,7 @@ public class Store {
 
     public void addFeedback(int stars, String message, Customer customer) {
         String Date = customer.getOrders().get(customer.getOrders().size()-1).getDate();
-        Feedback newFeedback = new Feedback(this.serialNumber,customer.getName(), stars,message,Date);
+        Feedback newFeedback = new Feedback(this.serialNumber,this.name,customer.getName(), stars,message,Date);
         this.storeFeedback.add(newFeedback);
     }
     public Map<Integer, Integer> getProductPrices() {

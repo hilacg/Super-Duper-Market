@@ -118,13 +118,15 @@ public class OrderServlet extends HttpServlet {
             int ownerId = zone.getAllStores().get(storeId).getOwnerId();
             Notification note = userManager.getAllStoreOwners().get(ownerId).getNotification();
             note.setMessage("sold!");
+            note.setType(Notification.Type.ORDER);
             note.setSent(false);
         });
     }
 
-    private void notifyfeedback(int ownerId) {
+    private void notifyfeedback(int ownerId, Feedback feedback) {
             Notification note = userManager.getAllStoreOwners().get(ownerId).getNotification();
-            note.setMessage("got feedback!");
+            note.setMessage(feedback.toString());
+            note.setType(Notification.Type.FEEDBACK);
             note.setSent(false);
     }
 
@@ -144,7 +146,6 @@ public class OrderServlet extends HttpServlet {
     }
 
     private JsonElement storeOrderProducts(HttpServletResponse response, ServletOutputStream out, Order order) {
-        Gson gson = new Gson();
         JsonObject storeObj = new JsonObject();
         JsonArray storeP = new JsonArray();
         JsonArray storeD = new JsonArray();
@@ -170,7 +171,7 @@ public class OrderServlet extends HttpServlet {
             JsonObject feedbackObj = (JsonObject) feedback;
             Store chosenStore = zone.getAllStores().get((feedbackObj.get("storeId").getAsInt()));
             chosenStore.addFeedback(feedbackObj.get("stars").getAsInt(),feedbackObj.get("message").getAsString(),userManager.getAllCustomers().get(userId));
-            notifyfeedback(chosenStore.getOwnerId());
+            notifyfeedback(chosenStore.getOwnerId(),chosenStore.getStoreFeedback().get(chosenStore.getStoreFeedback().size() - 1));
         });
         response.setStatus(200);
     }

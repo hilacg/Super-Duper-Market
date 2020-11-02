@@ -59,14 +59,12 @@ public class AccountServlet  extends HttpServlet {
     }
 
     private void getNotifications(HttpServletResponse response, ServletOutputStream out, Integer userIdFromSession) throws IOException {
-        response.setContentType("text/plain;charset=UTF-8");
+        Gson gson = new Gson();
         StoreOwner owner = userManager.getAllStoreOwners().get(userIdFromSession);
-        if(!owner.getNotification().isSent())
-        {
-            owner.getNotification().setSent(true);
-            out.println(owner.getNotification().getMessage());
-        }
+        out.println(gson.toJson(owner.getNotification()));
         out.flush();
+        response.setStatus(200);
+        owner.getNotification().setSent(true);
     }
 
     private void chargeOrder(HttpServletResponse response, HttpServletRequest request, ServletOutputStream out, Integer userIdFromSession) throws IOException {

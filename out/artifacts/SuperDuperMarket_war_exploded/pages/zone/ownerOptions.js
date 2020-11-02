@@ -58,7 +58,7 @@ function getOrders(storeId) {
             storeId: storeId,
         },
         success:(json)=> {
-            json.forEach(order=>$('#order-history-container>div').append(showOrderSum(order)));
+            json.forEach(order=>$('#order-history-container>div').append(showStoreOrder(order)));
             $(".summaryButtons").remove();
         }
     })

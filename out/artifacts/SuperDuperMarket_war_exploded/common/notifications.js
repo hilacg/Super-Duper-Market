@@ -1,12 +1,30 @@
 const notifyRate = 5000; //milli seconds
 
-function showNotification(response) {
+function showNotification(notification) {
     const newNote = $('<div class="notification"></div>')
     const exit = $(document.createElement('button'));
     exit.click(event=>event.target.closest("div").remove());
-    exit.addClass("fa fa-xs fa-times")
-    newNote.append(exit)
-    newNote.append($(document.createElement('div')).text(response));
+    exit.addClass("fa fa-xs fa-times");
+    newNote.append(exit);
+    var type;
+    switch(notification.type){
+        case "ORDER":{
+            type="fa fa-cart-plus";
+                break;
+            }
+        case "FEEDBACK":{
+            type="fa fa-commenting";
+                break;
+            }
+        case "STORE":{
+            type="fa fa-home";
+                break;
+            }
+    }
+    const icon = $(document.createElement('i'));
+    icon.addClass(type)
+    newNote.append(icon);
+    newNote.append($(document.createElement('div')).text(notification.message));
     var tempNote =  newNote.clone();
     setTimeout(()=>{ tempNote.remove() }, 5000)
     $("#notifications").append(tempNote);
@@ -20,8 +38,9 @@ function ajaxNotification() {
         data: {
             action: "getNotifications"
         },
-        success: function(response) {
-            response!=="" && showNotification(response);
+        success: function(json) {
+            const notification = JSON.parse(json);
+            notification.sent===false && showNotification(notification);
         }
     });
 }
