@@ -26,7 +26,8 @@ function showNotification(notification) {
     newNote.append(icon);
     newNote.append($(document.createElement('div')).text(notification.message));
     var tempNote =  newNote.clone();
-    setTimeout(()=>{ tempNote.remove() }, 5000)
+    tempNote.find("button").click((event=>event.target.closest("div").remove()));
+ //   setTimeout(()=>{ tempNote.remove() }, 5000)
     $("#notifications").append(tempNote);
     $(".overlay-content").prepend(newNote);
 }
