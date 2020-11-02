@@ -73,8 +73,16 @@ public class AreaServlet  extends HttpServlet {
                 storeFeedback(request,response,out);
                 break;
             }
+            case "addNewStore":{
+                addNewStore(request,response,out,SessionUtils.getUserId(request));
+                break;
+            }
         }
 
+
+    }
+
+    private void addNewStore(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out, Integer ownerId) {
 
     }
 

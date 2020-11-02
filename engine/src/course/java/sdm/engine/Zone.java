@@ -12,11 +12,13 @@ public class Zone {
     private Map<Integer, Product> allProducts = new HashMap<>();
     private Map<Integer, Store> allStores = new HashMap<>();
     private final List<Order> orders = new ArrayList<>();
+    private Map<Point,Integer> tempAllLocations = new HashMap<>();
 
     public Zone(SuperXML superXML) {
         this.name = superXML.getSuperMarket().getSDMZone().getName();
         allProducts = superXML.getTempAllProducts();
         allStores = superXML.getTempAllStores();
+        tempAllLocations = superXML.getTempAllLocations();
         setProductAvgAndStoreCount();
     }
 

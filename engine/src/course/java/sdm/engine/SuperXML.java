@@ -39,6 +39,8 @@ public class SuperXML {
         return tempAllStores;
     }
 
+    public Map<Point, Integer> getTempAllLocations() {return tempAllLocations;}
+
     public void load(InputStream fileContent, int userId) throws Exception {
         try {
             superMarket = this.XMLToObject(fileContent);
