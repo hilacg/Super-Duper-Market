@@ -29,8 +29,12 @@ function showProducts(products,selectors) {
             tr.append($(document.createElement('td')).text(product[key]));
         tr.appendTo(table);
     });
-    $("#products .productsTable tbody tr").unbind();
-    $("#products .productsTable tbody tr").click((event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML));
+    var productTable = $(".products .productsTable tbody tr");
+    productTable.unbind();
+    if(user.isCustomer)
+        productTable.click((event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML,event.target.closest("tr").children[1].innerHTML));
+    else
+        productTable.click((event)=>choosePrice(event.target.closest("tr").children[0].innerHTML,event.target.closest("tr").children[1].innerHTML));
 }
 
 function showStoreProducts(products) {
@@ -171,6 +175,10 @@ $(function() {
     getOwnerId(zoneName);
     $("#orderForm").submit(()=>{
         finishOrder();
+        return false;
+    })
+    $("#storeForm").submit(()=>{
+        saveNewStore();
         return false;
     })
 })
