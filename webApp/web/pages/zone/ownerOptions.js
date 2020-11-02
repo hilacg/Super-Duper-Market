@@ -1,3 +1,5 @@
+let newStore={};
+
 function showFeedbacks(json) {
     json.forEach(feedback=>{
         var i;
@@ -71,4 +73,53 @@ function openOrderHistory(event){
     $("body").append(popup);
     showWindow("order-history-container");
     getOrders(event.target.closest("tr").children[0].innerHTML);
+}
+
+function openStore(){
+    showWindow('store-container');
+    $(".productsToAdd>span").remove();
+    $("#storeForm").trigger('reset');
+    newStore = {
+        products:[],
+    }
+}
+
+function choosePrice(productId,productName) {
+    var price = prompt("Please enter price:");
+    if (!(price === null || price === "")) {
+        if(/^\d+$/.test(price)) {
+            newStore.products.push({
+                productId: productId,
+                price: price
+            })
+            $(".productsToAdd").append($(`<span>${productName}: </span><span>${price}</span><br>`))
+        }
+        else
+            alert("Price must be an integer");
+    }
+}
+
+function saveNewStore(){
+    if( $(".productsToAdd").children().length > 1) {
+        $.ajax({
+            url: AREA_URL,
+            method: 'GET',
+            data: {
+                action: "addNewStore",
+                storeName: $("#storeForm #storeName").val(),
+                x: $("#storeForm .x").val(),
+                y: $("#storeForm .y").val(),
+                ppk: $("#storeForm .ppk").val(),
+                products: newStore.products
+            },
+            success: function (json) {
+                alert("new store opened")
+            },
+            error: (error) => {
+                alert(error.responseText)
+            }
+        });
+    }
+    else
+        alert("Please choose products to sell first");
 }

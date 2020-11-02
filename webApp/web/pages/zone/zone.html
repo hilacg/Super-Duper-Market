@@ -25,7 +25,7 @@
     <button id="orderHistory" class="customerOption" onclick= "orderHistory()"><i class="fa fa-history"></i> Order History</button>
     <button id="ordersBtn" class="ownerOption" ><i class="fa fa-history"></i> Orders</button>
     <button id="feedbacksBtn" class="ownerOption"><i class="fa fa-commenting"></i> Feedbacks</button>
-    <button id="newStoreBtn" class="ownerOption" onclick= "showWindow('order-history-container')"><i class="fa fa-plus"></i> New Store</button>
+    <button id="newStoreBtn" class="ownerOption" onclick= "openStore()"><i class="fa fa-plus"></i> New Store</button>
 
     <img style="float: right " src="../../common/images/logo.png" id="logo" alt="logo">
 </div>
@@ -38,7 +38,7 @@
         <form id="orderForm" method="POST">
             <h1>New Order</h1>
             <input type="text" id="datepicker" name="date" required placeholder="Date">
-            <p>Location:  <input type="number" id="x" min="1" max="50" name="x" required placeholder="X"> <input type="number" id="y" min="1" max="50" name="y" required placeholder="Y"></p>
+            <p>Location:  <input type="number" class="x" min="1" max="50" name="x" required placeholder="X"> <input type="number" class="y" min="1" max="50" name="y" required placeholder="Y"></p>
             <div>
                 <input type="radio" id="static" name="type" value="static" onclick="staticOrder()">
                 <label for="static">Static</label>
@@ -47,7 +47,9 @@
             </div>
             <button>Finish Order</button>
         </form>
-
+<div class="cart">
+    <h3>Products in cart</h3>
+</div>
         <div id="staticOrder-container" style="display: none">
             <h3>Choose a store to buy From</h3>
             <table id="storeSelect">
@@ -76,7 +78,7 @@
         </div>
 
         <div id="dynamicOrder-container" style="display: none">
-            <div id="products">
+            <div class="products">
                 <table class="productsTable">
                     <thead>
                     <tr>
@@ -128,6 +130,38 @@
         </thead>
         <tbody></tbody>
     </table>
+</div>
+
+<div id="store-container" class="popup-window">
+    <div>
+        <button onclick="showWindow('store-container')" class="fa fa-lg fa-times exit"></button>
+        <form id="storeForm" method="POST">
+            <h1>New Store</h1>
+            <input id="storeName" type="text" name="storeName" placeholder="Store Name"/>
+            <br>
+            <p>Location:  <input type="number" class="x" min="1" max="50" name="x" required placeholder="X"> <input type="number" class="y" min="1" max="50" name="y" required placeholder="Y"></p>
+            <input type="number" class="ppk" name="ppk" required placeholder="PPK">
+            <button>Open New Store</button>
+        </form>
+        <div class="productsToAdd">
+            <h3>Products added</h3>
+        </div>
+        <div class="products">
+            <table class="productsTable">
+                <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Name</th>
+                    <th>Buying Method</th>
+                    <th>Sold In</th>
+                    <th>Average Price</th>
+                    <th>Amount Sold</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 </body>
 </html>

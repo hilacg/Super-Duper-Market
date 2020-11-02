@@ -18,13 +18,14 @@ function initOrder() {
             action: "initOrder",
         },
     })
+    $(".cart>span").remove();
     order={
         stores:[]
     };
 }
 
 
-function addToCart(productId,amount) {
+function addToCart(productId,amount,productName) {
     $.ajax({
         url:ORDER_URL,
         data: {
@@ -37,6 +38,7 @@ function addToCart(productId,amount) {
         },
         success: function(response) {
             alert(response);
+            $(".cart").append($(`<span>${productName}: </span><span>${amount}</span><br>`))
         },
         error:error=>{
             alert(error.responseText);
@@ -44,10 +46,10 @@ function addToCart(productId,amount) {
     });
 }
 
-function chooseAmount(productId) {
+function chooseAmount(productId,productName) {
     var amount = prompt("Please enter amount to buy:");
-    if (!(amount == null)) {
-        addToCart(productId,amount);
+    if (!(amount === null || amount === "")) {
+        addToCart(productId,amount,productName);
     }
 }
 
@@ -63,7 +65,7 @@ function getStoreProducts(storeId) {
         success: function(json) {
             json.storeProducts.forEach(product => delete product.sold);
             showProducts(json.storeProducts,'#storeProductSelect tbody');
-            $("#storeProductSelect tr").click((event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML));
+            $("#storeProductSelect tr").click((event)=>chooseAmount(event.target.closest("tr").children[0].innerHTML,event.target.closest("tr").children[1].innerHTML));
         }
     });
 }
@@ -439,8 +441,8 @@ function finishOrder() {
             action: "finishOrder",
             type: order.type,
             store: order.storeId,
-            x: document.getElementById("x").value,
-            y: document.getElementById("y").value,
+            x: $("#orderForm .x").val(),
+            y: $("#orderForm .y").val(),
             date: document.getElementById("datepicker").value
         },
         success: function (json) {

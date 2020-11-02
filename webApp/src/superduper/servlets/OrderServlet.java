@@ -44,12 +44,12 @@ public class OrderServlet extends HttpServlet {
         ServletOutputStream out = response.getOutputStream();
         switch (userAction) {
             case "initOrder":{
-                response.setContentType("text/plain;charset=UTF-8");
                 productsToOrder = new HashMap<>();
                 storeProductsToOrder = new HashMap<>();
                 discounts = new ArrayList<>();
                 response.setStatus(200);
                 out.flush();
+                break;
             }
             case "switchZone":{
                 zone = userManager.getZone(Integer.parseInt(request.getParameter("ownerId")),request.getParameter("zoneName"));
