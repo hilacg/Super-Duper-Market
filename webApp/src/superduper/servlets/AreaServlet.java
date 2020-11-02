@@ -3,6 +3,7 @@ package superduper.servlets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import course.java.sdm.engine.*;
 import superduper.utils.ServletUtils;
 import superduper.utils.SessionUtils;
@@ -83,6 +84,7 @@ public class AreaServlet  extends HttpServlet {
     }
 
     private void addNewStore(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out, Integer ownerId) {
+        JsonArray products = new JsonParser().parse(request.getParameter("products")).getAsJsonArray();
 
     }
 

@@ -1,5 +1,7 @@
 package course.java.sdm.engine;
 
+import generatedClasses.SDMStore;
+
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -67,20 +69,25 @@ public class Zone {
         }
     }
 
-   /* public Order setNewOrder(Customer selectedCustomer, Map<Integer, Map<Integer, Double>> storeProductsToOrder, String date, int x, int y) {
-        Order newOrder = new Order(++orderNum,date, storeProductsToOrder, new Point(x,y),selectedCustomer.getId());
-        newOrder.calculateDistance(allStores);
-        return newOrder;
-    }*/
-
-   /* public void addOrder(Order newOrder) {
-        newOrder.calculatePrice(allStores);
-        newOrder.calculateTotalPrice();
-        updateProductSoldAmount(newOrder);
-        Customer c = userManager.getAllCustomers().get(newOrder.getCustomerId());
-        c.addOrder(newOrder);
-        orders.add(newOrder);
-    }*/
+    private void checkStores(int userId) throws Exception {
+   /*     for(SDMStore store : superMarket.getSDMStores().getSDMStore()){
+            Store s = tempAllStores.putIfAbsent(store.getId(),new Store(store,userId));
+            if(checkLocationRange(store.getLocation().getX(), store.getLocation().getY()))
+            {
+                throw new Exception("location exception\n");
+            }
+            else{
+                Integer p = tempAllLocations.putIfAbsent(new Point(store.getLocation().getX(),store.getLocation().getY()),store.getId());
+                if(p!=null){
+                    throw new Exception("duplicated location error\n");
+                }
+            }
+            if(s != null)
+            {
+                throw new Exception("store duplicated id error\n");
+            }
+        }*/
+    }
 
     private void updateProductSoldAmount(Order newOrder) {
         for (Map.Entry<Integer, Map<Integer, Double>> storeSoldProduct : newOrder.getStoreProducts().entrySet()) {
