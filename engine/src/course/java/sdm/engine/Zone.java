@@ -59,6 +59,11 @@ public class Zone {
     public double getOrdersAvg(){
         return  orders.size() >0? (orders.stream().mapToDouble(Order::getTotalPrice).sum())/orders.size():0;
     }
+    public void addNewStore(Store newStore) throws Exception {
+        checkStores(newStore);
+        this.allStores.put(newStore.getSerialNumber(), newStore);
+        setProductAvgAndStoreCount();
+    }
 
     private void setProductAvgAndStoreCount() {
         int price;
@@ -74,11 +79,6 @@ public class Zone {
             product.setAvgPrice(price);
         }
     }
-    public void addNewStore(Store newStore) throws Exception {
-        checkStores(newStore);
-        this.allStores.put(newStore.getSerialNumber(), newStore);
-    }
-
     public void checkStores(Store store) throws Exception {
             Store s = allStores.get(store.getSerialNumber());
             if(checkLocationRange(store.getLocation().x, store.getLocation().y)){
