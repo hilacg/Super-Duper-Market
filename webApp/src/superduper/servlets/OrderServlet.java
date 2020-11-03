@@ -121,8 +121,9 @@ public class OrderServlet extends HttpServlet {
         newOrder.getStoreProducts().keySet().forEach(storeId->{
             int ownerId = zone.getAllStores().get(storeId).getOwnerId();
             Stack<Notification> notes = userManager.getAllStoreOwners().get(ownerId).getNotification();
+            Store store = zone.getAllStores().get(storeId);
             Notification note = new Notification();
-            note.setMessage("sold!");
+            note.setMessage(store.newOrderNotification(newOrder.getSerial(),zone,userManager));
             note.setType(Notification.Type.ORDER);
             notes.push(note);
         });
@@ -223,6 +224,9 @@ public class OrderServlet extends HttpServlet {
         JsonObject mainObj = new JsonObject();
         JsonObject orderObj = new JsonObject();
         newOrder.calculateTotalPrice();
+        orderObj.addProperty("order number", newOrder.getSerial());
+        orderObj.addProperty("date", newOrder.getDate());
+        orderObj.addProperty("number of stores", newOrder.getStoreProducts().keySet().size());
         orderObj.addProperty("total products price", newOrder.getPrice()+newOrder.getDiscountsPrice());
         orderObj.addProperty("total delivery price", newOrder.getDeliveryPrice());
         orderObj.addProperty("total order price", newOrder.getTotalPrice());
