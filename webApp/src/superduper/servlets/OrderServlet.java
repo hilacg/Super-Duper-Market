@@ -94,10 +94,10 @@ public class OrderServlet extends HttpServlet {
             case "confirmOrder":{
                 response.setContentType("text/plain;charset=UTF-8");
                 zone.addOrder(newOrder,userManager.getAllCustomers().get(newOrder.getCustomerId()));
+                setOwnerOrders();
                 synchronized (orderLock) {
                     notifyOrder();
                 }
-                setOwnerOrders();
                 response.setStatus(200);
                 out.flush();
             }
@@ -156,7 +156,6 @@ public class OrderServlet extends HttpServlet {
         JsonObject storeObj = new JsonObject();
         JsonArray storeP = new JsonArray();
         JsonArray storeD = new JsonArray();
-        storeOrderSum(order);
         order.getStoreProducts().forEach((storeId,productAndAmount)->{
             productAndAmount.forEach((productId,amount)->{
                 storeP.add(buildStoreSum(productId,amount,storeId, zone.getAllStores().get(storeId).getProductPrices().get(productId)));
@@ -174,7 +173,8 @@ public class OrderServlet extends HttpServlet {
         return storeObj;
     }
 
-    private JsonElement storeOrderSum(Order order) {
+
+    private JsonObject storeOrderSum(Order order) {
         JsonObject orderSum = new JsonObject();
         orderSum.addProperty("order number", order.getSerial());
         orderSum.addProperty("date", order.getDate());
@@ -210,14 +210,45 @@ public class OrderServlet extends HttpServlet {
         JsonArray orderArray = new JsonArray();
         Customer customer = userManager.getAllCustomers().get(userId);
         customer.getOrders().stream().filter(order->order.getZoneName().equals(zone.getName())).forEach(order-> {
-            try {
-                orderArray.add(getOrderSum(response,out,order));
-            } catch (IOException e){}
+
+                orderArray.add(customerOrderProducts(response,out,order));
+
         });
         response.setStatus(200);
         out.println(gson.toJson(orderArray));
         out.flush();
     }
+
+    private JsonElement customerOrderProducts(HttpServletResponse response, ServletOutputStream out, Order order) {
+        JsonObject storeObj = new JsonObject();
+        JsonArray storeP = new JsonArray();
+        JsonArray storeD = new JsonArray();
+        order.getStoreProducts().forEach((storeId,productAndAmount)->{
+            productAndAmount.forEach((productId,amount)->{
+                JsonObject p = buildStoreSum(productId,amount,storeId, zone.getAllStores().get(storeId).getProductPrices().get(productId));
+                p.addProperty("store id",storeId);
+                p.addProperty("store name",zone.getAllStores().get(storeId).getName());
+                storeP.add(p);
+            });
+            if( order.getDiscountsProducts().get(storeId) !=null ) {
+                order.getDiscountsProducts().get(storeId).forEach((productId, discountProducts) -> {
+                    JsonObject p = buildStoreSum(productId, discountProducts.getAmount(), storeId, discountProducts.getPrice());
+                    p.addProperty("store id",storeId);
+                    p.addProperty("store name",zone.getAllStores().get(storeId).getName());
+                    storeD.add(p);
+
+                });
+            }
+            JsonObject sum = storeOrderSum(order);
+            sum.remove("customer name");
+            sum.addProperty("numer of stores", order.getStoreProducts().size());
+            storeObj.add("ordersum",sum);
+            storeObj.add("product",storeP);
+            storeObj.add("discount",storeD);
+        });
+        return storeObj;
+    }
+
 
     private JsonObject getOrderSum(HttpServletResponse response, ServletOutputStream out,Order newOrder) throws IOException {
         Gson gson = new Gson();
@@ -378,7 +409,7 @@ public class OrderServlet extends HttpServlet {
         return jsonArray;
     }
 
-    private JsonElement buildStoreSum(Integer productId, Double amount,Integer storeId, int price) {
+    private JsonObject buildStoreSum(Integer productId, Double amount,Integer storeId, int price) {
         Product product = zone.getAllProducts().get(productId);
         JsonObject productObj = new JsonObject();
         productObj.addProperty("Product",product.getName());

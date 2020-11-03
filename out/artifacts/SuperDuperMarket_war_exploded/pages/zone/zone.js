@@ -21,6 +21,51 @@ function backButton(){
 }
 
 
+function makeProduct(discount) {
+
+    const productDiv = $(document.createElement('div'));
+    productDiv.addClass("orderProduct");
+    for (var key of Object.keys(discount)) {
+        productDiv.append($(document.createElement('span')).text(key + ": " + discount[key]));
+        productDiv.append($(document.createElement('br')))
+    }
+    return productDiv;
+}
+
+function showOrders(orders,main) {
+    orders.forEach(order => {
+        const orderDiv = $(document.createElement('div'));
+        orderDiv.addClass("storeOrder");
+        for (var key of Object.keys(order.ordersum)) {
+            orderDiv.append($(document.createElement('span')).text(key + ": " + order.ordersum[key]));
+            orderDiv.append($(document.createElement('br')));
+        }
+
+        const orderDetailsDiv = $(document.createElement('div'));
+        orderDetailsDiv.addClass("storeOrderDetails");
+        orderDetailsDiv.append($(document.createElement('b')).text("Products bought:"));
+        order.product.forEach(product => {
+            orderDetailsDiv.append(makeProduct(product));
+        })
+        orderDetailsDiv.append($(document.createElement('b')).text("Products from discounts:"));
+        order.discount.forEach(discount => {
+            orderDetailsDiv.append(makeProduct(discount));
+        })
+        main.append(orderDiv);
+        main.append(orderDetailsDiv);
+        orderDiv.click(event => {
+            var div =  event.target.closest(".storeOrder");
+            div.classList.toggle("active")
+            var panel = div.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        });
+    })
+}
+
 function showProducts(products,selectors) {
     const table = $(selectors);
     table.empty();
@@ -91,7 +136,7 @@ function addOwnerButtons(){
     $('#storesTable tbody').find("tr").each(function (){
         if($(this).children().eq(2).text() === user.name ){
             var feebeacks = $('<button class="feedbacks" style="margin-bottom: 5px" onclick="openFeedbacks(event)"><i class="fa fa-commenting"></i> Feedbacks</button>');
-            var orderHistory = $('<button class="orderHistory" onclick="openOrderHistory(event)"><i class="fa fa-history"></i> Orders</button>');
+            var orderHistory = $('<button class="orderHistory" onclick="getStoreOrders(event)"><i class="fa fa-history"></i> Orders</button>');
             $(this).children().eq(9).append(feebeacks,orderHistory);
         }
     })

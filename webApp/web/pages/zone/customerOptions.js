@@ -484,14 +484,19 @@ function showCustomerOrders(json) {
         div.append(mainDiv);
 }
 
-function orderHistory(){
+function getCustomerOrders(event) {
+
     $.ajax({
         url: ORDER_URL,
         data: {
             action: "getCustomerOrders",
         },
-        success: (json)=>{showCustomerOrders(json);
-        $(".summaryButtons").remove();
+        success:(json)=> {
+            openOrderHistory();
+            if(json.length === 0)
+                $('#order-history-container>div').append($(document.createElement('span')).text("No orders yet"));
+            else
+                showOrders(json,$('#order-history-container>div>div'));
         }
     })
 }

@@ -54,50 +54,9 @@ function openFeedbacks(event){
     getFeedbacks(event.target.closest("tr").children[0].innerHTML);
 }
 
-function makeProduct(discount) {
 
-    const productDiv = $(document.createElement('div'));
-    productDiv.addClass("orderProduct");
-    for (var key of Object.keys(discount)) {
-        productDiv.append($(document.createElement('span')).text(key + ": " + discount[key]));
-        productDiv.append($(document.createElement('br')))
-    }
-    return productDiv;
-}
-
-function showStoreOrder(orders,main) {
-    orders.forEach(order => {
-        const orderDiv = $(document.createElement('div'));
-        orderDiv.addClass("storeOrder");
-        for (var key of Object.keys(order.ordersum)) {
-            orderDiv.append($(document.createElement('span')).text(key + ": " + order.ordersum[key]));
-            orderDiv.append($(document.createElement('br')));
-        }
-
-        const orderDetailsDiv = $(document.createElement('div'));
-        orderDetailsDiv.addClass("storeOrderDetails");
-        order.product.forEach(product => {
-            orderDetailsDiv.append(makeProduct(product));
-        })
-        order.discount.forEach(discount => {
-            orderDetailsDiv.append(makeProduct(discount));
-        })
-        main.append(orderDiv);
-        main.append(orderDetailsDiv);
-        orderDiv.click(event => {
-            var div =  event.target.closest(".storeOrder");
-            div.classList.toggle("active")
-            var panel = div.nextElementSibling;
-            if (panel.style.maxHeight) {
-                panel.style.maxHeight = null;
-            } else {
-                panel.style.maxHeight = panel.scrollHeight + "px";
-            }
-        });
-    })
-}
-
-function getOrders(storeId) {
+function getStoreOrders(event) {
+    const storeId = event.target.closest("tr").children[0].innerHTML;
     $.ajax({
         url: ORDER_URL,
         data: {
@@ -105,23 +64,23 @@ function getOrders(storeId) {
             storeId: storeId,
         },
         success:(json)=> {
+            openOrderHistory();
             if(json.length === 0)
                 $('#order-history-container>div').append($(document.createElement('span')).text("No orders yet"));
             else
-                showStoreOrder(json,$('#order-history-container>div'));
+                showOrders(json,$('#order-history-container>div>div'));
         }
     })
 }
 
-function openOrderHistory(event){
+function openOrderHistory(){
     var popup = $(`<div id="order-history-container" class="popup-window">
     <div>
     <button onclick="$('#order-history-container').remove()" class="fa fa-lg fa-times"></button>
     <h1>Orders History</h1>
-</div></div>`);
+    <div style="font-family: Courier New, Courier, monospace"></div></div></div>`);
     $("body").append(popup);
     showWindow("order-history-container");
-    getOrders(event.target.closest("tr").children[0].innerHTML);
 }
 
 function openStore(){
