@@ -21,6 +21,7 @@ public class AccountServlet  extends HttpServlet {
     private UserManager userManager;
     private Engine engine;
 
+    private static final Object notificationLock = new Object();
 
     @Override
     public void init() throws ServletException {
@@ -61,12 +62,14 @@ public class AccountServlet  extends HttpServlet {
     }
 
     private void getNotifications(HttpServletResponse response, ServletOutputStream out, Integer userIdFromSession) throws IOException {
-        Gson gson = new Gson();
-        StoreOwner owner = userManager.getAllStoreOwners().get(userIdFromSession);
-        Stack<Notification> notificationList = owner.getNotification();
-        out.println(notificationList.size() > 0 ? gson.toJson( notificationList.pop()) : null);
-        out.flush();
-        response.setStatus(200);
+        synchronized (notificationLock) {
+            Gson gson = new Gson();
+            StoreOwner owner = userManager.getAllStoreOwners().get(userIdFromSession);
+            Stack<Notification> notificationList = owner.getNotification();
+            out.println(notificationList.size() > 0 ? gson.toJson(notificationList.pop()) : null);
+            out.flush();
+            response.setStatus(200);
+        }
     }
 
     private void chargeOrder(HttpServletResponse response, HttpServletRequest request, ServletOutputStream out, Integer userIdFromSession) throws IOException {
