@@ -9,7 +9,6 @@ import javax.servlet.ServletContext;
 public class ServletUtils {
 
 	private static final String USER_MANAGER_ATTRIBUTE_NAME = "userManager";
-	private static final String CHAT_MANAGER_ATTRIBUTE_NAME = "chatManager";
 
 	/*
 	Note how the synchronization is done only on the question and\or creation of the relevant managers and once they exists -
@@ -17,6 +16,7 @@ public class ServletUtils {
 	 */
 	private static final Object userManagerLock = new Object();
 	private static final Object engineLock = new Object();
+	private static final Object zoneLock = new Object();
 	private static final Object chatManagerLock = new Object();
 
 	public static UserManager getUserManager(ServletContext servletContext) {
@@ -34,7 +34,6 @@ public class ServletUtils {
 		synchronized (engineLock) {
 			if (servletContext.getAttribute("engine") == null) {
 				servletContext.setAttribute("engine", new Engine());
-				//servletContext.setAttribute(USER_MANAGER_ATTRIBUTE_NAME, new UserManager());
 			}
 		}
 		return (Engine) servletContext.getAttribute("engine");

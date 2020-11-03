@@ -21,10 +21,8 @@
 
 <div id="toolBar">
     <button id="backbtn" class="customerOption ownerOption" onclick= "backButton()"><i class="fa fa-lg fa-backward"></i></button>
-    <button id="newOrder" class="customerOption" onclick= "openOrder()"><i class="fa fa-plus"></i> New Order</button>
+    <button id="newOrder" class="customerOption" onclick= "openOrder()"><i class="fa fa-cart-plus"></i> New Order</button>
     <button id="orderHistory" class="customerOption" onclick= "orderHistory()"><i class="fa fa-history"></i> Order History</button>
-    <button id="ordersBtn" class="ownerOption" ><i class="fa fa-history"></i> Orders</button>
-    <button id="feedbacksBtn" class="ownerOption"><i class="fa fa-commenting"></i> Feedbacks</button>
     <button id="newStoreBtn" class="ownerOption" onclick= "openStore()"><i class="fa fa-plus"></i> New Store</button>
 
     <img style="float: right " src="../../common/images/logo.png" id="logo" alt="logo">
@@ -137,14 +135,16 @@
         <button onclick="showWindow('store-container')" class="fa fa-lg fa-times exit"></button>
         <form id="storeForm" method="POST">
             <h1>New Store</h1>
-            <input id="storeName" type="text" name="storeName" placeholder="Store Name"/>
+            <input id="storeId" type="number" min="1" name="storeId" placeholder="Store ID" required/>
+            <input id="storeName" type="text" name="storeName" placeholder="Store Name" required/>
             <br>
             <p>Location:  <input type="number" class="x" min="1" max="50" name="x" required placeholder="X"> <input type="number" class="y" min="1" max="50" name="y" required placeholder="Y"></p>
             <input type="number" class="ppk" name="ppk" required placeholder="PPK">
+            <br>
             <button>Open New Store</button>
         </form>
         <div class="productsToAdd">
-            <h3>Products added</h3>
+            <h3>Products and prices added</h3>
         </div>
         <div class="products">
             <table class="productsTable">

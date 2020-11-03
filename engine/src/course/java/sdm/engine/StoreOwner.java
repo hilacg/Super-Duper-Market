@@ -1,9 +1,6 @@
 package course.java.sdm.engine;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StoreOwner {
 
@@ -11,15 +8,15 @@ public class StoreOwner {
     private String name;
     private Map<String, Zone> zones = new HashMap<>();
     private Account account = new Account();
-    private Notification notification = new Notification();
+    private Stack<Notification> notifications = new Stack<>();
 
     public StoreOwner(Integer id, String name){
         this.id = id;
         this.name = name;
     }
 
-    public Notification getNotification() {
-        return notification;
+    public Stack<Notification> getNotification() {
+        return notifications;
     }
 
     public String getName() {

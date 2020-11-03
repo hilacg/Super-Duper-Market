@@ -13,12 +13,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.Stack;
 
 public class AccountServlet  extends HttpServlet {
 
     private UserManager userManager;
     private Engine engine;
 
+    private static final Object notificationLock = new Object();
 
     @Override
     public void init() throws ServletException {
@@ -59,14 +62,14 @@ public class AccountServlet  extends HttpServlet {
     }
 
     private void getNotifications(HttpServletResponse response, ServletOutputStream out, Integer userIdFromSession) throws IOException {
-        response.setContentType("text/plain;charset=UTF-8");
-        StoreOwner owner = userManager.getAllStoreOwners().get(userIdFromSession);
-        if(!owner.getNotification().isSent())
-        {
-            owner.getNotification().setSent(true);
-            out.println(owner.getNotification().getMessage());
+        synchronized (notificationLock) {
+            Gson gson = new Gson();
+            StoreOwner owner = userManager.getAllStoreOwners().get(userIdFromSession);
+            Stack<Notification> notificationList = owner.getNotification();
+            out.println(notificationList.size() > 0 ? gson.toJson(notificationList.pop()) : null);
+            out.flush();
+            response.setStatus(200);
         }
-        out.flush();
     }
 
     private void chargeOrder(HttpServletResponse response, HttpServletRequest request, ServletOutputStream out, Integer userIdFromSession) throws IOException {

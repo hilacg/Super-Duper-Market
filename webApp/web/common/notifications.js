@@ -1,13 +1,32 @@
 const notifyRate = 5000; //milli seconds
 
-function showNotification(response) {
+function showNotification(notification) {
     const newNote = $('<div class="notification"></div>')
     const exit = $(document.createElement('button'));
     exit.click(event=>event.target.closest("div").remove());
-    exit.addClass("fa fa-xs fa-times")
-    newNote.append(exit)
-    newNote.append($(document.createElement('div')).text(response));
+    exit.addClass("fa fa-xs fa-times");
+    newNote.append(exit);
+    var type;
+    switch(notification.type){
+        case "ORDER":{
+            type="fa fa-cart-plus";
+                break;
+            }
+        case "FEEDBACK":{
+            type="fa fa-commenting";
+                break;
+            }
+        case "STORE":{
+            type="fa fa-home";
+                break;
+            }
+    }
+    const icon = $(document.createElement('i'));
+    icon.addClass(type)
+    newNote.append(icon);
+    newNote.append($(document.createElement('div')).text(notification.message));
     var tempNote =  newNote.clone();
+    tempNote.find("button").click((event=>event.target.closest("div").remove()));
     setTimeout(()=>{ tempNote.remove() }, 5000)
     $("#notifications").append(tempNote);
     $(".overlay-content").prepend(newNote);
@@ -16,12 +35,14 @@ function showNotification(response) {
 
 function ajaxNotification() {
     $.ajax({
+        async: false,
         url:ACCOUNT_URL,
         data: {
             action: "getNotifications"
         },
-        success: function(response) {
-            response!=="" && showNotification(response);
+        success: function(json) {
+            const notification = JSON.parse(json);
+            notification!=null && showNotification(notification);
         }
     });
 }
@@ -38,7 +59,7 @@ function closeBar() {
 $(function() {
     if(!user.isCustomer) {
         $("body").append($('<div id="notifications"></div>'));
-        $("#toolBar").append($('<i id="notificationsBtn" onclick="openBar()" class="fa fa-lg fa-bell-o""></i>'))
+        $("#toolBar").append($('<span style="float: right"><i id="notificationsBtn" onclick="openBar()" class="fa fa-lg fa-bell-o""></i></span>'))
         $("body").append($(`<div id="noteBar" class="overlay">
         <button onclick="closeBar()" class="fa fa-lg fa-times"></button>
         <div class="overlay-content">`));

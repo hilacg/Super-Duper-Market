@@ -15,10 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class OrderServlet extends HttpServlet {
@@ -30,6 +28,9 @@ public class OrderServlet extends HttpServlet {
     private Map<Integer,  Map<Integer, Double>> storeProductsToOrder;
     private Order newOrder;
     private List<Discount> discounts = new ArrayList<>();
+
+    private static final Object orderLock = new Object();
+    private static final Object feedbackLock = new Object();
 
     @Override
     public void init() throws ServletException {
@@ -54,6 +55,7 @@ public class OrderServlet extends HttpServlet {
             case "switchZone":{
                 getServletContext().setAttribute("zone", zone);
                 zone = userManager.getZone(Integer.parseInt(request.getParameter("ownerId")),request.getParameter("zoneName"));
+                getServletContext().setAttribute("zone", zone);
                 response.setStatus(200);
                 out.flush();
             }
@@ -92,7 +94,9 @@ public class OrderServlet extends HttpServlet {
             case "confirmOrder":{
                 response.setContentType("text/plain;charset=UTF-8");
                 zone.addOrder(newOrder,userManager.getAllCustomers().get(newOrder.getCustomerId()));
-                notifyOrder();
+                synchronized (orderLock) {
+                    notifyOrder();
+                }
                 setOwnerOrders();
                 response.setStatus(200);
                 out.flush();
@@ -116,16 +120,20 @@ public class OrderServlet extends HttpServlet {
     private void notifyOrder() {
         newOrder.getStoreProducts().keySet().forEach(storeId->{
             int ownerId = zone.getAllStores().get(storeId).getOwnerId();
-            Notification note = userManager.getAllStoreOwners().get(ownerId).getNotification();
+            Stack<Notification> notes = userManager.getAllStoreOwners().get(ownerId).getNotification();
+            Notification note = new Notification();
             note.setMessage("sold!");
-            note.setSent(false);
+            note.setType(Notification.Type.ORDER);
+            notes.push(note);
         });
     }
 
-    private void notifyfeedback(int ownerId) {
-            Notification note = userManager.getAllStoreOwners().get(ownerId).getNotification();
-            note.setMessage("got feedback!");
-            note.setSent(false);
+    private void notifyfeedback(int ownerId, Feedback feedback) {
+            Stack<Notification> notes = userManager.getAllStoreOwners().get(ownerId).getNotification();
+            Notification note = new Notification();
+            note.setMessage(feedback.toString());
+            note.setType(Notification.Type.FEEDBACK);
+            notes.push(note);
     }
 
 
@@ -144,7 +152,6 @@ public class OrderServlet extends HttpServlet {
     }
 
     private JsonElement storeOrderProducts(HttpServletResponse response, ServletOutputStream out, Order order) {
-        Gson gson = new Gson();
         JsonObject storeObj = new JsonObject();
         JsonArray storeP = new JsonArray();
         JsonArray storeD = new JsonArray();
@@ -186,7 +193,9 @@ public class OrderServlet extends HttpServlet {
             JsonObject feedbackObj = (JsonObject) feedback;
             Store chosenStore = zone.getAllStores().get((feedbackObj.get("storeId").getAsInt()));
             chosenStore.addFeedback(feedbackObj.get("stars").getAsInt(),feedbackObj.get("message").getAsString(),userManager.getAllCustomers().get(userId));
-            notifyfeedback(chosenStore.getOwnerId());
+            synchronized (feedbackLock) {
+                notifyfeedback(chosenStore.getOwnerId(), chosenStore.getStoreFeedback().get(chosenStore.getStoreFeedback().size() - 1));
+            }
         });
         response.setStatus(200);
     }

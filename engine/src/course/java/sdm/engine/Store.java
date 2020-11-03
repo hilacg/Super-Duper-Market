@@ -41,11 +41,12 @@ public class Store {
 
     }
 
-    public Store(Point location, int storeId, String name,int ownerId){
+    public Store(Point location, int storeId, String name,int ownerId,int ppk){
         this.location = location;
         this.serialNumber = storeId;
         this.name = name;
         this.ownerId = ownerId;
+        this.PPK = ppk;
     }
 
     public int getOwnerId() {
@@ -113,7 +114,7 @@ public class Store {
 
     public void addFeedback(int stars, String message, Customer customer) {
         String Date = customer.getOrders().get(customer.getOrders().size()-1).getDate();
-        Feedback newFeedback = new Feedback(this.serialNumber,customer.getName(), stars,message,Date);
+        Feedback newFeedback = new Feedback(this.serialNumber,this.name,customer.getName(), stars,message,Date);
         this.storeFeedback.add(newFeedback);
     }
     public Map<Integer, Integer> getProductPrices() {
@@ -159,6 +160,13 @@ public class Store {
                 "\ndeliveryEarnings: " + deliveryEarnings;
 
         return res;
+    }
+
+    public String storeNotify(String owner, String zoneName, int zoneProducts){
+        return  owner + " has opened a new store in " + zoneName +
+                "\nstore name: " + name +
+                        "\nlocation: (" + location.x + ", " + location.y + ")" +
+                        "\nsells: " + productsSold.size() + "/" + zoneProducts + " products";
     }
 
     @Override
