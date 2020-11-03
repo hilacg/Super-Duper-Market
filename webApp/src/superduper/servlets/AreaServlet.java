@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 @WebServlet
 @MultipartConfig
@@ -112,12 +113,13 @@ public class AreaServlet  extends HttpServlet {
 
     private void notifyNewStore(Store newStore) {
         Zone zone = (Zone) getServletContext().getAttribute("zone");
-        Notification note = userManager.getAllStoreOwners().get(zone.getOwnerId()).getNotification();
+        Stack<Notification> notes = userManager.getAllStoreOwners().get(zone.getOwnerId()).getNotification();
         String newOwner = userManager.getAllStoreOwners().get(newStore.getOwnerId()).getName();
         int zoneProducts = zone.getProductTypes();
+        Notification note = new Notification();
         note.setMessage(newStore.storeNotify(newOwner,zone.getName(),zoneProducts));
         note.setType(Notification.Type.STORE);
-        note.setSent(false);
+        notes.push(note);
     }
 
     private void storeFeedback(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {

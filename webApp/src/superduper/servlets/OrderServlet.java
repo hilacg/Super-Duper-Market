@@ -15,10 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class OrderServlet extends HttpServlet {
@@ -122,18 +120,20 @@ public class OrderServlet extends HttpServlet {
     private void notifyOrder() {
         newOrder.getStoreProducts().keySet().forEach(storeId->{
             int ownerId = zone.getAllStores().get(storeId).getOwnerId();
-            Notification note = userManager.getAllStoreOwners().get(ownerId).getNotification();
+            Stack<Notification> notes = userManager.getAllStoreOwners().get(ownerId).getNotification();
+            Notification note = new Notification();
             note.setMessage("sold!");
             note.setType(Notification.Type.ORDER);
-            note.setSent(false);
+            notes.push(note);
         });
     }
 
     private void notifyfeedback(int ownerId, Feedback feedback) {
-            Notification note = userManager.getAllStoreOwners().get(ownerId).getNotification();
+            Stack<Notification> notes = userManager.getAllStoreOwners().get(ownerId).getNotification();
+            Notification note = new Notification();
             note.setMessage(feedback.toString());
             note.setType(Notification.Type.FEEDBACK);
-            note.setSent(false);
+            notes.push(note);
     }
 
 

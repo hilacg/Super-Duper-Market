@@ -242,7 +242,7 @@ function reviewWin() {
     confirm.on("click",()=> {saveReview()});
     divButtons.append(confirm);
     var cancel = $(document.createElement('button')).text("cancel");
-    cancel.on("click",()=>$(".discountsWin .exit").click());
+    cancel.on("click",()=>$(".reviewWindow .exit").click());
     divButtons.append(cancel);
     mainDiv.append(divButtons);
 

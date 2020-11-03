@@ -1,7 +1,6 @@
 package course.java.sdm.engine;
 
 public class Notification {
-    private boolean sent = true;
     private String message = "";
     private Notification.Type type;
 
@@ -11,14 +10,6 @@ public class Notification {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public boolean isSent() {
-        return sent;
-    }
-
-    public void setSent(boolean sent) {
-        this.sent = sent;
     }
 
     public void setType(Type type) {

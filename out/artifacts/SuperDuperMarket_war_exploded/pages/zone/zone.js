@@ -87,11 +87,11 @@ function showStores(stores) {
 }
 
 function addOwnerButtons(){
-    $('#storesTable tbody>tr').append($(document.createElement('td')))
+    $('#storesTable tbody>tr').append($('<td style="display: grid;position: relative;top: 50px;"></td>'))
     $('#storesTable tbody').find("tr").each(function (){
         if($(this).children().eq(2).text() === user.name ){
-            var feebeacks = $('<button class="feedbacks" onclick="openFeedbacks(event)"><i class="fa fa-commenting"></i> Feedbacks</button>');
-            var orderHistory = $('<button class="feedbacks" onclick="openOrderHistory(event)"><i class="fa fa-history"></i> Orders</button>');
+            var feebeacks = $('<button class="feedbacks" style="margin-bottom: 5px" onclick="openFeedbacks(event)"><i class="fa fa-commenting"></i> Feedbacks</button>');
+            var orderHistory = $('<button class="orderHistory" onclick="openOrderHistory(event)"><i class="fa fa-history"></i> Orders</button>');
             $(this).children().eq(9).append(feebeacks,orderHistory);
         }
     })
@@ -129,8 +129,11 @@ function getOwnerId(zoneName) {
         success: function(response) {
             ownerId = parseInt(response);
             switchZone();
-            getProducts();
+            setInterval(getProducts, refreshRate);
             setInterval(getStores, refreshRate);
+            if(!user.isCustomer)
+                $('#storesTable thead tr').append($(document.createElement('th')));
+
         }
     });
 }

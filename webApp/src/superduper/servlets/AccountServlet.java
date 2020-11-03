@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.Stack;
 
 public class AccountServlet  extends HttpServlet {
 
@@ -61,10 +63,10 @@ public class AccountServlet  extends HttpServlet {
     private void getNotifications(HttpServletResponse response, ServletOutputStream out, Integer userIdFromSession) throws IOException {
         Gson gson = new Gson();
         StoreOwner owner = userManager.getAllStoreOwners().get(userIdFromSession);
-        out.println(gson.toJson(owner.getNotification()));
+        Stack<Notification> notificationList = owner.getNotification();
+        out.println(notificationList.size() > 0 ? gson.toJson( notificationList.pop()) : null);
         out.flush();
         response.setStatus(200);
-        owner.getNotification().setSent(true);
     }
 
     private void chargeOrder(HttpServletResponse response, HttpServletRequest request, ServletOutputStream out, Integer userIdFromSession) throws IOException {

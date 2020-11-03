@@ -27,7 +27,7 @@ function showNotification(notification) {
     newNote.append($(document.createElement('div')).text(notification.message));
     var tempNote =  newNote.clone();
     tempNote.find("button").click((event=>event.target.closest("div").remove()));
- //   setTimeout(()=>{ tempNote.remove() }, 5000)
+    setTimeout(()=>{ tempNote.remove() }, 5000)
     $("#notifications").append(tempNote);
     $(".overlay-content").prepend(newNote);
 }
@@ -42,7 +42,7 @@ function ajaxNotification() {
         },
         success: function(json) {
             const notification = JSON.parse(json);
-            notification.sent===false && showNotification(notification);
+            notification!=null && showNotification(notification);
         }
     });
 }
@@ -59,7 +59,7 @@ function closeBar() {
 $(function() {
     if(!user.isCustomer) {
         $("body").append($('<div id="notifications"></div>'));
-        $("#toolBar").append($('<i id="notificationsBtn" onclick="openBar()" class="fa fa-lg fa-bell-o""></i>'))
+        $("#toolBar").append($('<span style="float: right"><i id="notificationsBtn" onclick="openBar()" class="fa fa-lg fa-bell-o""></i></span>'))
         $("body").append($(`<div id="noteBar" class="overlay">
         <button onclick="closeBar()" class="fa fa-lg fa-times"></button>
         <div class="overlay-content">`));
