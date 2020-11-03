@@ -180,7 +180,7 @@ public class Store {
 
     public String newOrderNotification(int serial,Zone zone,UserManager userManager) {
         Order order = orders.get(orders.size()-1);
-        return "New order number "+ serial + " was made by "+ userManager.getAllCustomers().get(order.getCustomerId()).getName()+
+        return "New order was made from " + name + "\norder number "+ serial + " was made by "+ userManager.getAllCustomers().get(order.getCustomerId()).getName()+
                 "\ntotal types of products sold: "+order.getStoreProducts().get(this.serialNumber).size()+
                 "\ntotal products prices: "+order.getPrice()+
                 "\ndelivery price: "+order.getDeliveryPrice();

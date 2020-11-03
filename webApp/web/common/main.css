@@ -6,6 +6,10 @@ body{
     font-family: "Trebuchet MS", Helvetica, sans-serif;
 }
 
+body *{
+    transition: background-color .25s ease;
+}
+
 #toolBar{
     position: relative;
     background-color: #333;
