@@ -278,16 +278,16 @@ public class OrderServlet extends HttpServlet {
         response.setStatus(200);
     }
 
-    private void finishOrder(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {
+    private boolean finishOrder(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out) throws IOException {
         storeProductsToOrder = new HashMap<>();
         Integer userIdFromSession = SessionUtils.getUserId(request);
         Customer customer = userManager.getAllCustomers().get(userIdFromSession);
         if(productsToOrder.size() == 0 ){
             String errorMessage = "The cart is empty. Please add products first.";
-
             // stands for unauthorized as there is already such user with this name
             response.setStatus(401);
             response.getOutputStream().println(errorMessage);
+            return false;
         }
         if(request.getParameter("type").equals("dynamic")){
             storeProductsToOrder = zone.findOptimalOrder(productsToOrder);
@@ -313,6 +313,7 @@ public class OrderServlet extends HttpServlet {
             });
         }
         buildOrderResponse(response,out);
+        return true;
 
     }
 
