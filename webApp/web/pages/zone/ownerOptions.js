@@ -2,7 +2,7 @@ let newStore={};
 
 function showFeedbacks(json) {
     if(json.length === 0)
-        $("#feedbacks").append();
+        $("#feedbacks").append($(document.createElement('span')).text("No feedbacks yet"));
     else {
         json.forEach(feedback => {
             var i;
