@@ -86,6 +86,7 @@ public class AreaServlet  extends HttpServlet {
     }
 
     private void addNewStore(HttpServletRequest request, HttpServletResponse response, ServletOutputStream out, Integer ownerId) throws IOException {
+        response.setContentType("text/plain;charset=UTF-8");
         Zone zone = (Zone)getServletContext().getAttribute("zone");
         Point storeLocation = new Point(Integer.parseInt(request.getParameter("x")),Integer.parseInt(request.getParameter("y")));
         Store newStore = new Store(storeLocation,Integer.parseInt(request.getParameter("storeId")),request.getParameter("storeName"),ownerId,Integer.parseInt(request.getParameter("ppk")));

@@ -2,7 +2,7 @@ let newStore={};
 
 function showFeedbacks(json) {
     if(json.length === 0)
-        $("#feedbacks").append($(document.createElement('span')).text("No feedbacks yet"));
+        $("#feedbacks").append();
     else {
         json.forEach(feedback => {
             var i;
@@ -54,6 +54,49 @@ function openFeedbacks(event){
     getFeedbacks(event.target.closest("tr").children[0].innerHTML);
 }
 
+function makeProduct(discount) {
+
+    const productDiv = $(document.createElement('div'));
+    productDiv.addClass("orderProduct");
+    for (var key of Object.keys(discount)) {
+        productDiv.append($(document.createElement('span')).text(key + ": " + discount[key]));
+        productDiv.append($(document.createElement('br')))
+    }
+    return productDiv;
+}
+
+function showStoreOrder(orders,main) {
+    orders.forEach(order => {
+        const orderDiv = $(document.createElement('div'));
+        orderDiv.addClass("storeOrder");
+        for (var key of Object.keys(order.ordersum)) {
+            orderDiv.append($(document.createElement('span')).text(key + ": " + order.ordersum[key]));
+            orderDiv.append($(document.createElement('br')));
+        }
+
+        const orderDetailsDiv = $(document.createElement('div'));
+        orderDetailsDiv.addClass("storeOrderDetails");
+        order.product.forEach(product => {
+            orderDetailsDiv.append(makeProduct(product));
+        })
+        order.discount.forEach(discount => {
+            orderDetailsDiv.append(makeProduct(discount));
+        })
+        main.append(orderDiv);
+        main.append(orderDetailsDiv);
+        orderDiv.click(event => {
+            var div =  event.target.closest(".storeOrder");
+            div.classList.toggle("active")
+            var panel = div.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        });
+    })
+}
+
 function getOrders(storeId) {
     $.ajax({
         url: ORDER_URL,
@@ -62,8 +105,10 @@ function getOrders(storeId) {
             storeId: storeId,
         },
         success:(json)=> {
-            json.forEach(order=>$('#order-history-container>div').append(showStoreOrder(order)));
-            $(".summaryButtons").remove();
+            if(json.length === 0)
+                $('#order-history-container>div').append($(document.createElement('span')).text("No orders yet"));
+            else
+                showStoreOrder(json,$('#order-history-container>div'));
         }
     })
 }
@@ -130,6 +175,7 @@ function saveNewStore(){
             },
             success: function (json) {
                 alert("new store opened")
+                $("#store-container").find(".exit").click();
             },
             error: (error) => {
                 alert(error.responseText)
